@@ -1,0 +1,29 @@
+<div class="container mt-5">
+  <div class="card login-card mx-auto p-4 shadow">
+    <h2 class="text-center mb-3">Set Your Username</h2>
+    <p class="text-center login-subtext mb-4">
+      Please choose a username to complete your profile.
+    </p>
+
+    <form [formGroup]="usernameForm" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="username"
+          placeholder="Enter username"
+          autocomplete="username"
+        />
+      </div>
+
+      <button type="submit" class="btn login-submit-btn w-100" [disabled]="usernameForm.invalid || isSubmitting">
+        Set Username
+      </button>
+
+      <div *ngIf="errorMessage" class="alert alert-danger mt-3 text-center">
+        {{ errorMessage }}
+      </div>
+    </form>
+  </div>
+</div>

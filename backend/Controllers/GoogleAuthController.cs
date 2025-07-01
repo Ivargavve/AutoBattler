@@ -25,15 +25,18 @@ namespace backend.Controllers
         {
             try
             {
+                // Validate Google token payload
                 var payload = await GoogleJsonWebSignature.ValidateAsync(request.Credential);
 
-                var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == payload.Email);
+                // Find user by GoogleId (subject) to avoid username conflicts
+                var user = await _db.Users.FirstOrDefaultAsync(u => u.GoogleId == payload.Subject);
 
                 if (user == null)
                 {
+                    // Create new user with empty username; user must set username later
                     user = new User
                     {
-                        Username = payload.Email,
+                        Username = "", // Empty username initially
                         Role = "User",
                         FullName = payload.Name ?? "",
                         ProfilePictureUrl = payload.Picture ?? "",
@@ -45,17 +48,17 @@ namespace backend.Controllers
                         Credits = 0,
                         CosmeticItemsJson = "{}",
                         SettingsJson = "{}",
-                        AchievementsJson = "{}"
+                        AchievementsJson = "{}",
+                        NeedsUsernameSetup = true // Flag to require username setup on first login
                     };
 
                     _db.Users.Add(user);
                 }
                 else
                 {
-                    // Update user info on login (optional)
+                    // Update user information on each login (optional)
                     user.FullName = payload.Name ?? user.FullName;
                     user.ProfilePictureUrl = payload.Picture ?? user.ProfilePictureUrl;
-                    user.GoogleId = payload.Subject ?? user.GoogleId;
                     user.LastLogin = DateTime.UtcNow;
 
                     _db.Users.Update(user);
@@ -63,8 +66,26 @@ namespace backend.Controllers
 
                 await _db.SaveChangesAsync();
 
+                // Create JWT token for authenticated user
                 var token = _jwt.CreateToken(user);
-                return Ok(new { token });
+
+                // Return token and user info, including flag if username setup is needed
+                return Ok(new 
+                { 
+                    token,
+                    user.Id,
+                    user.Username,
+                    user.FullName,
+                    user.ProfilePictureUrl,
+                    user.Role,
+                    user.ExperiencePoints,
+                    user.Level,
+                    user.Credits,
+                    user.CosmeticItemsJson,
+                    user.SettingsJson,
+                    user.AchievementsJson,
+                    user.NeedsUsernameSetup
+                });
             }
             catch (InvalidJwtException)
             {
@@ -72,6 +93,30 @@ namespace backend.Controllers
             }
         }
 
+        [HttpPut("set-username")]
+        public async Task<IActionResult> SetUsername(SetUsernameDto request)
+        {
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == request.UserId);
+            if (user == null) return NotFound("User not found");
+
+            // Check if the new username is already taken by another user
+            var exists = await _db.Users.AnyAsync(u => u.Username == request.NewUsername && u.Id != request.UserId);
+            if (exists) return BadRequest("Username already taken");
+
+            // Set the new username and mark that setup is complete
+            user.Username = request.NewUsername;
+            user.NeedsUsernameSetup = false;
+
+            _db.Users.Update(user);
+            await _db.SaveChangesAsync();
+
+            return Ok(new { message = "Username updated successfully" });
+        }
+
+        // DTO to receive Google token credential from frontend
         public record CredentialDto(string Credential);
+
+        // DTO for setting username request
+        public record SetUsernameDto(int UserId, string NewUsername);
     }
 }

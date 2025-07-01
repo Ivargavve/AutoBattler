@@ -29,16 +29,26 @@ export class LoginForm implements OnInit {
   }
 
   handleGoogleLogin(response: any): void {
-    const idToken = response.credential;
-    this.authService.googleLogin(idToken).subscribe({
-      next: (res) => {
-        localStorage.setItem('token', res.token);
-        this.router.navigate(['/']);
-      },
-      error: () => {
-        this.errorMessage = 'Google login failed.';
-        setTimeout(() => (this.errorMessage = ''), 3000);
-      },
-    });
-  }
+  const idToken = response.credential;
+
+  this.authService.googleLogin(idToken).subscribe({
+    next: (res: { token: string; needsUsernameSetup?: boolean; [key: string]: any }) => {
+      localStorage.setItem('token', res.token);
+
+      const { token, ...userData } = res;
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      if (res.needsUsernameSetup) {
+        this.router.navigate(['/username-form']);
+      } else {
+        this.router.navigate(['/profile']);
+      }
+    },
+    error: () => {
+      this.errorMessage = 'Google login failed.';
+      setTimeout(() => (this.errorMessage = ''), 3000);
+    },
+  });
+}
+
 }

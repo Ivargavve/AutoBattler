@@ -23,29 +23,7 @@ export class App implements OnInit {
 
   ngOnInit(): void { 
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark'; // Retrieve saved theme from localStorage
-    // If no theme is saved, default to 'light'
-    this.currentTheme = savedTheme || 'light';
-    this.applyTheme();
-
-    this.router.events.subscribe(event => {
-    if (event instanceof NavigationEnd) { 
-      setTimeout(() => {
-        const navbarCollapse = document.getElementById('navbarNav');
-        if (navbarCollapse && navbarCollapse.classList.contains('show')) { // Check if the navbar is expanded
-          // Use Bootstrap's Collapse instance to hide the navbar
-          // This ensures that the navbar is closed after navigation
-          const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse) 
-            || new bootstrap.Collapse(navbarCollapse, { toggle: false }); 
-          bsCollapse.hide();
-        }
-      }, 100); 
-    }
-  });
-  }
-
-  toggleTheme(): void {
-    this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
-    localStorage.setItem('theme', this.currentTheme);
+    this.currentTheme = savedTheme || 'dark';
     this.applyTheme();
   }
 

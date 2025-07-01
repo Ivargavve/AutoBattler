@@ -21,27 +21,25 @@ body.light {
   --meta-text: #a68b7c;       /* Ljusare ton för sekundär text */
   --card-border: rgba(0, 0, 0, 0.07);
 
-  /* Fix: primärknapp i light mode */
   --accent: #b56242;
   --accent-hover: #9e4e33;
 }
 
 body.dark {
-  --bg: #2e2b28;              /* Ljust mörkbrun bas (inte svart) */
-  --text: #f4eae3;            /* Ljus sandig vit */
-  --nav-bg: #3c3834;          /* Lite ljusare navbar */
-  --footer-bg: #3c3834;
-  --hover: #f2b794;           /* Varm aprikos-beige för interaktion */
-  --btn-bg: #403c38;
-  --btn-border: #e3c4a8;
-  --btn-hover-bg: #514b45;
-  --btn-icon-color: #f4eae3;
-  --meta-text: #d2bba9;
-  --card-border: rgba(255, 255, 255, 0.07);
+  --bg: #12110e;              /* Nästan svart, djup mörkgrå */
+  --text: #c9d1d9;            /* Kall ljusgrå/blå text */
+  --nav-bg: #1f1c1b;          /* Mörk kolgrå, nästan svart navbar */
+  --footer-bg: #1f1c1b;
+  --hover: #6a1b1b;           /* Djup blodröd hoverfärg */
+  --btn-bg: #2c2928;          /* Mörk sten/granitfärg för knappar */
+  --btn-border: #8b1a1a;      /* Rödaktig kant */
+  --btn-hover-bg: #421f1f;    /* Mörkare röd hover */
+  --btn-icon-color: #c9d1d9;  /* Samma som text */
+  --meta-text: #7a848f;       /* Kall och dämpad sekundär text */
+  --card-border: rgba(255, 0, 0, 0.1); /* Svagt rödaktig border */
 
-  /* Primärknapp i dark mode */
-  --accent: #f2b794;
-  --accent-hover: #eaa580;
+  --accent: #bf1e1e;          /* Klar blodröd accent */
+  --accent-hover: #8a1212;    /* Mörkare blodröd hover */
 }
 
 .btn-primary {

@@ -10,6 +10,8 @@
         public string ProfilePictureUrl { get; set; } = string.Empty;
         public string GoogleId { get; set; } = string.Empty;
 
+        public bool NeedsUsernameSetup { get; set; } = true;
+
         public int ExperiencePoints { get; set; } = 0;
         public int Level { get; set; } = 1;
         public int Credits { get; set; } = 0;

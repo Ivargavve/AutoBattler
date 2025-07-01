@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -12,15 +13,6 @@ export class AuthService {
   private googleUrl = `${environment.apiUrl}/googleauth`;
 
   constructor(private http: HttpClient, private router: Router) {}
-
-  login(username: string, password: string) {
-    return this.http.post<{ token: string }>(`${this.apiUrl}/login`, { username, password })
-      .pipe(tap(response => this.saveToken(response.token)));
-  }
-
-  register(username: string, password: string) {
-    return this.http.post(`${this.apiUrl}/register`, { username, password });
-  }
 
   googleLogin(credential: string) {
     return this.http.post<{ token: string }>(`${this.googleUrl}/login`, { credential })
@@ -42,5 +34,13 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('token');
     this.router.navigate(['/login']);
+  }
+  getProfile() {
+    const token = this.getToken();
+    const headers = token
+      ? new HttpHeaders().set('Authorization', `Bearer ${token}`)
+      : undefined;
+
+    return this.http.get(`${environment.apiUrl}/users/me`, { headers });
   }
 }
