@@ -13,6 +13,23 @@ namespace backend.Data
         public DbSet<Book> Books => Set<Book>();
         public DbSet<User> Users => Set<User>();
         public DbSet<Quote> Quotes => Set<Quote>();
+        public DbSet<Friendship> Friendships => Set<Friendship>();
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Friendship>()
+                .HasOne(f => f.Requester)
+                .WithMany(u => u.FriendshipsInitiated)
+                .HasForeignKey(f => f.RequesterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Friendship>()
+                .HasOne(f => f.Addressee)
+                .WithMany(u => u.FriendshipsReceived)
+                .HasForeignKey(f => f.AddresseeId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }

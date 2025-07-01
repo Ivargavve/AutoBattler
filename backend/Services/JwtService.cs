@@ -19,9 +19,9 @@ namespace backend.Services
         {
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),  // Användar-ID
-                new Claim(ClaimTypes.Name, user.Username),                 // Användarnamn
-                new Claim(ClaimTypes.Role, user.Role ?? "User")            // Roll (default: User)
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),  
+                new Claim(ClaimTypes.Name, user.Username),                
+                new Claim(ClaimTypes.Role, user.Role ?? "User")          
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));

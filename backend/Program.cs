@@ -59,7 +59,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// ✅ CORS måste komma före auth
 app.UseCors("AllowAngularApp");
 
 app.UseHttpsRedirection();

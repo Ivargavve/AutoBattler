@@ -26,7 +26,7 @@ namespace backend.Controllers
             try
             {
                 var payload = await GoogleJsonWebSignature.ValidateAsync(request.Credential);
-                
+
                 var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == payload.Email);
 
                 if (user == null)
@@ -34,13 +34,34 @@ namespace backend.Controllers
                     user = new User
                     {
                         Username = payload.Email,
-                        PasswordHash = "",
-                        Role = "User"
+                        Role = "User",
+                        FullName = payload.Name ?? "",
+                        ProfilePictureUrl = payload.Picture ?? "",
+                        GoogleId = payload.Subject ?? "",
+                        CreatedAt = DateTime.UtcNow,
+                        LastLogin = DateTime.UtcNow,
+                        ExperiencePoints = 0,
+                        Level = 1,
+                        Credits = 0,
+                        CosmeticItemsJson = "{}",
+                        SettingsJson = "{}",
+                        AchievementsJson = "{}"
                     };
 
                     _db.Users.Add(user);
-                    await _db.SaveChangesAsync();
                 }
+                else
+                {
+                    // Update user info on login (optional)
+                    user.FullName = payload.Name ?? user.FullName;
+                    user.ProfilePictureUrl = payload.Picture ?? user.ProfilePictureUrl;
+                    user.GoogleId = payload.Subject ?? user.GoogleId;
+                    user.LastLogin = DateTime.UtcNow;
+
+                    _db.Users.Update(user);
+                }
+
+                await _db.SaveChangesAsync();
 
                 var token = _jwt.CreateToken(user);
                 return Ok(new { token });
@@ -52,6 +73,5 @@ namespace backend.Controllers
         }
 
         public record CredentialDto(string Credential);
-
     }
 }
