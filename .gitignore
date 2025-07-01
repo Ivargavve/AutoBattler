@@ -22,7 +22,8 @@
 # Environment variables
 /.env                   # Environment variable config (should not be shared)
 
-/*.tsbuildinfo          # TypeScript incremental build info
+# TypeScript
+*.tsbuildinfo           # TypeScript incremental build info
 
 # Logs
 npm-debug.log*          # npm error logs
@@ -45,7 +46,7 @@ yarn-error.log*         # yarn error logs
 
 # IDE/Editor folders
 .idea/                  # JetBrains Rider
-.vscode/                # VSCode settings
+.vscode/                # VSCode settings (optional to keep)
 *.code-workspace        # VSCode workspace files
 
 # ASP.NET sensitive config
@@ -65,3 +66,14 @@ yarn-error.log*         # yarn error logs
 
 # Visual Studio
 .vs/                    # Visual Studio working directory
+
+# ============================
+# PostgreSQL / Local DB ignores
+# ============================
+
+# SQLite or test DB files (just in case)
+*.db
+*.sqlite
+
+# Local PostgreSQL volume folder (e.g. Docker volume)
+pgdata/
