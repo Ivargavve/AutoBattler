@@ -1,79 +1,78 @@
 # ============================
 # Angular specific ignores
 # ============================
+/frontend/dist/
+/frontend/out-tsc/
+/frontend/tmp/
+/frontend/coverage/
+/frontend/e2e/test-output/
+/frontend/.angular/
+/frontend/.angular-cli.json
+/frontend/.ng/
+frontend/node_modules/
+frontend/package-lock.json
+frontend/yarn.lock
+frontend/.env
+frontend/*.tsbuildinfo
 
-# Build output directories
-/dist/                  # Angular build output
-/out-tsc/               # Transpiled TypeScript code
-/tmp/                   # Temporary build files
-/coverage/              # Test coverage reports
-/e2e/test-output/       # E2E test output
+# Angular debug logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
 
-# Angular CLI cache
-/.angular/              # Angular compiler cache
-/.angular-cli.json      # Deprecated Angular CLI config
-/.ng/                   # Additional Angular CLI files
-
-# Node modules and dependency files
-/node_modules/          # All installed packages
-/package-lock.json      # Lock file for npm
-/yarn.lock              # Lock file for yarn
-
-# Environment variables
-/.env                   # Environment variable config (should not be shared)
-
-# TypeScript
-*.tsbuildinfo           # TypeScript incremental build info
-
-# Logs
-npm-debug.log*          # npm error logs
-yarn-debug.log*         # yarn error logs
-yarn-error.log*         # yarn error logs
+# ============================
+# Node Modules (general)
+# ============================
+/node_modules/               # root node_modules
+**/node_modules/             # any subfolder node_modules
+/backend/node_modules/       # backend node_modules
+/frontend/node_modules/      # frontend node_modules
+**/node_modules/.cache/      # node_modules cache
 
 # ============================
 # .NET / C# specific ignores
 # ============================
-
-# Build artifacts
-**/bin/                 # Binary output folder
-**/obj/                 # Intermediate object files
-
-# User-specific files
-*.user                  # Visual Studio user settings
-*.suo                   # Solution user options
-*.userosscache          # Source control cache
-*.sln.docstates         # VS document state
-
-# IDE/Editor folders
-.idea/                  # JetBrains Rider
-.vscode/                # VSCode settings (optional to keep)
-*.code-workspace        # VSCode workspace files
+**/bin/
+**/obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.code-workspace
+.idea/
+.vscode/
 
 # ASP.NET sensitive config
-**/appsettings.Development.json   # Local dev config
-**/appsettings.Local.json         # Local-only config
-**/secrets.json                   # Secrets (via secrets.json)
-
-# Logs
-*.log                   # General log files
-
-# .NET CLI tools
-.dotnet-tools/          # Tools installed via dotnet CLI
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/secrets.json
 
 # EF Core Migrations (optional)
-/**/Migrations/*.Designer.cs       # EF Core generated migration code
-/**/Migrations/*Snapshot.cs        # EF Core snapshot (can be regenerated)
+**/Migrations/*.Designer.cs
+**/Migrations/*Snapshot.cs
 
-# Visual Studio
-.vs/                    # Visual Studio working directory
+# .NET tools and logs
+*.log
+.dotnet-tools/
+.vs/
 
 # ============================
-# PostgreSQL / Local DB ignores
+# DB & data
 # ============================
-
-# SQLite or test DB files (just in case)
 *.db
 *.sqlite
-
-# Local PostgreSQL volume folder (e.g. Docker volume)
 pgdata/
+
+# ============================
+# Mac OS and system files
+# ============================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# ============================
+# Netlify
+# ============================
+netlify.toml
