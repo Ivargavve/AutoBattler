@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using backend.Models;
 
 namespace backend.Services
 {
@@ -16,10 +17,11 @@ namespace backend.Services
 
         public string CreateToken(User user)
         {
-            var claims = new[] // Claims are key-value pairs that represent user information
+            var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // User ID as a claim
-                new Claim(ClaimTypes.Name, user.Username), // Username as a claim
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),  // Användar-ID
+                new Claim(ClaimTypes.Name, user.Username),                 // Användarnamn
+                new Claim(ClaimTypes.Role, user.Role ?? "User")            // Roll (default: User)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));

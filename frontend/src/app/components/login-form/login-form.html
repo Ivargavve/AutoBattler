@@ -3,6 +3,11 @@
     <h2 class="text-center mb-3">Booksy Login</h2>
     <p class="text-center login-subtext mb-4">Welcome back! Please log in to continue.</p>
 
+    <!-- 🟢 Google Login -->
+    <div class="text-center mb-3">
+      <div id="google-button"></div>
+    </div>
+
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="mb-3">
         <label class="form-label">Username</label>
@@ -40,10 +45,7 @@
 
       <button type="submit" class="btn login-submit-btn w-100">Login</button>
 
-      <div 
-        *ngIf="errorMessage" 
-        class="alert alert-danger mt-3 text-center"
-      >
+      <div *ngIf="errorMessage" class="alert alert-danger mt-3 text-center">
         {{ errorMessage }}
       </div>
 

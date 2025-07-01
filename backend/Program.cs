@@ -9,26 +9,29 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); // Swagger used for API documentation
+builder.Services.AddSwaggerGen(); 
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=books.db"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp", policy =>
     {
-        policy.WithOrigins( // Allow requests from these origins, local and hosted urls
+        policy.WithOrigins(
             "http://localhost:4200",
-            "https://booktrackerbooksy.netlify.app"
+            "https://localhost:4200",
+            "https://e7d6-2001-2042-39af-2600-3522-dc1d-f9a3-33ab.ngrok-free.app"
         )
         .AllowAnyHeader()
         .AllowAnyMethod();
     });
 });
 
+// ✅ JWT-service
 builder.Services.AddScoped<JwtService>();
 
+// ✅ JWT config
 var jwtKeyString = builder.Configuration["Jwt:Key"];
 if (string.IsNullOrEmpty(jwtKeyString))
 {
@@ -56,12 +59,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-using (var scope = app.Services.CreateScope()) // Ensure the database is created
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
-}
-
+// ✅ CORS måste komma före auth
 app.UseCors("AllowAngularApp");
 
 app.UseHttpsRedirection();

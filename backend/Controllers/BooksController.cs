@@ -47,6 +47,8 @@ namespace backend.Controllers
 
             book.UserId = userId;
 
+            book.PublishedDate = DateTime.SpecifyKind(book.PublishedDate, DateTimeKind.Utc);
+
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
 
@@ -71,6 +73,8 @@ namespace backend.Controllers
             if (existingBook == null) return NotFound();
             if (existingBook.UserId != userId)
                 return Forbid("You can only update your own books");
+
+            book.PublishedDate = DateTime.SpecifyKind(book.PublishedDate, DateTimeKind.Utc);
 
             // Update the book's user ID to ensure it belongs to the current user
             book.UserId = userId;

@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "jwt-decode": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/google.accounts": "^0.0.17"
   }
 }
