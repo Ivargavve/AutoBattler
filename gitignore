@@ -1,0 +1,67 @@
+# ============================
+# Angular specific ignores
+# ============================
+
+# Build output directories
+/dist/                  # Angular build output
+/out-tsc/               # Transpiled TypeScript code
+/tmp/                   # Temporary build files
+/coverage/              # Test coverage reports
+/e2e/test-output/       # E2E test output
+
+# Angular CLI cache
+/.angular/              # Angular compiler cache
+/.angular-cli.json      # Deprecated Angular CLI config
+/.ng/                   # Additional Angular CLI files
+
+# Node modules and dependency files
+/node_modules/          # All installed packages
+/package-lock.json      # Lock file for npm
+/yarn.lock              # Lock file for yarn
+
+# Environment variables
+/.env                   # Environment variable config (should not be shared)
+
+/*.tsbuildinfo          # TypeScript incremental build info
+
+# Logs
+npm-debug.log*          # npm error logs
+yarn-debug.log*         # yarn error logs
+yarn-error.log*         # yarn error logs
+
+# ============================
+# .NET / C# specific ignores
+# ============================
+
+# Build artifacts
+**/bin/                 # Binary output folder
+**/obj/                 # Intermediate object files
+
+# User-specific files
+*.user                  # Visual Studio user settings
+*.suo                   # Solution user options
+*.userosscache          # Source control cache
+*.sln.docstates         # VS document state
+
+# IDE/Editor folders
+.idea/                  # JetBrains Rider
+.vscode/                # VSCode settings
+*.code-workspace        # VSCode workspace files
+
+# ASP.NET sensitive config
+**/appsettings.Development.json   # Local dev config
+**/appsettings.Local.json         # Local-only config
+**/secrets.json                   # Secrets (via secrets.json)
+
+# Logs
+*.log                   # General log files
+
+# .NET CLI tools
+.dotnet-tools/          # Tools installed via dotnet CLI
+
+# EF Core Migrations (optional)
+/**/Migrations/*.Designer.cs       # EF Core generated migration code
+/**/Migrations/*Snapshot.cs        # EF Core snapshot (can be regenerated)
+
+# Visual Studio
+.vs/                    # Visual Studio working directory
