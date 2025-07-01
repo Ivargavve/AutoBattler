@@ -1,3 +1,15 @@
-<div class="container mt-4">
-  <h2>Hej</h2>
+<div *ngIf="loading">Laddar profil...</div>
+<div *ngIf="error">{{ error }}</div>
+
+<div *ngIf="user && !loading" class="profile-container">
+  <img [src]="user.profilePictureUrl" alt="Profile Picture" width="120" class="rounded mb-3" />
+
+  <h2>{{ user.username }}</h2>
+  <p>{{ user.fullName}}</p>
+  <p><strong>Role:</strong> {{ user.role }}</p>
+  <p><strong>User Level:</strong> {{ user.level }}</p>
+  <p><strong>XP:</strong> {{ user.experiencePoints }}</p>
+  <p><strong>Credits:</strong> {{ user.credits }}</p>
+  <p><strong>Last time logged in:</strong> {{ user.lastLogin | date:'short' }}</p>
+  <p><strong>User registered on:</strong> {{ user.createdAt | date:'short' }}</p>
 </div>

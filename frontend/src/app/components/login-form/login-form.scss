@@ -1,70 +1,64 @@
+.login-container {
+  height: 100%;;
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
 .login-card {
-  max-width: 400px;
-  background-color: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--card-border);
-  border-radius: 0.5rem;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  width: 100%;
+  max-width: 560px; 
+  background: radial-gradient(ellipse at center, #1b1b1b 0%, #111 100%);
+  color: #e2e2e2;
+  border: 1px solid #2c2c2c;
+  border-radius: 8px;
+  box-shadow: 0 0 16px rgba(100, 255, 100, 0.15);
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 3px rgba(0, 255, 100, 0.3);
+  transition: all 0.3s ease;
+  padding: 4rem 3rem;
+  text-align: center;
+}
+
+.login-title {
+  font-size: 2.4rem;
+  color: #86f7b3;
+  text-shadow: 0 0 10px rgba(134, 247, 179, 0.5);
+  letter-spacing: 1.5px;
+  margin-bottom: 1.5rem;
 }
 
 .login-subtext {
-  color: var(--meta-text);
+  font-size: 1.1rem;
+  color: #888;
+  font-style: italic;
+  margin-bottom: 2.5rem;
 }
 
-.input-group-text {
-  background-color: var(--btn-bg);
-  color: var(--btn-icon-color);
-  border: 1px solid var(--btn-border);
-  transition: background-color 0.2s, color 0.2s;
-}
+#google-button {
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
 
-input.form-control {
-  background-color: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--btn-border);
-
-  &::placeholder {
-    color: var(--meta-text);
+  &:hover {
+    transform: scale(1.1);
   }
 }
 
-.btn-icon {
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  border: 1px solid var(--btn-border);
-  background-color: var(--btn-bg);
-  color: var(--btn-icon-color);
-  transition: background-color 0.2s, color 0.2s;
+.google-login-wrapper {
+  background: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+  filter: drop-shadow(0 0 2px rgba(0, 255, 100, 0.2));
 
-  &:hover {
-    background-color: var(--btn-hover-bg);
-    color: var(--hover);
+  #google-button {
+    all: unset;
+    display: block;
   }
-}
 
-.login-submit-btn {
-  background-color: var(--btn-border);
-  color: var(--bg);
-  border: none;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: var(--hover);
-    color: var(--bg);
-  }
-}
-
-.register-link {
-  color: var(--hover);
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
+  iframe {
+    filter: none !important;
   }
 }

@@ -1,24 +1,36 @@
 /* styles.scss */
 
 body {
-  font-family: 'Merriweather', serif;
+  font-family: 'Share Tech Mono', monospace;
   margin: 0;
   padding: 0;
   background-color: var(--bg);
   color: var(--text);
+  overflow-x: hidden;
+  position: relative;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 body.light {
-  --bg: #fdf7f2;              /* Varm, lite rosa-beige bakgrund */
-  --text: #2e2b28;            /* Mjuk mörkbrun text */
-  --nav-bg: #f4e9dc;          /* Krämig beige navbar */
+  --bg: #fdf7f2;
+  --text: #2e2b28;
+  --nav-bg: #f4e9dc;
   --footer-bg: #f4e9dc;
-  --hover: #c17c62;           /* Mild terrakotta (hover) */
-  --btn-bg: #fefaf6;          /* Nästan vit knappfärg */
-  --btn-border: #b57e6a;      /* Varm brun-beige */
+  --hover: #c17c62;
+  --btn-bg: #fefaf6;
+  --btn-border: #b57e6a;
   --btn-hover-bg: #f2ded0;
   --btn-icon-color: #4a3628;
-  --meta-text: #a68b7c;       /* Ljusare ton för sekundär text */
+  --meta-text: #a68b7c;
   --card-border: rgba(0, 0, 0, 0.07);
 
   --accent: #b56242;
@@ -26,26 +38,26 @@ body.light {
 }
 
 body.dark {
-  --bg: #12110e;              /* Nästan svart, djup mörkgrå */
-  --text: #c9d1d9;            /* Kall ljusgrå/blå text */
-  --nav-bg: #1f1c1b;          /* Mörk kolgrå, nästan svart navbar */
-  --footer-bg: #1f1c1b;
-  --hover: #6a1b1b;           /* Djup blodröd hoverfärg */
-  --btn-bg: #2c2928;          /* Mörk sten/granitfärg för knappar */
-  --btn-border: #8b1a1a;      /* Rödaktig kant */
-  --btn-hover-bg: #421f1f;    /* Mörkare röd hover */
-  --btn-icon-color: #c9d1d9;  /* Samma som text */
-  --meta-text: #7a848f;       /* Kall och dämpad sekundär text */
-  --card-border: rgba(255, 0, 0, 0.1); /* Svagt rödaktig border */
+  --bg: #0b0c0b;
+  --text: #d1ffe8;
+  --nav-bg: #111311;
+  --footer-bg: #111311;
+  --hover: #86f7b3;
+  --btn-bg: #1b1d1b;
+  --btn-border: #52d798;
+  --btn-hover-bg: #143d2a;
+  --btn-icon-color: #a2fcd6;
+  --meta-text: #7cbfa5;
+  --card-border: rgba(0, 255, 100, 0.07);
 
-  --accent: #bf1e1e;          /* Klar blodröd accent */
-  --accent-hover: #8a1212;    /* Mörkare blodröd hover */
+  --accent: #00ff99;
+  --accent-hover: #00cc7a;
 }
 
 .btn-primary {
   background-color: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: #000;
   transition: background-color 0.2s, border-color 0.2s;
 
   &:hover {
@@ -74,17 +86,20 @@ body.dark {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Merriweather', serif;
+  font-family: 'Share Tech Mono', monospace;
   margin: 0;
+  text-shadow: 0 0 3px rgba(0, 255, 100, 0.3);
 }
 
 .navbar {
   background-color: var(--nav-bg) !important;
+  border-bottom: 1px solid var(--card-border);
 }
 
 footer {
   background-color: var(--footer-bg);
   color: var(--text);
+  border-top: 1px solid var(--card-border);
 }
 
 .input-group-text {

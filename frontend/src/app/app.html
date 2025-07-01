@@ -1,27 +1,28 @@
-<nav class="navbar navbar-expand-lg border-bottom shadow-sm px-3">
-  <div class="container-fluid">
-    <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/profile">
-      <i class="fas fa-book"></i>
-      AutoBattler
-    </a>
+<div class="app-wrapper">
+  <nav class="navbar navbar-expand-lg shadow-sm px-3">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/profile">
+        <i class="fas fa-chess-rook"></i>
+        AutoBattler
+      </a>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-
-        <li class="nav-item" *ngIf="isLoggedIn">
-          <a (click)="logout()"  class="nav-link" style="cursor: pointer;">Log out</a>
-        </li>
-      </ul>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item" *ngIf="isLoggedIn">
+            <a (click)="logout()" class="nav-link" style="cursor: pointer;">Log out</a>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
-<main class="container my-4">
-  <router-outlet></router-outlet>
-</main>
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
 
-<footer class="text-center py-3 border-top">
-  <small>&copy; 2025 AutoBattler by 
-    <a href="https://ivargavelin.com/" target="_blank" rel="noopener noreferrer">Ivar Gavelin</a>
-  </small>
-</footer>
+  <footer class="text-center py-3">
+    <small>&copy; 2025 AutoBattler by 
+      <a href="https://ivargavelin.com/" target="_blank" rel="noopener noreferrer">Ivar Gavelin</a>
+    </small>
+  </footer>
+</div>

@@ -15,7 +15,6 @@ export const routes: Routes = [
   { 
     path: 'profile', 
     loadComponent: () => import('./components/profile-component/profile-component').then(m => m.ProfileComponent),
-    canActivate: [AuthGuard] // valfritt: skydda sidan
+    canActivate: [AuthGuard]
   }
-
 ];

@@ -10,9 +10,7 @@ namespace backend.Data
         {
         }
 
-        public DbSet<Book> Books => Set<Book>();
         public DbSet<User> Users => Set<User>();
-        public DbSet<Quote> Quotes => Set<Quote>();
         public DbSet<Friendship> Friendships => Set<Friendship>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
