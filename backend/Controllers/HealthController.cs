@@ -9,9 +9,6 @@ namespace backend.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            // Simple health check endpoint
-            // This can be used to check if the server is running
-            // and responding to requests.
             return Ok("Server is alive!");
         }
     }

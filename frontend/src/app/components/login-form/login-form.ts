@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
-import { User } from '../../services/user'; // Justera sökvägen om din User.ts ligger annorlunda
+import { User } from '../../services/user'; 
 
 declare const google: any;
 
@@ -38,12 +38,11 @@ export class LoginForm implements OnInit {
         const userData: User = rest as User;
 
         localStorage.setItem('token', token);
-        this.authService.setUser(userData); // Spara preliminärt user-objekt
+        this.authService.setUser(userData);
 
-        // Hämta sedan färsk profildata och uppdatera BehaviorSubject
         this.authService.getProfile().subscribe({
           next: (profile) => {
-            this.authService.setUser(profile); // Uppdatera med backend-data
+            this.authService.setUser(profile); 
             if (needsUsernameSetup) {
               this.router.navigate(['/username-form']);
             } else {

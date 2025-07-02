@@ -33,7 +33,7 @@ export class App implements OnInit {
     if (this.auth.isLoggedIn) {
       this.auth.getProfile().subscribe({
         next: (profile) => {
-          this.auth.setUser(profile); // detta triggar nya user$ värdet
+          this.auth.setUser(profile);
         },
         error: (err) => {
           console.error('Kunde inte hämta användarinfo', err);

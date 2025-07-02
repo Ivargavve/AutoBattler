@@ -20,18 +20,15 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
             "http://localhost:4200",
-            "https://localhost:4200",
-            "https://e7d6-2001-2042-39af-2600-3522-dc1d-f9a3-33ab.ngrok-free.app"
+            "https://localhost:4200"
         )
         .AllowAnyHeader()
         .AllowAnyMethod();
     });
 });
 
-// ✅ JWT-service
 builder.Services.AddScoped<JwtService>();
 
-// ✅ JWT config
 var jwtKeyString = builder.Configuration["Jwt:Key"];
 if (string.IsNullOrEmpty(jwtKeyString))
 {

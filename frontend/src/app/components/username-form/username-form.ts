@@ -51,7 +51,7 @@ export class UsernameSetupComponent {
       next: () => {
         this.authService.getProfile().subscribe({
         next: (profile) => {
-          this.authService.setUser(profile); // Uppdatera userSubject och localStorage
+          this.authService.setUser(profile); 
           this.router.navigate(['/home']);
         },
         error: (err) => {
