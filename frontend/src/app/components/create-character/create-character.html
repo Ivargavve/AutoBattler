@@ -3,11 +3,20 @@
 
   <form [formGroup]="characterForm" (ngSubmit)="onSubmit()">
     <label for="name">Name</label>
-    <input id="name" type="text" formControlName="name" placeholder="Enter your character name" />
+    <input
+      id="name"
+      type="text"
+      formControlName="name"
+      placeholder="Enter your character name"
+      autocomplete="off"
+      spellcheck="false"
+    />
 
     <label for="class">Class</label>
     <select id="class" formControlName="class">
-      <option *ngFor="let cls of characterClasses" [value]="cls">{{ cls }}</option>
+      <option *ngFor="let cls of characterClasses" [value]="cls">
+        {{ cls }}
+      </option>
     </select>
 
     <label>Profile Icon</label>
@@ -18,10 +27,14 @@
         [class.selected]="icon === selectedIcon"
         (click)="onIconSelect(icon)"
         alt="Character Icon"
+        tabindex="0"
+        (keydown.enter)="onIconSelect(icon)"
       />
     </div>
 
-    <button type="submit" [disabled]="isSubmitting || characterForm.invalid">Create Character</button>
+    <button type="submit" [disabled]="isSubmitting || characterForm.invalid">
+      Create Character
+    </button>
 
     <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
   </form>
