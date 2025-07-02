@@ -8,6 +8,10 @@ RUN dotnet publish -c Release -o out
 # Step 2: Run
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
+
+# Ange att appen kör i Production
+ENV ASPNETCORE_ENVIRONMENT=Production
+
 COPY --from=build /app/out .
 
 ENV ASPNETCORE_URLS=http://+:80
