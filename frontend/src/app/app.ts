@@ -50,7 +50,7 @@ export class App implements OnInit {
     this.auth.logout();
   }
   getXpRequired(level: number): number {
-    return 100; // Kan bytas till en formel eller lookup
+    return 33;
   }
 
   getXpPercentage(xp: number, level: number): number {
