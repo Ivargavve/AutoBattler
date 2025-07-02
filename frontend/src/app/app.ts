@@ -34,11 +34,15 @@ export class App implements OnInit {
       this.auth.getProfile().subscribe({
         next: (profile) => {
           this.auth.setUser(profile);
+          this.router.navigate(['/home']);
         },
         error: (err) => {
           console.error('Kunde inte hämta användarinfo', err);
+          this.auth.logout();
         }
       });
+    } else {
+      this.router.navigate(['/login']);
     }
   }
 
