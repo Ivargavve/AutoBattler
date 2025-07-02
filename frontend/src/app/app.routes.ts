@@ -18,6 +18,10 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   { 
+    path: 'privacy', 
+    loadComponent: () => import('./components/privacy-component/privacy-component').then(m => m.PrivacyComponent),
+  },
+  { 
     path: 'home', 
     loadComponent: () => import('./components/home-component/home-component').then(m => m.HomeComponent),
     canActivate: [AuthGuard]
