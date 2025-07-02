@@ -49,8 +49,16 @@ export class UsernameSetupComponent {
 
     this.http.put(`${environment.apiUrl}/googleauth/set-username`, { userId, newUsername }).subscribe({
       next: () => {
-        this.isSubmitting = false;
-        this.router.navigate(['/home']);
+        this.authService.getProfile().subscribe({
+        next: (profile) => {
+          this.authService.setUser(profile); // Uppdatera userSubject och localStorage
+          this.router.navigate(['/home']);
+        },
+        error: (err) => {
+          this.errorMessage = 'Failed to refresh user profile.';
+          this.isSubmitting = false;
+        }
+      });
       },
       error: (err) => {
         this.errorMessage = err.error || 'Failed to update username.';

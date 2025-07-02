@@ -6,17 +6,19 @@
     </p>
 
     <form [formGroup]="usernameForm" (ngSubmit)="onSubmit()">
-      <div class="mb-3">
-        <input
-          type="text"
-          class="form-control"
-          formControlName="username"
-          placeholder="Enter username"
-          autocomplete="username"
-        />
-      </div>
+      <input
+        type="text"
+        class="form-control neon-input"
+        formControlName="username"
+        placeholder="Enter username"
+        autocomplete="username"
+      />
 
-      <button type="submit" class="btn login-submit-btn w-100" [disabled]="usernameForm.invalid || isSubmitting">
+      <button
+        type="submit"
+        class="btn login-submit-btn w-100 mt-3"
+        [disabled]="usernameForm.invalid || isSubmitting"
+      >
         Set Username
       </button>
 

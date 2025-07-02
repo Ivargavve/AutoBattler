@@ -1,95 +1,94 @@
-<!-- app.component.html -->
 <div class="app-wrapper">
   <div class="app-layout">
 
     <!-- Sidebar -->
-    <aside *ngIf="isLoggedIn" class="sidebar">
-      <div class="sidebar-inner">
-        <div routerLink="/home" class="logo">AutoBattler</div>
-        <nav class="nav-section">
-          <a routerLink="/home">🏠 Home</a>
-          <a routerLink="/home">⚔️ Battle</a>
-          <a routerLink="/home">🧰 Armory</a>
-          <a routerLink="/home">🏪 Shop</a>
-          <a routerLink="/profile">👥 Social</a>
-          <a routerLink="/home">🪦 Graveyard</a>
-          <a routerLink="/home">🏆 Achievements</a>
-          <a routerLink="/home">📜 Lore</a>
-        </nav>
-      </div>
-      <div class="logout-wrapper">
-        <a (click)="logout()" class="logout-link" href="#">📕 Log out</a>
-      </div>
+    <aside *ngIf="showPanels$ | async" class="sidebar">
+        <div class="sidebar-inner">
+          <div routerLink="/home" class="logo">AutoBattler</div>
+          <nav class="nav-section">
+            <a routerLink="/home">🏠 Home</a>
+            <a routerLink="/home">⚔️ Battle</a>
+            <a routerLink="/home">🧰 Armory</a>
+            <a routerLink="/home">🏪 Shop</a>
+            <a routerLink="/profile">👥 Social</a>
+            <a routerLink="/home">🪦 Graveyard</a>
+            <a routerLink="/home">🏆 Achievements</a>
+            <a routerLink="/home">📜 Lore</a>
+          </nav>
+        </div>
+        <div class="logout-wrapper">
+          <a (click)="logout()" class="logout-link" href="#">📕 Log out</a>
+        </div>
     </aside>
 
-    <!-- Main content -->
+    <ng-template #sidebarHidden></ng-template>
+
+    <!-- Main content is always visible -->
     <main class="main-content">
       <router-outlet></router-outlet>
     </main>
 
     <!-- Right sidebar -->
-    <aside *ngIf="isLoggedIn" class="right-panel">
-      
-      <div class="right-content" *ngIf="user; else loading">
+    <aside *ngIf="(showPanels$ | async) && (user$ | async) as user; else rightPanelHidden" class="right-panel">
+      <ng-container *ngIf="!user.needsUsernameSetup; else loading">
 
-        <!-- Profile -->
-        <h2 routerLink="/profile" class="section-title">Profile</h2>
-        
-        <a routerLink="/profile" class="user-block clickable-profile">
-          <img [src]="user.profilePictureUrl" alt="Profile" class="avatar" />
-          <div>
-            <div class="username">{{ user.username }}</div>
-            <div class="fullname">{{ user.fullName }}</div>
-          </div>
-        </a>
-
-        <div class="level-block">
-          <div class="level-line">
-            <span>Lvl {{ user.level }}</span>
-          </div>
-          <div class="xp-bar">
-            <div class="xp-fill" style="width: 42%"></div>
-            <span class="xp-text">42 / 100</span>
-          </div>
-        </div>
-
-        <div class="credits">
-          <strong>Credits:</strong> 🪙 {{ user.credits }}
-        </div>
-
-        <hr class="divider" />
-
-        <!-- Character -->
-        <h2 class="section-title">Character</h2>
-        <ul>
-          <li><strong>Name:</strong> TBD</li>
-          <li>
-            <strong>HP:</strong>
-            <div class="bar-container red">
-              <div class="bar-fill" style="width: 73%"></div>
-              <span class="bar-text">73 / 100</span>
+        <div class="right-content">
+          <!-- Profile -->
+          <h2 routerLink="/profile" class="section-title">Profile</h2>
+          <a routerLink="/profile" class="user-block clickable-profile">
+            <img [src]="user.profilePictureUrl" alt="Profile" class="avatar" />
+            <div>
+              <div class="username">{{ user.username }}</div>
+              <div class="fullname">{{ user.fullName }}</div>
             </div>
-          </li>
-          <li>
-            <strong>Energy:</strong>
-            <div class="bar-container yellow">
-              <div class="bar-fill" style="width: 33%"></div>
-              <span class="bar-text">1 / 3</span>
-            </div>
-          </li>
-          <li><strong>Status:</strong> Idle</li>
-        </ul>
+          </a>
 
-        <hr class="divider" />
-
-        <!-- Friends -->
-        <h2 class="section-title">Friends</h2>
-        <div class="friend-controls">
-              <input type="text" placeholder="Search..." />
-              <button>Add</button>
+          <div class="level-block">
+            <div class="level-line">
+              <span>Lvl {{ user.level }}</span>
             </div>
+            <div class="xp-bar">
+              <div class="xp-fill" style="width: 73%"></div>
+              <span class="xp-text">73 / 100</span>
+            </div>
+          </div>
+
+          <div class="credits">
+            <strong>Credits:</strong> 🪙 {{ user.credits }}
+          </div>
+
+          <hr class="divider" />
+
+          <!-- Character -->
+          <h2 class="section-title">Character</h2>
+          <ul>
+            <li><strong>Name:</strong> TBD</li>
+            <li>
+              <strong>HP:</strong>
+              <div class="bar-container red">
+                <div class="bar-fill" style="width: 73%"></div>
+                <span class="bar-text">73 / 100</span>
+              </div>
+            </li>
+            <li>
+              <strong>Energy:</strong>
+              <div class="bar-container yellow">
+                <div class="bar-fill" style="width: 33%"></div>
+                <span class="bar-text">1 / 3</span>
+              </div>
+            </li>
+            <li><strong>Status:</strong> Idle</li>
+          </ul>
+
+          <hr class="divider" />
+
+          <!-- Friends -->
+          <h2 class="section-title">Friends</h2>
+          <div class="friend-controls">
+            <input type="text" placeholder="Search..." />
+            <button>Add</button>
+          </div>
           <div class="friends-wrapper">
-            
             <ul class="friend-list">
               <li routerLink="/profile">
                 <div class="friend-entry">
@@ -128,21 +127,21 @@
               </li>
             </ul>
           </div>
-      </div>
 
-      <ng-template #loading>
-        <p>Laddar användare...</p>
-      </ng-template>
+          <hr class="divider" />
 
-      <hr class="divider" />
+          <div class="right-footer">
+            <small>&copy; 2025 AutoBattler by 
+              <a href="https://ivargavelin.com/" target="_blank" rel="noopener noreferrer">Ivar Gavelin</a>
+            </small>
+          </div>
+        </div>
 
-      <div class="right-footer">
-        <small>&copy; 2025 AutoBattler by 
-          <a href="https://ivargavelin.com/" target="_blank" rel="noopener noreferrer">Ivar Gavelin</a>
-        </small>
-      </div>
-
+      </ng-container>
     </aside>
+
+    <ng-template #rightPanelHidden></ng-template>
+    <ng-template #loading><p>Laddar användare...</p></ng-template>
 
   </div>
 </div>

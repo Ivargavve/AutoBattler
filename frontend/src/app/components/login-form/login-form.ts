@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
+import { User } from '../../services/user'; // Justera sökvägen om din User.ts ligger annorlunda
 
 declare const google: any;
 
@@ -29,26 +30,38 @@ export class LoginForm implements OnInit {
   }
 
   handleGoogleLogin(response: any): void {
-  const idToken = response.credential;
+    const idToken = response.credential;
 
-  this.authService.googleLogin(idToken).subscribe({
-    next: (res: { token: string; needsUsernameSetup?: boolean; [key: string]: any }) => {
-      localStorage.setItem('token', res.token);
+    this.authService.googleLogin(idToken).subscribe({
+      next: (res: { token: string; needsUsernameSetup?: boolean; [key: string]: any }) => {
+        const { token, needsUsernameSetup, ...rest } = res;
+        const userData: User = rest as User;
 
-      const { token, ...userData } = res;
-      localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('token', token);
+        this.authService.setUser(userData); // Spara preliminärt user-objekt
 
-      if (res.needsUsernameSetup) {
-        this.router.navigate(['/username-form']);
-      } else {
-        this.router.navigate(['/home']);
-      }
-    },
-    error: () => {
-      this.errorMessage = 'Google login failed.';
-      setTimeout(() => (this.errorMessage = ''), 3000);
-    },
-  });
-}
+        // Hämta sedan färsk profildata och uppdatera BehaviorSubject
+        this.authService.getProfile().subscribe({
+          next: (profile) => {
+            this.authService.setUser(profile); // Uppdatera med backend-data
+            if (needsUsernameSetup) {
+              this.router.navigate(['/username-form']);
+            } else {
+              this.router.navigate(['/home']);
+            }
+          },
+          error: () => {
+            this.errorMessage = 'Failed to fetch user profile.';
+            setTimeout(() => (this.errorMessage = ''), 3000);
+          }
+        });
+      },
+      error: () => {
+        this.errorMessage = 'Google login failed.';
+        setTimeout(() => (this.errorMessage = ''), 3000);
+      },
+    });
+  }
+
 
 }

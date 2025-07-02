@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { RouterOutlet, RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
+import { User } from './services/user';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -16,25 +19,33 @@ import { AuthService } from './services/auth.service';
 })
 export class App implements OnInit {
   public currentTheme: 'light' | 'dark' = 'light';
-  public user: any = null;
+  public user$: Observable<User | null>;
 
-  constructor(public auth: AuthService, private router: Router) {}
+  constructor(public auth: AuthService, private router: Router) {
+    this.user$ = this.auth.user$;
+  }
 
   ngOnInit(): void {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
     this.currentTheme = savedTheme || 'dark';
     this.applyTheme();
 
-    if (this.isLoggedIn) {
+    if (this.auth.isLoggedIn) {
       this.auth.getProfile().subscribe({
-        next: (data) => {
-          this.user = data;
+        next: (profile) => {
+          this.auth.setUser(profile); // detta triggar nya user$ värdet
         },
         error: (err) => {
           console.error('Kunde inte hämta användarinfo', err);
         }
       });
     }
+  }
+
+  get showPanels$(): Observable<boolean> {
+    return this.auth.user$.pipe(
+      map(user => !!user && !user.needsUsernameSetup)
+    );
   }
 
   applyTheme(): void {
@@ -49,8 +60,9 @@ export class App implements OnInit {
   logout(): void {
     this.auth.logout();
   }
+
   getXpRequired(level: number): number {
-    return 33;
+    return 100;
   }
 
   getXpPercentage(xp: number, level: number): number {
