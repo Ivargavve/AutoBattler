@@ -50,7 +50,7 @@ export class UsernameSetupComponent {
     this.http.put(`${environment.apiUrl}/googleauth/set-username`, { userId, newUsername }).subscribe({
       next: () => {
         this.isSubmitting = false;
-        this.router.navigate(['/profile']);
+        this.router.navigate(['/home']);
       },
       error: (err) => {
         this.errorMessage = err.error || 'Failed to update username.';

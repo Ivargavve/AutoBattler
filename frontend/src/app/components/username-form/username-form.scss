@@ -1,0 +1,19 @@
+.login-submit-btn {
+  background-color: #86f7b3;
+  border: none;
+  color: #000;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #a4ffd0;
+  }
+
+  &:disabled {
+    background-color: #444;
+    color: #888;
+    cursor: not-allowed;
+  }
+}

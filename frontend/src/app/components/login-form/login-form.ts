@@ -41,7 +41,7 @@ export class LoginForm implements OnInit {
       if (res.needsUsernameSetup) {
         this.router.navigate(['/username-form']);
       } else {
-        this.router.navigate(['/profile']);
+        this.router.navigate(['/home']);
       }
     },
     error: () => {

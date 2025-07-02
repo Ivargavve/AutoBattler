@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet, RouterModule, Router, NavigationEnd } from '@angular/router';
+import { RouterOutlet, RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
-import * as bootstrap from 'bootstrap';
 
 @Component({
   selector: 'app-root',
@@ -16,28 +15,46 @@ import * as bootstrap from 'bootstrap';
   styleUrl: './app.scss'
 })
 export class App implements OnInit {
-  protected title = 'book-tracker';
   public currentTheme: 'light' | 'dark' = 'light';
+  public user: any = null;
 
   constructor(public auth: AuthService, private router: Router) {}
 
-  ngOnInit(): void { 
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark'; // Retrieve saved theme from localStorage
+  ngOnInit(): void {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
     this.currentTheme = savedTheme || 'dark';
     this.applyTheme();
+
+    if (this.isLoggedIn) {
+      this.auth.getProfile().subscribe({
+        next: (data) => {
+          this.user = data;
+        },
+        error: (err) => {
+          console.error('Kunde inte hämta användarinfo', err);
+        }
+      });
+    }
   }
 
   applyTheme(): void {
-    document.body.classList.remove('light', 'dark'); 
-    document.body.classList.add(this.currentTheme); // Apply the current theme to the body
+    document.body.classList.remove('light', 'dark');
+    document.body.classList.add(this.currentTheme);
   }
 
   get isLoggedIn(): boolean {
-    return this.auth.isLoggedIn; 
+    return this.auth.isLoggedIn;
   }
 
   logout(): void {
-    this.auth.logout(); 
+    this.auth.logout();
+  }
+  getXpRequired(level: number): number {
+    return 100; // Kan bytas till en formel eller lookup
   }
 
+  getXpPercentage(xp: number, level: number): number {
+    const required = this.getXpRequired(level);
+    return Math.min((xp / required) * 100, 100);
+  }
 }
