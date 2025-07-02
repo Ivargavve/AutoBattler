@@ -24,7 +24,8 @@ builder.Services.AddCors(options =>
             "https://autobattlerdb.netlify.app"
         )
         .AllowAnyHeader()
-        .AllowAnyMethod();
+        .AllowAnyMethod()
+        .AllowCredentials(); 
     });
 });
 
