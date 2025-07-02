@@ -26,7 +26,7 @@ export class LoginForm implements OnInit {
 
     google.accounts.id.renderButton(
       document.getElementById('google-button'),
-      { theme: 'outline', size: 'large' }
+      { theme: 'outline', size: 'medium', text: 'signin_with' }
     );
   }
 
