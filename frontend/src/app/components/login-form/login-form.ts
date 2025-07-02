@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { User } from '../../services/user'; 
+import { firstValueFrom } from 'rxjs';
 
 declare const google: any;
 
@@ -29,38 +30,28 @@ export class LoginForm implements OnInit {
     );
   }
 
-  handleGoogleLogin(response: any): void {
+  async handleGoogleLogin(response: any): Promise<void> {
     const idToken = response.credential;
 
-    this.authService.googleLogin(idToken).subscribe({
-      next: (res: { token: string; needsUsernameSetup?: boolean; [key: string]: any }) => {
-        const { token, needsUsernameSetup, ...rest } = res;
-        const userData: User = rest as User;
+    try {
+      const res: any = await firstValueFrom(this.authService.googleLogin(idToken));
+      const { token, needsUsernameSetup, ...rest } = res;
+      const userData: User = rest as User;
 
-        localStorage.setItem('token', token);
-        this.authService.setUser(userData);
+      localStorage.setItem('token', token);
+      this.authService.setUser(userData);
 
-        this.authService.getProfile().subscribe({
-          next: (profile) => {
-            this.authService.setUser(profile); 
-            if (needsUsernameSetup) {
-              this.router.navigate(['/username-form']);
-            } else {
-              this.router.navigate(['/home']);
-            }
-          },
-          error: () => {
-            this.errorMessage = 'Failed to fetch user profile.';
-            setTimeout(() => (this.errorMessage = ''), 3000);
-          }
-        });
-      },
-      error: () => {
-        this.errorMessage = 'Google login failed.';
-        setTimeout(() => (this.errorMessage = ''), 3000);
-      },
-    });
+      const profile = await firstValueFrom(this.authService.getProfile());
+      this.authService.setUser(profile);
+
+      if (needsUsernameSetup) {
+        await this.router.navigate(['/username-form']);
+      } else {
+        await this.router.navigate(['/home']);
+      }
+    } catch (error) {
+      this.errorMessage = 'Login failed. Please try again.';
+      setTimeout(() => (this.errorMessage = ''), 3000);
+    }
   }
-
-
 }

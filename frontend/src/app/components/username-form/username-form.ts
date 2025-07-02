@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-username-setup',
@@ -29,7 +30,7 @@ export class UsernameSetupComponent {
     });
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.usernameForm.invalid || this.isSubmitting) {
       this.errorMessage = 'Please enter a valid username (3–20 characters).';
       setTimeout(() => (this.errorMessage = ''), 3000);
@@ -47,25 +48,19 @@ export class UsernameSetupComponent {
       return;
     }
 
-    this.http.put(`${environment.apiUrl}/googleauth/set-username`, { userId, newUsername }).subscribe({
-      next: () => {
-        this.authService.getProfile().subscribe({
-        next: (profile) => {
-          this.authService.setUser(profile); 
-          this.router.navigate(['/home']);
-        },
-        error: (err) => {
-          this.errorMessage = 'Failed to refresh user profile.';
-          this.isSubmitting = false;
-        }
-      });
-      },
-      error: (err) => {
-        this.errorMessage = err.error || 'Failed to update username.';
-        this.isSubmitting = false;
-        setTimeout(() => (this.errorMessage = ''), 3000);
-      },
-    });
+    try {
+      await firstValueFrom(this.http.put(`${environment.apiUrl}/googleauth/set-username`, { userId, newUsername }));
+      
+      const profile = await firstValueFrom(this.authService.getProfile());
+      this.authService.setUser(profile);
+
+      await this.router.navigate(['/home']);
+    } catch (err: any) {
+      this.errorMessage = err.error || 'Failed to update username.';
+      setTimeout(() => (this.errorMessage = ''), 3000);
+    } finally {
+      this.isSubmitting = false;
+    }
   }
 
   private getUserIdFromToken(): number | null {
