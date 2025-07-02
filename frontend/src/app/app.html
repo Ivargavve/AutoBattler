@@ -17,7 +17,10 @@
           </nav>
         </div>
         <div class="logout-wrapper">
-          <a (click)="logout()" class="logout-link" href="#">📕 Log out</a>
+          <a (click)="logout()" class="logout-link" href="#">
+            <img src="icon.svg" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 5px;">
+            Log out
+          </a>
         </div>
     </aside>
 
@@ -34,35 +37,32 @@
 
         <div class="right-content">
           <!-- Profile -->
-          <h2 routerLink="/profile" class="section-title">Profile</h2>
           <a routerLink="/profile" class="user-block clickable-profile">
             <img [src]="user.profilePictureUrl" alt="Profile" class="avatar" />
             <div>
-              <div class="username">{{ user.username }}</div>
+              <div class="username">{{ user.username }} - {{ user.level }} </div>
               <div class="fullname">{{ user.fullName }}</div>
             </div>
           </a>
 
-          <div class="level-block">
-            <div class="level-line">
-              <span>Lvl {{ user.level }}</span>
-            </div>
-            <div class="xp-bar">
-              <div class="xp-fill" style="width: 73%"></div>
-              <span class="xp-text">73 / 100</span>
-            </div>
-          </div>
-
           <div class="credits">
-            <strong>Credits:</strong> 🪙 {{ user.credits }}
+            <strong>Credits:</strong> {{ user.credits }} <br>
+            <strong>Achievements:</strong> {{ user.achievementsJson.length }}
           </div>
 
           <hr class="divider" />
 
           <!-- Character -->
-          <h2 class="section-title">Character</h2>
+          <h2 class="section-title">GrrarWarrMan</h2>
           <ul>
-            <li><strong>Name:</strong> TBD</li>
+            <li><strong>Class:</strong> Warrior</li>
+            <li>
+              <strong>Lvl: 4</strong>
+              <div class="xp-bar">
+                <div class="xp-fill" style="width: 73%"></div>
+                <span class="xp-text">73 / 100</span>
+              </div>
+            </li>
             <li>
               <strong>HP:</strong>
               <div class="bar-container red">
@@ -77,7 +77,6 @@
                 <span class="bar-text">1 / 3</span>
               </div>
             </li>
-            <li><strong>Status:</strong> Idle</li>
           </ul>
 
           <hr class="divider" />
@@ -93,37 +92,57 @@
               <li routerLink="/profile">
                 <div class="friend-entry">
                   <span class="icon">👤</span>
-                  <span class="friend-name">CoolDude123</span>
+                  <span class="friend-name">CoolDude123 
+                    <i class="fas fa-circle" style="color: #6ed99e; font-size: 0.5rem;"></i>
+                  </span>
                 </div>
-                <div class="friend-fullname">Linus Nilsson</div>
+                <div class="friend-info">
+                  <span class="friend-fullname">Linus Nilsson</span><br>
+                </div>
               </li>
-              <li>
+              <li routerLink="/profile">
                 <div class="friend-entry">
                   <span class="icon">👤</span>
-                  <span class="friend-name">FlameMage</span>
+                  <span>FlameMage 
+                    <i class="fas fa-circle" style="color: #6ed99e; font-size: 0.5rem;"></i>
+                  </span>
                 </div>
                 <div class="friend-fullname">Saga Ek</div>
               </li>
-              <li>
+              <li routerLink="/profile">
                 <div class="friend-entry">
                   <span class="icon">👤</span>
-                  <span class="friend-name">TrollMan45</span>
+                  <span class="offline">TrollMan45</span>
                 </div>
-                <div class="friend-fullname">Victor Lindroth</div>
+                <div class="friend-fullname">Victor Lindroth - {{ user.lastLogin | date:'shortTime' }}</div>
               </li>
-              <li>
+              <li routerLink="/profile">
                 <div class="friend-entry">
                   <span class="icon">👤</span>
-                  <span class="friend-name">BD Gäddan</span>
+                  <span class="offline">BD Gäddan</span>
                 </div>
-                <div class="friend-fullname">Albin Will</div>
+                <div class="friend-fullname">Albin Will - {{ user.lastLogin | date:'shortTime' }}</div>
               </li>
-              <li>
+              <li routerLink="/profile">
                 <div class="friend-entry">
                   <span class="icon">👤</span>
-                  <span class="friend-name">Håkan4</span>
+                  <span class="offline">Håkan4</span>
                 </div>
-                <div class="friend-fullname">Erik Håkansson</div>
+                <div class="friend-fullname">Erik Håkansson - {{ user.lastLogin | date:'shortTime' }}</div>
+              </li>
+              <li routerLink="/profile">
+                <div class="friend-entry">
+                  <span class="icon">👤</span>
+                  <span class="offline">Håkan</span>
+                </div>
+                <div class="friend-fullname">Håkan Eriksson - {{ user.lastLogin | date:'shortTime' }}</div>
+              </li>
+              <li routerLink="/profile">
+                <div class="friend-entry">
+                  <span class="icon">👤</span>
+                  <span class="offline">Abbelito</span>
+                </div>
+                <div class="friend-fullname">Albus Kjellberg - {{ user.lastLogin | date:'shortTime' }}</div>
               </li>
             </ul>
           </div>

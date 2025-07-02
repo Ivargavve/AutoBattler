@@ -25,7 +25,7 @@ body, html {
 }
 
 .credits {
-  margin-bottom: 1.2rem;
+  padding-top: 0.3rem;
   font-size: 0.95rem;
 }
 
@@ -165,7 +165,6 @@ body, html {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  margin-bottom: 0.5rem;
   text-decoration: none;
   color: inherit;
   cursor: pointer;
@@ -234,7 +233,7 @@ nav a {
 .right-content {
   display: flex;
   flex-direction: column;
-  height: 94%;
+  height: 100%;
 }
 
 .right-footer {
@@ -321,8 +320,6 @@ nav a {
 .user-block {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
 }
 
 .username {
@@ -389,7 +386,6 @@ nav a {
   overflow-y: auto;
   padding-right: 0.3rem;
   margin-top: 0.5rem;
-  min-height: 10vh;
 }
 
 .friend-controls {
@@ -424,6 +420,11 @@ nav a {
   }
 }
 
+.offline {
+  color: #888;
+  opacity: 0.6;
+}
+
 .friend-list {
   list-style: none;
   padding: 0;
@@ -451,6 +452,12 @@ nav a {
       font-size: 0.75rem;
       color: #888;
       padding-left: 1.5rem;
+    }
+
+    .last-login {
+      white-space: nowrap;
+      font-style: italic;
+      color: #6ed99e;
     }
   }
 }

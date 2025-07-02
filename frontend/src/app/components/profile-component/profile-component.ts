@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { User } from '../../services/user';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -10,41 +12,30 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./profile-component.scss']
 })
 export class ProfileComponent implements OnInit {
-  user: any = null;
-  loading = true;
-  error: string | null = null;
+  user$: Observable<User | null>;
   achievementsCount = 0;
   cosmeticsCount = 0;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {
+    this.user$ = this.authService.user$;
+  }
 
   ngOnInit(): void {
-    this.authService.getProfile().subscribe({
-      next: (data) => {
-        this.user = data;
-
-        // Räkna achievements om JSON finns
+    this.user$.subscribe((user) => {
+      if (user) {
         try {
-          const ach = JSON.parse(this.user.achievementsJson || '{}');
+          const ach = JSON.parse(user.achievementsJson || '{}');
           this.achievementsCount = Object.keys(ach).length;
         } catch {
           this.achievementsCount = 0;
         }
 
-        // Räkna cosmetics om JSON finns
         try {
-          const cos = JSON.parse(this.user.cosmeticItemsJson || '{}');
+          const cos = JSON.parse(user.cosmeticItemsJson || '{}');
           this.cosmeticsCount = Object.keys(cos).length;
         } catch {
           this.cosmeticsCount = 0;
         }
-
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Kunde inte hämta användarinfo';
-        this.loading = false;
-        console.error(err);
       }
     });
   }

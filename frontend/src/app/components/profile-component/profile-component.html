@@ -1,21 +1,24 @@
-<div *ngIf="loading">Loading profile...</div>
-<div *ngIf="error">{{ error }}</div>
+<ng-container *ngIf="user$ | async as user; else loading">
+  <div class="profile-card">
+    <div class="profile-header">
+      <img [src]="user.profilePictureUrl" alt="Profile Picture" class="profile-pic" />
+      <h2 class="username">{{ user.username }}</h2>
+    </div>
 
-<div *ngIf="user && !loading" class="profile-card">
-  <div class="profile-header">
-    <img [src]="user.profilePictureUrl" alt="Profile Picture" class="profile-pic" />
-    <h2 class="username">{{ user.username }}</h2>
+    <div class="profile-body">
+      <p class="fullname">{{ user.fullName }}</p>
+      <p><strong>Role:</strong> {{ user.role }}</p>
+      <p><strong>Level:</strong> {{ user.level }}</p>
+      <p><strong>XP:</strong> {{ user.experiencePoints }}</p>
+      <p><strong>Credits:</strong> {{ user.credits }}</p>
+      <p><strong>Achievements:</strong> {{ achievementsCount }}</p>
+      <p><strong>Cosmetics:</strong> {{ cosmeticsCount }}</p>
+      <p><strong>Last login:</strong> {{ user.lastLogin | date:'short' }}</p>
+      <p><strong>Registered:</strong> {{ user.createdAt | date:'short' }}</p>
+    </div>
   </div>
+</ng-container>
 
-  <div class="profile-body">
-    <p class="fullname">{{ user.fullName }}</p>
-    <p><strong>Role:</strong> {{ user.role }}</p>
-    <p><strong>Level:</strong> {{ user.level }}</p>
-    <p><strong>XP:</strong> {{ user.experiencePoints }}</p>
-    <p><strong>Credits:</strong> {{ user.credits }}</p>
-    <p><strong>Achievements:</strong> {{ achievementsCount }}</p>
-    <p><strong>Cosmetics:</strong> {{ cosmeticsCount }}</p>
-    <p><strong>Last login:</strong> {{ user.lastLogin | date:'short' }}</p>
-    <p><strong>Registered:</strong> {{ user.createdAt | date:'short' }}</p>
-  </div>
-</div>
+<ng-template #loading>
+  <div>Loading profile...</div>
+</ng-template>
