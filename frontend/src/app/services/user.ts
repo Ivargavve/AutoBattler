@@ -1,3 +1,5 @@
+import { Character } from '../services/character';
+
 export interface User {
   id: number;
   username: string;
@@ -19,4 +21,6 @@ export interface User {
 
   createdAt: string;
   lastLogin: string;
+
+  character?: Character;
 }

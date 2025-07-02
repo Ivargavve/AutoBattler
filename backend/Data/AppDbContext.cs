@@ -11,6 +11,7 @@ namespace backend.Data
         }
 
         public DbSet<User> Users => Set<User>();
+        public DbSet<Character> Characters { get; set; }
         public DbSet<Friendship> Friendships => Set<Friendship>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

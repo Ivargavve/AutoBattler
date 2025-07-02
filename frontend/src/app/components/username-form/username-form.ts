@@ -51,9 +51,8 @@ export class UsernameSetupComponent {
     try {
       await firstValueFrom(this.http.put(`${environment.apiUrl}/googleauth/set-username`, { userId, newUsername }));
       
-      const profile = await firstValueFrom(this.authService.getProfile());
-      this.authService.setUser(profile);
-
+      await this.authService.loadUserWithCharacter();
+      await firstValueFrom(this.authService.user$);
       await this.router.navigate(['/home']);
     } catch (err: any) {
       this.errorMessage = err.error || 'Failed to update username.';

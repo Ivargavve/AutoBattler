@@ -1,0 +1,28 @@
+<div class="create-character-container">
+  <h1>Create your Character</h1>
+
+  <form [formGroup]="characterForm" (ngSubmit)="onSubmit()">
+    <label for="name">Name</label>
+    <input id="name" type="text" formControlName="name" placeholder="Enter your character name" />
+
+    <label for="class">Class</label>
+    <select id="class" formControlName="class">
+      <option *ngFor="let cls of characterClasses" [value]="cls">{{ cls }}</option>
+    </select>
+
+    <label>Profile Icon</label>
+    <div class="icon-selector">
+      <img
+        *ngFor="let icon of profileIcons"
+        [src]="icon"
+        [class.selected]="icon === selectedIcon"
+        (click)="onIconSelect(icon)"
+        alt="Character Icon"
+      />
+    </div>
+
+    <button type="submit" [disabled]="isSubmitting || characterForm.invalid">Create Character</button>
+
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+  </form>
+</div>

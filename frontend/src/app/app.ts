@@ -3,6 +3,7 @@ import { RouterOutlet, RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
 import { User } from './services/user';
+import { Character } from './services/character';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -20,32 +21,33 @@ import { map } from 'rxjs/operators';
 export class App implements OnInit {
   public currentTheme: 'light' | 'dark' = 'light';
   public user$: Observable<User | null>;
+  public character$: Observable<Character | null>;
 
   constructor(public auth: AuthService, private router: Router) {
     this.user$ = this.auth.user$;
+    this.character$ = this.user$.pipe(
+      map(user => user?.character ?? null)
+    );
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
     this.currentTheme = savedTheme || 'dark';
     this.applyTheme();
 
     if (this.auth.isLoggedIn) {
-      this.auth.getProfile().subscribe({
-        next: (profile) => {
-          this.auth.setUser(profile);
-          this.router.navigate(['/home']);
-        },
-        error: (err) => {
-          console.error('Kunde inte hämta användarinfo', err);
-          this.auth.logout();
-        }
-      });
+      try {
+        await this.auth.loadUserWithCharacter();
+        this.router.navigate(['/home']);
+      } catch (error) {
+        console.error('Failed to load user with character', error);
+        this.auth.logout();
+      }
     } else {
       this.router.navigate(['/login']);
     }
   }
-
+  
   get showPanels$(): Observable<boolean> {
     return this.auth.user$.pipe(
       map(user => !!user && !user.needsUsernameSetup)
@@ -73,4 +75,5 @@ export class App implements OnInit {
     const required = this.getXpRequired(level);
     return Math.min((xp / required) * 100, 100);
   }
+  
 }

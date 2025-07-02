@@ -6,7 +6,8 @@ import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { User } from '../services/user';
 import { map } from 'rxjs/operators';
-
+import { Character } from '../services/character';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -70,4 +71,30 @@ export class AuthService {
     localStorage.setItem('user', JSON.stringify(user));
     this.userSubject.next({ ...user });
   }
+
+  getAuthHeaders(): { headers: HttpHeaders } {
+    const token = this.getToken();
+    const headers = token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : new HttpHeaders();
+    return { headers };
+  }
+
+  getCharacter() {
+    const token = this.getToken();
+    const headers = token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : undefined;
+    return this.http.get<Character>(`${environment.apiUrl}/characters/me`, { headers });
+  }
+
+  loadUserWithCharacter(): Promise<void> {
+    return lastValueFrom(this.getProfile()).then(profile => {
+      return lastValueFrom(this.getCharacter())
+        .then(character => {
+          const newUser = { ...profile, character };
+          this.setUser(newUser);
+        })
+        .catch(() => {
+          this.setUser({ ...profile, character: undefined });
+        });
+    });
+  }
+
 }

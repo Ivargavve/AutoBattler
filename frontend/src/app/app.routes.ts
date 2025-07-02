@@ -18,6 +18,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   { 
+    path: 'create-character', 
+    loadComponent: () => import('./components/create-character/create-character').then(m => m.CreateCharacterComponent),
+    canActivate: [AuthGuard]
+  },
+  { 
     path: 'privacy', 
     loadComponent: () => import('./components/privacy-component/privacy-component').then(m => m.PrivacyComponent),
   },

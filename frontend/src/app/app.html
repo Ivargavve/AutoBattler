@@ -7,7 +7,7 @@
           <div routerLink="/home" class="logo">AutoBattler</div>
           <nav class="nav-section">
             <a routerLink="/home">🏠 Home</a>
-            <a routerLink="/home">⚔️ Battle</a>
+            <a routerLink="/create-character">⚔️ Battle</a>
             <a routerLink="/home">🧰 Armory</a>
             <a routerLink="/home">🏪 Shop</a>
             <a routerLink="/profile">👥 Social</a>
@@ -52,31 +52,40 @@
           <hr class="divider" />
 
           <!-- Character -->
-          <h2 class="section-title">GrrarWarrMan</h2>
-          <ul>
-            <li><strong>Class:</strong> Warrior</li>
-            <li>
-              <strong>Lvl: 4</strong>
-              <div class="xp-bar">
-                <div class="xp-fill" style="width: 73%"></div>
-                <span class="xp-text">73 / 100</span>
-              </div>
-            </li>
-            <li>
-              <strong>HP:</strong>
-              <div class="bar-container red">
-                <div class="bar-fill" style="width: 73%"></div>
-                <span class="bar-text">73 / 100</span>
-              </div>
-            </li>
-            <li>
-              <strong>Energy:</strong>
-              <div class="bar-container yellow">
-                <div class="bar-fill" style="width: 33%"></div>
-                <span class="bar-text">1 / 3</span>
-              </div>
-            </li>
-          </ul>
+          <ng-container *ngIf="user.character; else createCharacterPrompt">
+            <h2 class="section-title">{{ user.character.name }}</h2>
+            <ul>
+              <li><strong>Class:</strong> {{ user.character.class }}</li>
+              <li>
+                <strong>Lvl: {{ user.character.level }}</strong>
+                <div class="xp-bar">
+                  <div class="xp-fill" [style.width.%]="getXpPercentage(user.character.experiencePoints, user.character.level)"></div>
+                  <span class="xp-text">{{ user.character.experiencePoints }} / {{ getXpRequired(user.character.level) }}</span>
+                </div>
+              </li>
+              <li>
+                <strong>HP:</strong>
+                <div class="bar-container red">
+                  <div class="bar-fill" [style.width.%]="(user.character.currentHealth / user.character.maxHealth) * 100"></div>
+                  <span class="bar-text">{{ user.character.currentHealth }} / {{ user.character.maxHealth }}</span>
+                </div>
+              </li>
+              <li>
+                <strong>Energy:</strong>
+                <div class="bar-container yellow">
+                  <div class="bar-fill" [style.width.%]="(user.character.currentEnergy / user.character.maxEnergy) * 100"></div>
+                  <span class="bar-text">{{ user.character.currentEnergy }} / {{ user.character.maxEnergy }}</span>
+                </div>
+              </li>
+            </ul>
+          </ng-container>
+
+          <ng-template #createCharacterPrompt>
+            <div class="create-character-prompt">
+              <p>You have no character</p>
+              <a routerLink="/create-character">Create a character</a>
+            </div>
+          </ng-template>
 
           <hr class="divider" />
 

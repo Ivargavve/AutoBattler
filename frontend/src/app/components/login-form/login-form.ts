@@ -35,14 +35,18 @@ export class LoginForm implements OnInit {
 
     try {
       const res: any = await firstValueFrom(this.authService.googleLogin(idToken));
-      const { token, needsUsernameSetup, ...rest } = res;
-      const userData: User = rest as User;
+      const { token, needsUsernameSetup } = res;
 
       localStorage.setItem('token', token);
-      this.authService.setUser(userData);
 
-      const profile = await firstValueFrom(this.authService.getProfile());
-      this.authService.setUser(profile);
+      // Ladda user + character direkt efter inloggning
+      await this.authService.loadUserWithCharacter();
+
+      // Efter laddning är userSubject uppdaterad, så hämta aktuell user
+      const profile = await firstValueFrom(this.authService.user$);
+      if (profile) {
+        this.authService.setUser(profile);
+      }
 
       if (needsUsernameSetup) {
         await this.router.navigate(['/username-form']);
@@ -54,4 +58,6 @@ export class LoginForm implements OnInit {
       setTimeout(() => (this.errorMessage = ''), 3000);
     }
   }
+
+
 }

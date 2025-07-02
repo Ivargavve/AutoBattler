@@ -420,6 +420,34 @@ nav a {
   }
 }
 
+.create-character-prompt {
+  text-align: center;
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #222;
+  border-radius: 4px;
+
+  p {
+    margin-bottom: 0.5rem;
+    color: #888;
+  }
+
+  a.create-character-btn {
+    display: inline-block;
+    background-color: #86f7b3;
+    color: #000;
+    padding: 0.5rem 0.5rem;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    width: 100%;
+
+    &:hover {
+      background-color: #a4ffd0;
+      color: #000;
+    }
+  }
+}
+
 .offline {
   color: #888;
   opacity: 0.6;
