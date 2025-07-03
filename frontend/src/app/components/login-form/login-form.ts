@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
-import { User } from '../../services/user'; 
 import { firstValueFrom } from 'rxjs';
 
 declare const google: any;
@@ -12,9 +12,11 @@ declare const google: any;
   standalone: true,
   templateUrl: './login-form.html',
   styleUrls: ['./login-form.scss'],
+  imports: [CommonModule],
 })
 export class LoginForm implements OnInit {
   errorMessage = '';
+  loading = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -32,17 +34,14 @@ export class LoginForm implements OnInit {
 
   async handleGoogleLogin(response: any): Promise<void> {
     const idToken = response.credential;
+    this.loading = true; 
 
     try {
       const res: any = await firstValueFrom(this.authService.googleLogin(idToken));
       const { token, needsUsernameSetup } = res;
-
       localStorage.setItem('token', token);
 
-      // Ladda user + character direkt efter inloggning
       await this.authService.loadUserWithCharacter();
-
-      // Efter laddning är userSubject uppdaterad, så hämta aktuell user
       const profile = await firstValueFrom(this.authService.user$);
       if (profile) {
         this.authService.setUser(profile);
@@ -56,8 +55,8 @@ export class LoginForm implements OnInit {
     } catch (error) {
       this.errorMessage = 'Login failed. Please try again.';
       setTimeout(() => (this.errorMessage = ''), 3000);
+    } finally {
+      this.loading = false;
     }
   }
-
-
 }

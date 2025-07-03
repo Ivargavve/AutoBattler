@@ -49,9 +49,50 @@ body.dark {
   --btn-icon-color: #a2fcd6;
   --meta-text: #7cbfa5;
   --card-border: rgba(0, 255, 100, 0.07);
+  --accent: #86f7b3;
+  --accent-hover: #baffd8;
 
-  --accent: #00ff99;
-  --accent-hover: #00cc7a;
+  /* App shell custom vars */
+  --app-bg: #0b0c0b;
+  --app-text: #d1ffe8;
+
+  --sidebar-bg: #121212;
+  --sidebar-border: #2c2c2c;
+  --sidebar-link: #e0e0e0;
+  --sidebar-link-bg: transparent;
+  --sidebar-link-hover-bg: #2c2c2c;
+  --sidebar-link-active-bg: #222;
+  --sidebar-logout: #888;
+  --logout-hover: #ff6666;
+  --logout-hover-alt: #ccc;
+  --accent-shadow: #86f7b366;
+  --accent-logo-shadow: rgba(134, 247, 179, 0.5);
+  --accent-logo-hover-shadow: rgba(186, 255, 216, 0.6);
+  --accent-hover-shadow: rgba(134, 247, 179, 0.4);
+
+  --avatar-border: #333;
+
+  --bar-bg: #2c2c2c;
+  --bar-text: #fff;
+  --bar-fill-red: #e74c3c;
+  --bar-fill-yellow: #f1c40f;
+
+  --right-panel-bg: #181818;
+  --right-link-hover: #c0ffe2;
+  --right-title-shadow: rgba(134, 247, 179, 0.4);
+  --right-footer: #666;
+
+  --section-title: #fff;
+  --section-title-hover-shadow: rgba(186, 255, 216, 0.6);
+
+  --username-shadow: rgba(134, 247, 179, 0.4);
+  --fullname: #888;
+  --fullname-hover: #aaa;
+
+  --divider: #444;
+  --offline: #888;
+  --friend-li-bg: #111;
+  --friend-li-hover-bg: #222
 }
 
 .btn-primary {

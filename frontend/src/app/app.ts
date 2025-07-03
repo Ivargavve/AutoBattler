@@ -38,13 +38,10 @@ export class App implements OnInit {
     if (this.auth.isLoggedIn) {
       try {
         await this.auth.loadUserWithCharacter();
-        this.router.navigate(['/home']);
       } catch (error) {
         console.error('Failed to load user with character', error);
         this.auth.logout();
       }
-    } else {
-      this.router.navigate(['/login']);
     }
   }
   
