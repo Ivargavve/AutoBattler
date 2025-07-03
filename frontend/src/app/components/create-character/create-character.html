@@ -22,16 +22,33 @@
         </select>
 
         <label>Choose your characters icon</label>
-        <div class="icon-selector">
-          <img
-            *ngFor="let icon of profileIcons"
-            [src]="icon"
-            [class.selected]="icon === selectedIcon"
-            (click)="onIconSelect(icon)"
-            alt="Character Icon"
-            tabindex="0"
-            (keydown.enter)="onIconSelect(icon)"
-          />
+        <div class="icon-selector-outer">
+          <div
+            class="icon-selector animated"
+            [class.expanded]="showAllIcons"
+            [style.--icon-count]="maxVisibleIcons"
+          >
+            <img
+              *ngFor="let icon of profileIcons; let i = index"
+              [src]="icon"
+              [class.selected]="icon === selectedIcon"
+              [class.hide]="!showAllIcons && i >= maxVisibleIcons"
+              (click)="onIconSelect(icon)"
+              alt="Character Icon"
+              tabindex="0"
+              (keydown.enter)="onIconSelect(icon)"
+            />
+          </div>
+          <button
+            type="button"
+            class="toggle-btn"
+            (click)="toggleIcons()"
+            aria-label="Show more icons"
+            *ngIf="profileIcons.length > maxVisibleIcons"
+          >
+            <span *ngIf="!showAllIcons">&#x25BC;</span>
+            <span *ngIf="showAllIcons">&#x25B2;</span>
+          </button>
         </div>
 
         <button 

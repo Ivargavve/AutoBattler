@@ -1,11 +1,12 @@
 .main-content.character-main {
   width: 100%;
-  min-height: 100vh;
+  min-height: 80vh;
   background: var(--right-panel-bg);
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 3.5rem 0 2rem 0;
+  padding: 2rem 0 2rem 0;
+  border: 1.5px solid var(--sidebar-border);
 
   @media (max-width: 700px) {
     padding: 1.3rem 0;
@@ -29,7 +30,7 @@
   color: var(--text);
   border: 1.5px solid var(--sidebar-border);
   font-family: 'Share Tech Mono', 'Courier New', monospace;
-  padding: 2.5rem 2.2rem 2rem 2.2rem;
+  padding: 2rem;
   text-align: left;
 
   @media (max-width: 700px) {
@@ -40,7 +41,7 @@
 
 .character-title {
   text-align: center;
-  font-size: 2.3rem;
+  font-size: 2rem;
   color: #fff;
   margin-bottom: 2rem;
   letter-spacing: 1.5px;
@@ -83,12 +84,26 @@ select {
   }
 }
 
+/* ICON SELECTOR - med smooth collapse/expand */
+.icon-selector-outer {
+  width: 100%;
+  position: relative;
+  margin-bottom: 0.6rem;
+}
+
 .icon-selector {
   display: flex;
+  flex-wrap: wrap;
   gap: 1.3rem;
   justify-content: flex-start;
-  flex-wrap: wrap;
-  margin-bottom: 0.4rem;
+  max-height: calc(68px * var(--icon-count)); // one row by default
+  overflow: hidden;
+  transition: max-height 0.43s cubic-bezier(.5,1.8,.6,1.0);
+
+  &.expanded {
+    max-height: 500px; // enough for alla ikoner
+    transition: max-height 0.43s cubic-bezier(.5,1.8,.6,1.0);
+  }
 
   img {
     width: 60px;
@@ -97,7 +112,7 @@ select {
     border: 2px solid var(--sidebar-border);
     background: var(--sidebar-bg);
     cursor: pointer;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition: border-color 0.15s, box-shadow 0.15s, opacity 0.2s;
 
     &.selected {
       border-color: var(--accent);
@@ -109,6 +124,31 @@ select {
       border-color: var(--accent-hover);
       box-shadow: 0 0 10px var(--accent-hover-shadow);
     }
+
+    &.hide {
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      z-index: -1;
+    }
+  }
+}
+
+/* Toggle button under icons */
+.toggle-btn {
+  background: transparent;
+  border: none;
+  color: #5efcff;
+  font-size: 2rem;
+  margin: 0 auto;
+  display: block;
+  transition: color 0.14s;
+  cursor: pointer;
+  outline: none;
+
+  &:hover {
+    color: #76f7e4;
+    filter: drop-shadow(0 0 5px var(--accent));
   }
 }
 

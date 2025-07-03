@@ -19,8 +19,7 @@ export class CreateCharacterComponent implements OnInit {
   errorMessage = '';
   isSubmitting = false;
 
-  characterClasses = ['Warrior', 'Mage', 'Rogue', 'Cleric', 'Paladin', 'Druid', 'Hunter', 'Sorcerer', 'Bard', 'Necromancer', 
-    'Monk', 'Warlock', 'Ranger', 'Assassin', 'Shaman', 'Berserker', 'Knight', 'Priest', 'Wizard', 'Alchemist'];
+  characterClasses = ['Warrior', 'Mage'];
   profileIcons = [
     'assets/char1.jpeg', 'assets/char2.jpeg', 'assets/char3.jpeg',
     'assets/char4.jpeg', 'assets/char5.jpeg', 'assets/char6.jpeg', 'assets/char7.jpeg',
@@ -28,6 +27,9 @@ export class CreateCharacterComponent implements OnInit {
     'assets/char12.jpeg', 'assets/char13.jpeg', 'assets/char14.jpeg', 'assets/char15.jpeg'
   ];
   selectedIcon = this.profileIcons[0];
+
+  maxVisibleIcons = 5;
+  showAllIcons = false;
 
   hasCharacter = false;
   private userSub?: Subscription;
@@ -58,6 +60,10 @@ export class CreateCharacterComponent implements OnInit {
   onIconSelect(icon: string) {
     this.selectedIcon = icon;
     this.characterForm.patchValue({ profileIconUrl: icon });
+  }
+
+  toggleIcons() {
+    this.showAllIcons = !this.showAllIcons;
   }
 
   async onSubmit(): Promise<void> {

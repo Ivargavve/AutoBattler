@@ -622,4 +622,30 @@ nav a {
 
 
 }
+.corner-label-dev {
+  position: absolute;
+  top: 22px;
+  left: -60px;
+  z-index: 9999;
+  background: linear-gradient(90deg, #0fffc0 0%, #31f3ff 100%);
+  color: #222;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.02rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  padding: 7px 64px;
+  border-radius: 7px;
+  box-shadow: 0 2px 14px 0 rgba(45, 255, 196, 0.25);
+  transform: rotate(-24deg);
+  pointer-events: none; // så att inget blockeras under
+  user-select: none;
+
+  @media (max-width: 600px) {
+    font-size: 0.86rem;
+    padding: 5px 36px;
+    left: -38px;
+    top: 16px;
+  }
+}
 
