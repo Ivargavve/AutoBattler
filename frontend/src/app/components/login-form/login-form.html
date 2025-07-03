@@ -7,7 +7,6 @@
     </p>
     <div class="google-login-wrapper">
       <div id="google-button"></div>
-      <app-loading-spinner *ngIf="loading"></app-loading-spinner>
       <div *ngIf="loading" class="login-block-overlay"></div>
     </div>
     <div *ngIf="errorMessage" class="login-error">{{ errorMessage }}</div>
@@ -17,4 +16,5 @@
       </span>
     </div>
   </div>
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
 </div>

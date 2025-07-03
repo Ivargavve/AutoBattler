@@ -1,5 +1,12 @@
+.spinner-center {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .app-spinner {
-  margin: 80px auto 0 auto;
   border: 5px solid var(--sidebar-border, #2c2c2c);
   border-top: 5px solid var(--accent, #86f7b3);
   border-radius: 50%;
