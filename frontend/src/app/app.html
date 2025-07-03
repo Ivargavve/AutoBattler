@@ -42,8 +42,8 @@
             <div class="clickable-profile" routerLink="/profile">
               <div class="profile-main-row">
                 <div>
-                  <div class="username">My Username</div>
-                  <div class="fullname">Ivar Gavelin</div>
+                  <div class="username">{{ user.username }}</div>
+                  <div class="fullname">{{ user.fullName }}</div>
                 </div>
                 <div class="level-xp-circle" data-level="4">
                   <svg width="52" height="52" viewBox="0 0 52 52">
@@ -74,7 +74,7 @@
                       text-anchor="middle"
                       dy=".33em"
                       class="level-text"
-                    >4</text>
+                    >{{ user.level }}</text>
                   </svg>
                 </div>
               </div>
