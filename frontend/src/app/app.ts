@@ -35,15 +35,22 @@ export class App implements OnInit {
     this.currentTheme = savedTheme || 'dark';
     this.applyTheme();
 
+    const currentUrl = this.router.url;
+
     if (this.auth.isLoggedIn) {
       try {
         await this.auth.loadUserWithCharacter();
+        if (currentUrl === '/login' || currentUrl === '/') {
+          this.router.navigate(['/home']);
+        }
       } catch (error) {
         console.error('Failed to load user with character', error);
         this.auth.logout();
+        this.router.navigate(['/login']);
       }
-    }
+    } 
   }
+
   
   get showPanels$(): Observable<boolean> {
     return this.auth.user$.pipe(
