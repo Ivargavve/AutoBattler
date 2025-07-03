@@ -7,9 +7,9 @@ body, html {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: var(--app-bg, #000);
+  background-color: var(--bg, #000);
   font-family: 'Courier New', monospace;
-  color: var(--app-text, #fff);
+  color: var(--text, #fff);
 }
 
 .app-wrapper {
@@ -31,7 +31,7 @@ body, html {
 
 /* === Sidebar === */
 .sidebar {
-  background-color: var(--sidebar-bg, #121212);
+  background-color: var(--bg, #121212);
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--sidebar-border, #2c2c2c);
@@ -114,6 +114,7 @@ body, html {
 
 .bar-fill {
   height: 100%;
+  border-radius: 4px;
 }
 
 .bar-text {
@@ -131,6 +132,14 @@ body, html {
 
 .bar-container.yellow .bar-fill {
   background: var(--bar-fill-yellow, #f1c40f);
+}
+
+.main-content{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--main-content-bg, #181818);
+  overflow-y: auto;
 }
 
 .sidebar-inner {
@@ -161,19 +170,30 @@ body, html {
 
 .clickable-profile {
   display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
+  flex-direction: column;
+  align-items: flex-start;
+  background: var(--friend-li-bg, #111);
+  border: 1px solid var(--accent, #86f7b3);
+  border-radius: 4px;
+  box-shadow: 0 0 14px var(--accent-shadow, #86f7b366);
+  padding: 1rem;
+  margin-bottom: 1.1rem;
+  transition: 
+    box-shadow 0.22s, 
+    border-color 0.18s, 
+    background 0.19s;
 
+  // Hover-effekt som liknar karaktärskortet
   &:hover {
-    text-shadow: 0 0 6px var(--accent-hover-shadow, rgba(134, 247, 179, 0.4));
+    cursor:pointer;
+    border-color: var(--accent-hover, #baffd8);
+    box-shadow: 0 0 32px 6px var(--accent-hover-shadow, rgba(186, 255, 216, 0.32));
+    background: rgba(134, 247, 179, 0.08);
 
     .username {
-      color: var(--accent-hover, #a4ffd0);
+      color: var(--accent-hover, #baffd8);
+      text-shadow: 0 0 22px var(--accent-hover-shadow, rgba(186, 255, 216, 0.6));
     }
-
     .fullname {
       color: var(--fullname-hover, #aaa);
     }
@@ -221,7 +241,7 @@ nav a {
 
 /* === Right Panel === */
 .right-panel {
-  background-color: var(--right-panel-bg, #181818);
+  background-color: var(--bg, #121212);
   border-left: 1px solid var(--sidebar-border, #2c2c2c);
   padding: 1rem;
   display: flex;
@@ -247,7 +267,6 @@ nav a {
       text-decoration: none;
 
       &:hover {
-        text-decoration: underline;
         color: var(--right-link-hover, #c0ffe2);
       }
     }
@@ -306,12 +325,6 @@ nav a {
     text-shadow: 0 0 14px var(--section-title-hover-shadow, rgba(186, 255, 216, 0.6));
   }
 }
-
-.user-block {
-  display: flex;
-  align-items: center;
-}
-
 .username {
   font-size: 1.1rem;
   font-weight: bold;
@@ -385,13 +398,14 @@ nav a {
 
   input {
     flex: 1;
-    background-color: var(--input-bg, #111);
+    background-color: var(--input-bg, #313131);
     border: 1px solid var(--input-border, #333);
     padding: 0.3rem 0.4rem;
     font-size: 0.7rem;
     color: var(--input-color, #ccc);
     margin-right: 0.4rem;
     width: 100%;
+    border-radius: 4px;
   }
 
   button {
@@ -403,6 +417,7 @@ nav a {
     cursor: pointer;
     transition: background-color 0.2s;
     white-space: nowrap;
+    border-radius: 4px;
 
     &:hover {
       background-color: var(--button-hover-bg, #2c2c2c);
@@ -448,12 +463,12 @@ nav a {
   padding: 0;
 
   li {
-    background-color: var(--friend-li-bg, #111);
+    background-color: var(--friend-li-bg, #181f1a);
     padding: 0 0.6rem;
     cursor: pointer;
 
     &:hover {
-      background-color: var(--friend-li-hover-bg, #222);
+      background-color: var(--friend-li-hover-bg, #232f22);
       text-shadow: 0 0 6px var(--friend-li-hover-shadow, rgba(134, 247, 179, 0.4));
     }
 
@@ -535,6 +550,7 @@ nav a {
   height: 20px;
   overflow: hidden;
   margin-top: 0.3rem;
+  border-radius: 4px;
 }
 
 .xp-fill {
@@ -557,15 +573,30 @@ nav a {
   gap: 0.6rem;
   margin-bottom: 1.2rem;
   container-type: inline-size;
+  padding: 0.6rem 0.2rem 0.6rem 0.2rem;
+  border-radius: 4px;
+  transition: box-shadow 0.22s;
+
+  &:hover {
+    background: rgba(134, 247, 179, 0.07);
+    box-shadow: 0 0 24px var(--accent-hover-shadow, rgba(186, 255, 216, 0.18));
+    cursor: pointer;
+  }
+  &:hover .character-name {
+    color: var(--accent-hover, #baffd8);
+    text-shadow: 0 0 18px var(--accent-hover-shadow, rgba(186, 255, 216, 0.6));
+  }
+  &:hover .character-class-meta {
+    color: var(--accent-hover, #baffd8);
+    text-shadow: 0 0 9px var(--accent-hover-shadow, rgba(186, 255, 216, 0.3));
+  }
 
   .character-profile-icon {
     width: 62px;
     height: 62px;
-    border: 2.2px solid var(--accent);
     border-radius: 0.5em;
-    background: var(--sidebar-bg);
+    background: var(--bg, #121212);
     object-fit: cover;
-    box-shadow: 0 0 9px var(--accent-shadow);
     margin: 0;
   }
 
@@ -589,7 +620,7 @@ nav a {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    text-shadow: 0 0 6px var(--accent-shadow);
+    text-shadow: 0 0 6px var(--accent-shadow, #86f7b366);
   }
 
   .character-class-meta {
@@ -601,7 +632,7 @@ nav a {
     margin-top: 0.04rem;
     margin-left: 0.06rem;
     letter-spacing: 1px;
-    text-shadow: 0 0 2px var(--accent-shadow);
+    text-shadow: 0 0 2px var(--accent-shadow, #86f7b366);
 
     .meta-label {
       color: #b6b6b6;
@@ -612,6 +643,7 @@ nav a {
     }
   }
 }
+
 .corner-label-dev {
   position: absolute;
   top: 22px;
@@ -637,4 +669,27 @@ nav a {
     left: -38px;
     top: 16px;
   }
+}
+.profile-main-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.level-xp-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  min-height: 52px;
+}
+
+.level-xp-circle .level-text {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.36rem;
+  fill: var(--accent);
+  font-weight: bold;
+  filter: drop-shadow(0 0 4px var(--accent-shadow));
+  pointer-events: none;
 }

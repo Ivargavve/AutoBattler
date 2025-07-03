@@ -7,14 +7,14 @@
 }
 
 .app-spinner {
-  border: 5px solid var(--sidebar-border, #2c2c2c);
-  border-top: 5px solid var(--accent, #86f7b3);
+  border: 5px solid var(--sidebar-border);
+  border-top: 5px solid var(--accent);
   border-radius: 50%;
   width: 48px;
   height: 48px;
   animation: spin 0.75s linear infinite;
   display: block;
-  box-shadow: 0 0 16px var(--card-border, rgba(0, 255, 100, 0.08));
+  box-shadow: 0 0 16px var(--card-border);
 }
 
 @keyframes spin {

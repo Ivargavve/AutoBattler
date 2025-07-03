@@ -24,12 +24,9 @@ body.light {
   --bg: #fdf7f2;
   --text: #2e2b28;
   --nav-bg: #f4e9dc;
-  --footer-bg: #f4e9dc;
-  --hover: #c17c62;
   --btn-bg: #fefaf6;
   --btn-border: #b57e6a;
   --btn-hover-bg: #f2ded0;
-  --btn-icon-color: #4a3628;
   --meta-text: #a68b7c;
   --card-border: rgba(0, 0, 0, 0.07);
 
@@ -39,24 +36,16 @@ body.light {
 
 body.dark {
   --bg: #0b0c0b;
+  --grey-bg: #181818;
   --text: #d1ffe8;
   --nav-bg: #111311;
-  --footer-bg: #111311;
-  --hover: #86f7b3;
   --btn-bg: #1b1d1b;
   --btn-border: #52d798;
   --btn-hover-bg: #143d2a;
-  --btn-icon-color: #a2fcd6;
   --meta-text: #7cbfa5;
   --card-border: rgba(0, 255, 100, 0.07);
   --accent: #86f7b3;
   --accent-hover: #baffd8;
-
-  /* App shell custom vars */
-  --app-bg: #0b0c0b;
-  --app-text: #d1ffe8;
-
-  --sidebar-bg: #121212;
   --sidebar-border: #2c2c2c;
   --sidebar-link: #e0e0e0;
   --sidebar-link-bg: transparent;
@@ -69,26 +58,19 @@ body.dark {
   --accent-logo-shadow: rgba(134, 247, 179, 0.5);
   --accent-logo-hover-shadow: rgba(186, 255, 216, 0.6);
   --accent-hover-shadow: rgba(134, 247, 179, 0.4);
-
   --avatar-border: #333;
-
   --bar-bg: #2c2c2c;
   --bar-text: #fff;
   --bar-fill-red: #e74c3c;
   --bar-fill-yellow: #f1c40f;
-
-  --right-panel-bg: #181818;
   --right-link-hover: #c0ffe2;
   --right-title-shadow: rgba(134, 247, 179, 0.4);
   --right-footer: #666;
-
   --section-title: #fff;
   --section-title-hover-shadow: rgba(186, 255, 216, 0.6);
-
   --username-shadow: rgba(134, 247, 179, 0.4);
   --fullname: #888;
   --fullname-hover: #aaa;
-
   --divider: #444;
   --offline: #888;
   --friend-li-bg: #111;
@@ -118,7 +100,7 @@ body.dark {
   font-size: 16px;
   border: 1px solid var(--btn-border);
   background-color: var(--btn-bg);
-  color: var(--btn-icon-color);
+  color: var(--accent-hover);
   transition: background-color 0.2s, color 0.2s;
 
   &:hover {
@@ -138,14 +120,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 footer {
-  background-color: var(--footer-bg);
+  background-color: var(--nav-bg);
   color: var(--text);
   border-top: 1px solid var(--card-border);
 }
 
 .input-group-text {
   background-color: var(--btn-bg);
-  color: var(--btn-icon-color);
+  color: var(--accent-hover);
   border: 1px solid var(--btn-border);
   transition: background-color 0.2s, color 0.2s;
 }

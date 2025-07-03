@@ -14,9 +14,8 @@
             <a routerLink="/home">🏪 Shop</a>
             <a routerLink="/home">👥 Social</a>
             <a routerLink="/home">🪦 Graveyard</a>
-            <a routerLink="/create-character">🏆 Achievements</a>
-            <a routerLink="/profile">📜 Lore</a>
-            <a routerLink="/privacy">🔒 Privacy Policy</a>
+            <a routerLink="/home">🏆 Achievements</a>
+            <a routerLink="/home">📜 Lore</a>
           </nav>
         </div>
         <div class="logout-wrapper">
@@ -29,7 +28,7 @@
 
     <ng-template #sidebarHidden></ng-template>
 
-    <main>
+    <main class="main-content">
       <router-outlet></router-outlet>
     </main>
 
@@ -39,13 +38,48 @@
 
         <div class="right-content">
           <!-- Profile -->
-          <a routerLink="/profile" class="user-block clickable-profile">
-            <img [src]="user.profilePictureUrl" alt="Profile" class="avatar" />
-            <div>
-              <div class="username">{{ user.username }} - {{ user.level }} </div>
-              <div class="fullname">{{ user.fullName }}</div>
+            <div class="clickable-profile" routerLink="/profile">
+              <div class="profile-main-row">
+                <div>
+                  <div class="username">My Username</div>
+                  <div class="fullname">Ivar Gavelin</div>
+                </div>
+                <div class="level-xp-circle" data-level="4">
+                  <svg width="52" height="52" viewBox="0 0 52 52">
+                    <circle
+                      class="xp-bg"
+                      cx="26"
+                      cy="26"
+                      r="22"
+                      fill="none"
+                      stroke="var(--sidebar-border)"
+                      stroke-width="4"
+                    />
+                    <circle
+                      class="xp-bar"
+                      cx="26"
+                      cy="26"
+                      r="22"
+                      fill="none"
+                      stroke="var(--accent)"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                      stroke-dasharray="138.2"
+                      stroke-dashoffset="51.1"
+                    />
+                    <text
+                      x="50%"
+                      y="50%"
+                      text-anchor="middle"
+                      dy=".33em"
+                      class="level-text"
+                    >4</text>
+                  </svg>
+                </div>
+              </div>
             </div>
-          </a>
+
+
 
           <div class="credits">
             <strong>Credits:</strong> {{ user.credits }} <br>
@@ -55,7 +89,7 @@
 
           <!-- Character -->
           <ng-container *ngIf="user.character; else createCharacterPrompt">
-            <div class="character-header-row">
+            <div class="character-header-row" routerLink="/profile">
               <img 
                 *ngIf="user.character.profileIconUrl"
                 [src]="user.character.profileIconUrl"

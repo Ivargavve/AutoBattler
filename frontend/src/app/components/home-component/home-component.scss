@@ -3,9 +3,6 @@
   flex-direction: column;
   gap: 2rem;
   padding: 2rem;
-  background-color: var(--right-panel-bg, #181818);
-  box-shadow: 0 0 16px var(--card-border, rgba(0, 255, 100, 0.05));
-  border: 1px solid var(--sidebar-border, #2c2c2c);
   width: 100%;
 }
 
@@ -21,10 +18,8 @@
 }
 
 .home-block {
-  background-color: var(--sidebar-bg, #121212);
+  background-color: var(--grey-bg, #181818);
   padding: 1.5rem 2rem;
-  border: 1px solid var(--sidebar-border, #2c2c2c);
-  box-shadow: 0 0 10px var(--card-border, rgba(0, 255, 100, 0.04));
   flex: 1 1 0;
   min-width: 0;
 
@@ -59,7 +54,7 @@
 }
 
 .welcome-block {
-  background: radial-gradient(circle at top left, var(--sidebar-bg, #181818), var(--sidebar-bg, #111));
+  background: radial-gradient(circle at top left, var(--bg, #181818), var(--bg, #111));
   text-align: center;
   border: 1.5px solid var(--sidebar-border, #2c2c2c);
 
@@ -79,10 +74,10 @@
 .under-construction {
   background: repeating-linear-gradient(
     135deg,
-    var(--sidebar-bg, #181818),
-    var(--sidebar-bg, #181818) 15px,
+    var(--bg, #181818),
+    var(--bg, #181818) 15px,
     var(--sidebar-border, #2c2c2c) 16px,
-    var(--sidebar-bg, #181818) 30px
+    var(--bg, #181818) 30px
   );
   border: 1.5px dashed var(--sidebar-border, #2c2c2c);
   text-align: center;

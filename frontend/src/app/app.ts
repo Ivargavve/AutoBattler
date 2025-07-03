@@ -83,5 +83,5 @@ export class App implements OnInit {
     const required = this.getXpRequired(level);
     return Math.min((xp / required) * 100, 100);
   }
-  
+
 }

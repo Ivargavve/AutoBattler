@@ -9,11 +9,11 @@
 .login-card {
   width: 100%;
   max-width: 560px;
-  background: radial-gradient(ellipse at center, #1b1b1b 0%, #111 100%);
-  color: #e2e2e2;
-  border: 1px solid #2c2c2c;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--sidebar-border);
   font-family: 'Courier New', monospace;
-  text-shadow: 0 0 3px rgba(0, 255, 100, 0.3);
+  text-shadow: 0 0 3px var(--card-border);
   transition: all 0.3s ease;
   padding: 4rem 3rem;
   text-align: center;
@@ -28,43 +28,43 @@
 
 .login-title {
   font-size: 2.4rem;
-  color: white;
-  text-shadow: 0 0 10px rgba(134, 247, 179, 0.5);
+  color: var(--section-title);
+  text-shadow: 0 0 10px var(--accent-logo-shadow);
   letter-spacing: 1.5px;
   margin-bottom: 1.5rem;
 }
 
 .login-subtext {
   font-size: 1.1rem;
-  color: #888;
+  color: var(--offline);
   font-style: italic;
   margin-bottom: 2.5rem;
 }
 
 .login-submit-btn {
-  background-color: #86f7b3;
+  background-color: var(--accent);
   border: none;
-  color: #000;
+  color: var(--bg);
   font-weight: bold;
   padding: 0.5rem 1rem;
   border-radius: 4px;
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #a4ffd0;
+    background-color: var(--accent-hover);
   }
 
   &:disabled {
-    background-color: #444;
-    color: #888;
+    background-color: var(--divider);
+    color: var(--offline);
     cursor: not-allowed;
   }
 }
 
 .neon-input {
   background-color: transparent;
-  border: 1px solid #86f7b3;
-  color: #fff;
+  border: 1px solid var(--accent);
+  color: var(--section-title);
   padding: 0.75rem;
   border-radius: 4px;
   width: 100%;
@@ -74,11 +74,11 @@
   transition: box-shadow 0.3s ease;
 
   &::placeholder {
-    color: #aaa;
+    color: var(--fullname-hover);
   }
 
   &:focus {
-    box-shadow: 0 0 10px rgba(134, 247, 179, 0.5);
-    border-color: #a4ffd0;
+    box-shadow: 0 0 10px var(--accent-logo-shadow);
+    border-color: var(--accent-hover);
   }
 }
