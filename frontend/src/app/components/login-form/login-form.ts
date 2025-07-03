@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { firstValueFrom } from 'rxjs';
-import { LoadingSpinnerComponent } from '../loading-component/loading-component';
 
 declare const google: any;
 
@@ -13,7 +12,7 @@ declare const google: any;
   standalone: true,
   templateUrl: './login-form.html',
   styleUrls: ['./login-form.scss'],
-  imports: [CommonModule, LoadingSpinnerComponent],
+  imports: [CommonModule],
 })
 export class LoginForm implements OnInit {
   errorMessage = '';
