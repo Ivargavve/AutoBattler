@@ -34,6 +34,7 @@ export class LoginForm implements OnInit {
 
   async handleGoogleLogin(response: any): Promise<void> {
     const idToken = response.credential;
+    this.loading = true;
 
     try {
       const res: any = await firstValueFrom(this.authService.googleLogin(idToken));
@@ -57,9 +58,5 @@ export class LoginForm implements OnInit {
     } finally {
       this.loading = false;
     }
-  }
-
-  startLoading() {
-    this.loading = true;
   }
 }
