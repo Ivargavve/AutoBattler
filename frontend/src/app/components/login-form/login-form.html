@@ -1,15 +1,20 @@
 <div class="login-container">
-  <div class="login-card">
+  <div class="login-card" style="position: relative;">
     <h1 class="login-title">AutoBattler</h1>
     <p class="login-subtext">
       <em>Log in to enter the arena. One login stands between you and GLORY!</em>
     </p>
-    <div class="google-login-wrapper">
+    <div class="google-login-wrapper" style="position: relative;">
       <div id="google-button"></div>
-    </div>
-    <div class="google-login-wrapper">
-      <div id="google-button"></div>
+      <div 
+        *ngIf="!loading" 
+        class="google-click-catcher" 
+        (click)="startLoading()"
+        style="position:absolute;top:0;left:0;width:100%;height:100%;cursor:pointer;z-index:2;"
+      ></div>
       <div *ngIf="loading" class="login-spinner"></div>
     </div>
+    <div *ngIf="errorMessage" class="login-error">{{ errorMessage }}</div>
+    <div *ngIf="loading" class="login-block-overlay"></div>
   </div>
 </div>
