@@ -1,19 +1,21 @@
 <div class="app-wrapper">
-  <div class="app-layout">
-
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+  <div class="app-layout" *ngIf="!loading">
+    
     <!-- Sidebar -->
     <aside *ngIf="showPanels$ | async" class="sidebar">
         <div class="sidebar-inner">
           <div routerLink="/home" class="logo">AutoBattler</div>
           <nav class="nav-section">
             <a routerLink="/home">🏠 Home</a>
-            <a routerLink="/create-character">⚔️ Battle</a>
+            <a routerLink="/home">⚔️ Battle</a>
             <a routerLink="/home">🧰 Armory</a>
             <a routerLink="/home">🏪 Shop</a>
-            <a routerLink="/profile">👥 Social</a>
-            <a routerLink="/privacy">🪦 Graveyard</a>
-            <a routerLink="/home">🏆 Achievements</a>
-            <a routerLink="/home">📜 Lore</a>
+            <a routerLink="/home">👥 Social</a>
+            <a routerLink="/home">🪦 Graveyard</a>
+            <a routerLink="/create-character">🏆 Achievements</a>
+            <a routerLink="/profile">📜 Lore</a>
+            <a routerLink="/privacy">🔒 Privacy Policy</a>
           </nav>
         </div>
         <div class="logout-wrapper">
@@ -53,9 +55,21 @@
 
           <!-- Character -->
           <ng-container *ngIf="user.character; else createCharacterPrompt">
-            <h2 class="section-title">{{ user.character.name }}</h2>
+            <div class="character-header-row">
+              <img 
+                *ngIf="user.character.profileIconUrl"
+                [src]="user.character.profileIconUrl"
+                alt="Character Icon"
+                class="character-profile-icon"
+              />
+              <div class="character-title-block">
+                <h2 class="section-title character-name">{{ user.character.name }}</h2>
+                <div class="character-class-meta">
+                  <span class="meta-label">Class:</span>{{ user.character.class }}
+                </div>
+              </div>
+            </div>
             <ul>
-              <li><strong>Class:</strong> {{ user.character.class }}</li>
               <li>
                 <strong>Lvl: {{ user.character.level }}</strong>
                 <div class="xp-bar">

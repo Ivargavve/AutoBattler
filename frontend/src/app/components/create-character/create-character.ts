@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-create-character',
@@ -14,21 +14,23 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./create-character.scss'],
   imports: [ReactiveFormsModule, CommonModule],
 })
-export class CreateCharacterComponent {
+export class CreateCharacterComponent implements OnInit {
   characterForm: FormGroup;
   errorMessage = '';
   isSubmitting = false;
 
-  characterClasses = ['Warrior', 'Mage', 'Rogue', 'Cleric'];
-
+  characterClasses = ['Warrior', 'Mage', 'Rogue', 'Cleric', 'Paladin', 'Druid', 'Hunter', 'Sorcerer', 'Bard', 'Necromancer', 
+    'Monk', 'Warlock', 'Ranger', 'Assassin', 'Shaman', 'Berserker', 'Knight', 'Priest', 'Wizard', 'Alchemist'];
   profileIcons = [
-    'https://i.imgur.com/2XqffFt.png', // Warrior icon
-    'https://i.imgur.com/Rs7bxZT.png', // Mage icon
-    'https://i.imgur.com/fP7KCfQ.png', // Rogue icon
-    'https://i.imgur.com/fXKMczN.png', // Cleric icon
+    'assets/char1.jpeg', 'assets/char2.jpeg', 'assets/char3.jpeg',
+    'assets/char4.jpeg', 'assets/char5.jpeg', 'assets/char6.jpeg', 'assets/char7.jpeg',
+    'assets/char8.jpeg', 'assets/char9.jpeg', 'assets/char10.jpeg', 'assets/char11.jpeg',
+    'assets/char12.jpeg', 'assets/char13.jpeg', 'assets/char14.jpeg', 'assets/char15.jpeg'
   ];
-
   selectedIcon = this.profileIcons[0];
+
+  hasCharacter = false;
+  private userSub?: Subscription;
 
   constructor(
     private fb: FormBuilder,
@@ -43,30 +45,35 @@ export class CreateCharacterComponent {
     });
   }
 
+  ngOnInit(): void {
+    this.userSub = this.authService.user$.subscribe(user => {
+      this.hasCharacter = !!user?.character;
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.userSub?.unsubscribe();
+  }
+
   onIconSelect(icon: string) {
     this.selectedIcon = icon;
     this.characterForm.patchValue({ profileIconUrl: icon });
   }
 
   async onSubmit(): Promise<void> {
-    if (this.characterForm.invalid || this.isSubmitting) {
-      this.errorMessage = 'Please fill in all fields correctly.';
+    if (this.characterForm.invalid || this.isSubmitting || this.hasCharacter) {
+      this.errorMessage = this.hasCharacter
+        ? 'You already have a character!'
+        : 'Please fill in all fields correctly.';
       setTimeout(() => (this.errorMessage = ''), 3000);
       return;
     }
-
     this.isSubmitting = true;
-
     const options = this.authService.getAuthHeaders();
 
     try {
-      // Skapa karaktär på servern
       await firstValueFrom(this.http.post(`${environment.apiUrl}/characters`, this.characterForm.value, options));
-
-      // Uppdatera användarobjektet med ny karaktär
       await this.authService.loadUserWithCharacter();
-
-      // Navigera efter att datan uppdaterats
       await this.router.navigate(['/home']);
     } catch (err: any) {
       this.errorMessage = err.error || 'Failed to create character.';
@@ -75,5 +82,4 @@ export class CreateCharacterComponent {
       this.isSubmitting = false;
     }
   }
-
 }

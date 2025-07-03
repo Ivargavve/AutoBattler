@@ -559,3 +559,67 @@ nav a {
   top: 2px;
   font-weight: bold;
 }
+.character-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+  container-type: inline-size;
+
+  .character-profile-icon {
+    width: 62px;
+    height: 62px;
+    border: 2.2px solid var(--accent);
+    border-radius: 0.5em;
+    background: var(--sidebar-bg);
+    object-fit: cover;
+    box-shadow: 0 0 9px var(--accent-shadow);
+    margin: 0;
+  }
+
+  .character-title-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+    flex: 1 1 0;
+    max-width: 165px;
+  }
+
+  .character-name {
+    margin: 0;
+    color: #fff;
+    font-family: 'Share Tech Mono', monospace;
+    word-break: break-all;
+    line-height: 1.08;
+    width: 100%;
+    font-size: 1.2rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-shadow: 0 0 6px var(--accent-shadow);
+  }
+
+  .character-class-meta {
+    color: var(--meta-text, #a6bcb0);
+    font-size: 0.6rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    opacity: 0.8;
+    margin-top: 0.04rem;
+    margin-left: 0.06rem;
+    letter-spacing: 1px;
+    text-shadow: 0 0 2px var(--accent-shadow);
+
+    .meta-label {
+      color: #b6b6b6;
+      font-weight: 400;
+      margin-right: 0.15em;
+      opacity: 0.75;
+      font-size: 0.9em;
+    }
+  }
+
+
+}
+

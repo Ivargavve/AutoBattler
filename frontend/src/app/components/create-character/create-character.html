@@ -1,41 +1,47 @@
-<div class="create-character-container">
-  <h1>Create your Character</h1>
+<div class="main-content character-main">
+  <div class="character-card">
+    <div class="create-character-container">
+      <h1 class="character-title">Create your Character</h1>
 
-  <form [formGroup]="characterForm" (ngSubmit)="onSubmit()">
-    <label for="name">Name</label>
-    <input
-      id="name"
-      type="text"
-      formControlName="name"
-      placeholder="Enter your character name"
-      autocomplete="off"
-      spellcheck="false"
-    />
+      <form [formGroup]="characterForm" (ngSubmit)="onSubmit()">
+        <label for="name">Name</label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          placeholder="Enter your character name"
+          autocomplete="off"
+          spellcheck="false"
+        />
 
-    <label for="class">Class</label>
-    <select id="class" formControlName="class">
-      <option *ngFor="let cls of characterClasses" [value]="cls">
-        {{ cls }}
-      </option>
-    </select>
+        <label for="class">Class</label>
+        <select id="class" formControlName="class">
+          <option *ngFor="let cls of characterClasses" [value]="cls">
+            {{ cls }}
+          </option>
+        </select>
 
-    <label>Profile Icon</label>
-    <div class="icon-selector">
-      <img
-        *ngFor="let icon of profileIcons"
-        [src]="icon"
-        [class.selected]="icon === selectedIcon"
-        (click)="onIconSelect(icon)"
-        alt="Character Icon"
-        tabindex="0"
-        (keydown.enter)="onIconSelect(icon)"
-      />
+        <label>Choose your characters icon</label>
+        <div class="icon-selector">
+          <img
+            *ngFor="let icon of profileIcons"
+            [src]="icon"
+            [class.selected]="icon === selectedIcon"
+            (click)="onIconSelect(icon)"
+            alt="Character Icon"
+            tabindex="0"
+            (keydown.enter)="onIconSelect(icon)"
+          />
+        </div>
+
+        <button 
+          type="submit" 
+          [disabled]="isSubmitting || characterForm.invalid || hasCharacter">
+          Create Character
+        </button>
+
+        <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+      </form>
     </div>
-
-    <button type="submit" [disabled]="isSubmitting || characterForm.invalid">
-      Create Character
-    </button>
-
-    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
-  </form>
+  </div>
 </div>

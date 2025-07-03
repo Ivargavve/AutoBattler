@@ -6,6 +6,7 @@ import { User } from './services/user';
 import { Character } from './services/character';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { LoadingSpinnerComponent } from './components/loading-component/loading-component';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +14,8 @@ import { map } from 'rxjs/operators';
   imports: [
     RouterOutlet,
     RouterModule,
-    CommonModule
+    CommonModule,
+    LoadingSpinnerComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
@@ -22,6 +24,7 @@ export class App implements OnInit {
   public currentTheme: 'light' | 'dark' = 'light';
   public user$: Observable<User | null>;
   public character$: Observable<Character | null>;
+  public loading = true; 
 
   constructor(public auth: AuthService, private router: Router) {
     this.user$ = this.auth.user$;
@@ -31,6 +34,7 @@ export class App implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    this.loading = true;
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
     this.currentTheme = savedTheme || 'dark';
     this.applyTheme();
@@ -44,11 +48,11 @@ export class App implements OnInit {
           this.router.navigate(['/home']);
         }
       } catch (error) {
-        console.error('Failed to load user with character', error);
         this.auth.logout();
         this.router.navigate(['/login']);
-      }
+      } 
     } 
+    this.loading = false;
   }
 
   
