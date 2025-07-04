@@ -24,4 +24,5 @@ export interface Character {
 
   createdAt: string;
   updatedAt: string;
+  lastRechargeTime?: string | Date;
 }

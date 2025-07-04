@@ -62,7 +62,7 @@
                   <div class="username">{{ user.username }}</div>
                   <div class="fullname">{{ user.fullName }}</div>
                 </div>
-                <div class="level-xp-circle" data-level="4">
+                <div class="level-xp-circle" [attr.data-level]="user.level">
                   <svg width="52" height="52" viewBox="0 0 52 52">
                     <circle
                       class="xp-bg"
@@ -83,7 +83,7 @@
                       stroke-width="4"
                       stroke-linecap="round"
                       stroke-dasharray="138.2"
-                      stroke-dashoffset="51.1"
+                      [attr.stroke-dashoffset]="138.2 - 138.2 * getXpPercentage(user.experiencePoints) / 100"
                     />
                     <text
                       x="50%"
@@ -94,6 +94,7 @@
                     >{{ user.level }}</text>
                   </svg>
                 </div>
+
               </div>
             </div>
 
@@ -106,43 +107,46 @@
           <hr class="divider" />
 
           <!-- Character -->
-          <ng-container *ngIf="user.character; else createCharacterPrompt">
-            <div class="character-header-row" routerLink="/hero">
+          <ng-container *ngIf="character$ | async as character; else createCharacterPrompt">
+            <div class="character-header-row" routerLink="/profile">
               <img 
-                *ngIf="user.character.profileIconUrl"
-                [src]="user.character.profileIconUrl"
+                *ngIf="character.profileIconUrl"
+                [src]="character.profileIconUrl"
                 alt="Character Icon"
                 class="character-profile-icon"
               />
               <div class="character-title-block">
-                <h2 class="section-title character-name">{{ user.character.name }}</h2>
+                <h2 class="section-title character-name">{{ character.name }}</h2>
                 <div class="character-class-meta">
-                  <span class="meta-label">Class:</span>{{ user.character.class }}
+                  <span class="meta-label">Class:</span>{{ character.class }}
                 </div>
               </div>
             </div>
             <ul>
               <li>
-                <strong>Lvl: {{ user.character.level }}</strong>
+                <strong>Lvl: {{ character.level }}</strong>
                 <div class="xp-bar">
-                  <div class="xp-fill" [style.width.%]="getXpPercentage(user.character.experiencePoints, user.character.level)"></div>
-                  <span class="xp-text">{{ user.character.experiencePoints }} / {{ getXpRequired(user.character.level) }}</span>
+                  <div class="xp-fill" [style.width.%]="getXpPercentage(character.experiencePoints)"></div>
+                  <span class="xp-text">{{ character.experiencePoints }} / {{ 100 }}</span>
                 </div>
               </li>
               <li>
                 <strong>HP:</strong>
                 <div class="bar-container red">
-                  <div class="bar-fill" [style.width.%]="(user.character.currentHealth / user.character.maxHealth) * 100"></div>
-                  <span class="bar-text">{{ user.character.currentHealth }} / {{ user.character.maxHealth }}</span>
+                  <div class="bar-fill" [style.width.%]="(character.currentHealth / character.maxHealth) * 100"></div>
+                  <span class="bar-text">{{ character.currentHealth }} / {{ character.maxHealth }}</span>
                 </div>
               </li>
               <li>
                 <strong>Energy:</strong>
                 <div class="bar-container yellow">
-                  <div class="bar-fill" [style.width.%]="(user.character.currentEnergy / user.character.maxEnergy) * 100"></div>
-                  <span class="bar-text">{{ user.character.currentEnergy }} / {{ user.character.maxEnergy }}</span>
+                  <div class="bar-fill" [style.width.%]="(character.currentEnergy / character.maxEnergy) * 100"></div>
+                  <span class="bar-text">{{ character.currentEnergy }} / {{ character.maxEnergy }}</span>
                 </div>
               </li>
+              <li>
+                <strong>Last Recharge:</strong>
+                <span class="recharge-time">{{ character.lastRechargeTime | date:'short' }}</span>
             </ul>
           </ng-container>
 

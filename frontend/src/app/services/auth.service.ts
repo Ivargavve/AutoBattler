@@ -93,6 +93,7 @@ export class AuthService {
         })
         .catch(() => {
           this.setUser({ ...profile, character: undefined });
+          
         });
     });
   }

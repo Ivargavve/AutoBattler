@@ -1,0 +1,139 @@
+.battle-container {
+  background: var(--grey-bg);
+  margin: 0 auto;
+  color: var(--text);
+  font-family: 'JetBrains Mono', 'Share Tech Mono', monospace;
+  position: relative;
+
+  h2 {
+    color: var(white);
+    font-size: 2.2rem;
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 12px var(--accent-shadow);
+    margin-bottom: 1.6rem;
+    font-weight: bold;
+    text-align: left;
+  }
+
+  .fighter-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 1.3rem;
+
+    .player-info, .enemy-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.08rem;
+
+      .name {
+        color: var(--accent);
+        font-size: 1.12rem;
+        font-weight: 700;
+        text-shadow: 0 0 8px var(--accent-logo-shadow);
+        margin-bottom: 0.05rem;
+      }
+
+      .hp {
+        font-size: 1.04rem;
+        color: var(--meta-text);
+        font-weight: 600;
+        text-shadow: 0 0 5px var(--accent-shadow);
+      }
+    }
+
+    .vs {
+      color: var(--accent);
+      font-size: 1.25rem;
+      font-weight: bold;
+      text-shadow: 0 0 12px var(--accent-hover-shadow);
+      margin: 0 1.2rem;
+      letter-spacing: 2px;
+    }
+  }
+
+  .battle-log {
+    background: var(--bg);
+    min-height: 90px;
+    max-height: 180px;
+    overflow-y: auto;
+    border-radius: 6px;
+    margin: 1.1rem 0 1.5rem 0;
+    padding: 0.7rem 1rem 0.7rem 0.8rem;
+    font-size: 1.04rem;
+    box-shadow: 0 0 7px var(--accent-shadow);
+    border: 1px solid var(--card-border);
+
+    div {
+      margin-bottom: 0.2rem;
+      white-space: pre-line;
+      line-height: 1.17;
+      font-family: inherit;
+      letter-spacing: 0.4px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .attack-btn,
+  button {
+    background: var(--btn-bg);
+    color: var(--accent);
+    border: 2px solid var(--btn-border);
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 1.17rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-top: 0.1rem;
+    margin-bottom: 0.4rem;
+    padding: 0.38rem 1.25rem;
+    cursor: pointer;
+    transition: 
+      background 0.2s, 
+      color 0.16s, 
+      border-color 0.18s, 
+      box-shadow 0.2s;
+
+    &:hover:not(:disabled) {
+      background: var(--btn-hover-bg);
+      color: var(--accent-hover);
+      border-color: var(--accent-hover);
+      box-shadow: 0 0 12px 0 var(--accent-hover-shadow);
+    }
+
+    &:disabled {
+      background: var(--sidebar-link-hover-bg);
+      color: var(--offline);
+      cursor: not-allowed;
+      border-color: var(--sidebar-border);
+    }
+  }
+
+  // Victory/Defeat
+  .battle-ended {
+    margin-top: 1rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--accent);
+    text-shadow: 0 0 13px var(--accent-hover-shadow);
+  }
+  .defeat {
+    color: #e74c3c;
+    text-shadow: 0 0 8px #e74c3ccc;
+  }
+}
+
+// Responsiv på mobil
+@media (max-width: 600px) {
+  .battle-container {
+    padding: 1rem 0.6rem 1.2rem 0.6rem;
+    max-width: 98vw;
+  }
+  .battle-log {
+    font-size: 0.95rem;
+    padding: 0.5rem 0.6rem;
+  }
+}

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace backend.Controllers
 {
@@ -19,6 +18,16 @@ namespace backend.Controllers
         {
             _db = db;
         }
+        private void RechargeEnergyAndHp(Character player)
+        {
+            var now = DateTime.UtcNow;
+            if ((now - player.LastRechargeTime).TotalSeconds >= 120)
+            {
+                player.CurrentEnergy = Math.Min(player.CurrentEnergy + 1, player.MaxEnergy);   
+                player.CurrentHealth = Math.Min(player.CurrentHealth + 10, player.MaxHealth); 
+                player.LastRechargeTime = player.LastRechargeTime.AddSeconds(120);
+            }
+        }
 
         [HttpGet("me")]
         public async Task<IActionResult> GetMyCharacter()
@@ -27,12 +36,14 @@ namespace backend.Controllers
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                 return Unauthorized();
 
-            var chr = await _db.Characters
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.UserId == userId);
+            var chr = await _db.Characters.FirstOrDefaultAsync(c => c.UserId == userId);
 
             if (chr == null)
                 return NotFound();
+
+            RechargeEnergyAndHp(chr);
+
+            await _db.SaveChangesAsync();
 
             return Ok(new
             {
@@ -54,7 +65,8 @@ namespace backend.Controllers
                 chr.InventoryJson,
                 chr.EquipmentJson,
                 chr.CreatedAt,
-                chr.UpdatedAt
+                chr.UpdatedAt,
+                chr.LastRechargeTime
             });
         }
 
@@ -73,7 +85,8 @@ namespace backend.Controllers
                 UserId = userId,
                 Name = dto.Name,
                 Class = dto.Class,
-                ProfileIconUrl = dto.ProfileIconUrl
+                ProfileIconUrl = dto.ProfileIconUrl,
+                LastRechargeTime = DateTime.UtcNow
             };
 
             _db.Characters.Add(chr);
@@ -102,7 +115,8 @@ namespace backend.Controllers
                     chr.InventoryJson,
                     chr.EquipmentJson,
                     chr.CreatedAt,
-                    chr.UpdatedAt
+                    chr.UpdatedAt,
+                    chr.LastRechargeTime
                 }
             );
         }

@@ -16,13 +16,13 @@ namespace backend.Models
 
         public int MaxHealth { get; set; } = 100;
         public int CurrentHealth { get; set; } = 100;
-        public int MaxEnergy { get; set; } = 3;
-        public int CurrentEnergy { get; set; } = 3;
+        public int MaxEnergy { get; set; } = 5;
+        public int CurrentEnergy { get; set; } = 5;
 
         public int Attack { get; set; } = 10;
         public int Defense { get; set; } = 5;
         public int Agility { get; set; } = 5;
-        public double CriticalChance { get; set; } = 0.05; 
+        public double CriticalChance { get; set; } = 0.05;
 
         public int Credits { get; set; } = 0;
         public string InventoryJson { get; set; } = string.Empty;
@@ -30,5 +30,6 @@ namespace backend.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime LastRechargeTime { get; set; } = DateTime.UtcNow;
     }
 }

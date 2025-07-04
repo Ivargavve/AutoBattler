@@ -4,8 +4,8 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
 import { User } from './services/user';
 import { Character } from './services/character';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, timer, of } from 'rxjs';
+import { map, switchMap, startWith } from 'rxjs/operators';
 import { LoadingSpinnerComponent } from './components/loading-component/loading-component';
 import {
   faHome,
@@ -29,15 +29,19 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     LoadingSpinnerComponent,
     FontAwesomeModule
   ],
-  templateUrl: './app.html', 
+  templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App implements OnInit {
   public currentTheme: 'light' | 'dark' = 'light';
   public user$: Observable<User | null>;
   public character$: Observable<Character | null>;
-  public loading = true; 
+  public loading = true;
 
+  lastRechargeTime: Date | null = null;
+  rechargeIntervalMinutes = 2;
+
+  // Ikoner
   faHome = faHome;
   faFistRaised = faFistRaised;
   faBoxOpen = faBoxOpen;
@@ -47,10 +51,36 @@ export class App implements OnInit {
   faBookOpen = faBookOpen;
   faUserSecret = faUserSecret;
 
+  // Reaktiv recharge-timer
+  public rechargeTimer$: Observable<string | null>;
+
   constructor(public auth: AuthService, private router: Router) {
     this.user$ = this.auth.user$;
     this.character$ = this.user$.pipe(
       map(user => user?.character ?? null)
+    );
+
+    // --- TIMER LOGIKEN ---
+    this.rechargeTimer$ = this.character$.pipe(
+      switchMap(char => {
+        if (!char?.lastRechargeTime) return of('00:00');
+        return timer(0, 1000).pipe(
+          map(() => {
+            const lastRecharge = char.lastRechargeTime;
+            const last = (typeof lastRecharge === 'string' || lastRecharge instanceof Date)
+              ? new Date(lastRecharge)
+              : new Date();
+            const now = new Date();
+            const diffSec = Math.floor((now.getTime() - last.getTime()) / 1000);
+            const intervalSec = this.rechargeIntervalMinutes * 60;
+            const timeUntilNext = intervalSec - (diffSec % intervalSec);
+            const mins = Math.floor(timeUntilNext / 60);
+            const secs = timeUntilNext % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+          })
+        );
+      }),
+      startWith('00:00')
     );
   }
 
@@ -65,18 +95,27 @@ export class App implements OnInit {
     if (this.auth.isLoggedIn) {
       try {
         await this.auth.loadUserWithCharacter();
+
         if (currentUrl === '/login' || currentUrl === '/') {
           this.router.navigate(['/home']);
         }
       } catch (error) {
         this.auth.logout();
         this.router.navigate(['/login']);
-      } 
-    } 
+      }
+    }
     this.loading = false;
   }
 
-  
+  setLastRechargeTimeFromCharacter(): void {
+    const user = this.auth.user;
+    if (user && user.character && user.character.lastRechargeTime) {
+      this.lastRechargeTime = new Date(user.character.lastRechargeTime);
+    } else {
+      this.lastRechargeTime = null;
+    }
+  }
+
   get showPanels$(): Observable<boolean> {
     return this.auth.user$.pipe(
       map(user => !!user && !user.needsUsernameSetup)
@@ -96,13 +135,12 @@ export class App implements OnInit {
     this.auth.logout();
   }
 
-  getXpRequired(level: number): number {
-    return 100;
+  getXpPercentage(xp: number): number {
+    const xpForCurrentLevel = xp;
+    return Math.max(0, Math.min((xpForCurrentLevel / 100) * 100, 100));
   }
-
-  getXpPercentage(xp: number, level: number): number {
-    const required = this.getXpRequired(level);
-    return Math.min((xp / required) * 100, 100);
+  getUserXpPercentage(user: User) {
+    if (!user) return 0;
+    return Math.max(0, Math.min((user.experiencePoints / 100) * 100, 100));
   }
-
 }
