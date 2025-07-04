@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Fighter, BattleResponse } from '../../services/battle-interfaces';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-battle',
@@ -32,7 +33,7 @@ export class BattleComponent implements OnInit {
 
   loadPlayerData(): void {
     this.isLoading = true;
-    this.http.get<any>('http://localhost:5051/api/characters/me').subscribe({
+    this.http.get<any>(`${environment.apiUrl}/characters/me`).subscribe({
       next: (playerData) => {
         this.player = {
           name: playerData.name,
