@@ -30,5 +30,45 @@ export const routes: Routes = [
     path: 'home', 
     loadComponent: () => import('./components/home-component/home-component').then(m => m.HomeComponent),
     canActivate: [AuthGuard]
+  },
+  { 
+    path: 'battle', 
+    loadComponent: () => import('./components/battle-component/battle-component').then(m => m.BattleComponent),
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'vault', 
+    loadComponent: () => import('./components/vault-component/vault-component').then(m => m.VaultComponent),
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'bazaar', 
+    loadComponent: () => import('./components/bazaar-component/bazaar-component').then(m => m.BazaarComponent),
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'social', 
+    loadComponent: () => import('./components/social-component/social-component').then(m => m.SocialComponent),
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'social', 
+    loadComponent: () => import('./components/social-component/social-component').then(m => m.SocialComponent),
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'hall-of-legends', 
+    loadComponent: () => import('./components/hall-of-legends-component/hall-of-legends-component').then(m => m.HallOfLegendsComponent),
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'tales', 
+    loadComponent: () => import('./components/tales-component/tales-component').then(m => m.TalesComponent),
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'hero', 
+    loadComponent: () => import('./components/hero-component/hero-component').then(m => m.HeroComponent),
+    canActivate: [AuthGuard]
   }
 ];

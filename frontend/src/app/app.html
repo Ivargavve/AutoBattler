@@ -8,16 +8,33 @@
         <div class="sidebar-inner">
           <div routerLink="/home" class="logo">AutoBattler</div>
           <nav class="nav-section">
-            <a routerLink="/home">🏠 Home</a>
-            <a routerLink="/home">⚔️ Battle</a>
-            <a routerLink="/home">🧰 Armory</a>
-            <a routerLink="/home">🏪 Shop</a>
-            <a routerLink="/home">👥 Social</a>
-            <a routerLink="/home">🪦 Graveyard</a>
-            <a routerLink="/home">🏆 Achievements</a>
-            <a routerLink="/home">📜 Lore</a>
-              <a routerLink="/privacy">📖 Privacy Policy</a>
+            <a routerLink="/home">
+              <fa-icon [icon]="faHome"></fa-icon>Home
+            </a>
+            <a routerLink="/battle">
+              <fa-icon [icon]="faFistRaised"></fa-icon>Battle
+            </a>
+            <a routerLink="/vault">
+              <fa-icon [icon]="faBoxOpen"></fa-icon>Vault
+            </a>
+            <a routerLink="/bazaar">
+              <fa-icon [icon]="faStore"></fa-icon>Bazaar
+            </a>
+            <a routerLink="/social">
+              <fa-icon [icon]="faUsers"></fa-icon>Social
+            </a>
+            <a routerLink="/hall-of-legends">
+              <fa-icon [icon]="faTrophy"></fa-icon>Hall of Legends
+            </a>
+            <a routerLink="/tales">
+              <fa-icon [icon]="faBookOpen"></fa-icon>Tales
+            </a>
+            <a routerLink="/privacy">
+              <fa-icon [icon]="faUserSecret"></fa-icon>Privacy Policy
+            </a>
           </nav>
+
+
         </div>
         <div class="logout-wrapper">
           <a (click)="logout()" class="logout-link" href="#">
@@ -90,7 +107,7 @@
 
           <!-- Character -->
           <ng-container *ngIf="user.character; else createCharacterPrompt">
-            <div class="character-header-row" routerLink="/profile">
+            <div class="character-header-row" routerLink="/hero">
               <img 
                 *ngIf="user.character.profileIconUrl"
                 [src]="user.character.profileIconUrl"

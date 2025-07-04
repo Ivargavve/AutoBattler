@@ -7,6 +7,17 @@ import { Character } from './services/character';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { LoadingSpinnerComponent } from './components/loading-component/loading-component';
+import {
+  faHome,
+  faFistRaised,
+  faBoxOpen,
+  faStore,
+  faUsers,
+  faTrophy,
+  faBookOpen,
+  faUserSecret
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-root',
@@ -15,9 +26,10 @@ import { LoadingSpinnerComponent } from './components/loading-component/loading-
     RouterOutlet,
     RouterModule,
     CommonModule,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    FontAwesomeModule
   ],
-  templateUrl: './app.html',
+  templateUrl: './app.html', 
   styleUrl: './app.scss'
 })
 export class App implements OnInit {
@@ -25,6 +37,15 @@ export class App implements OnInit {
   public user$: Observable<User | null>;
   public character$: Observable<Character | null>;
   public loading = true; 
+
+  faHome = faHome;
+  faFistRaised = faFistRaised;
+  faBoxOpen = faBoxOpen;
+  faStore = faStore;
+  faUsers = faUsers;
+  faTrophy = faTrophy;
+  faBookOpen = faBookOpen;
+  faUserSecret = faUserSecret;
 
   constructor(public auth: AuthService, private router: Router) {
     this.user$ = this.auth.user$;
