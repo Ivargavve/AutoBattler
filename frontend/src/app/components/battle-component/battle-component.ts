@@ -66,7 +66,7 @@ export class BattleComponent implements OnInit {
       this.battleEnded = false;  // Viktigt: striden är pågående
       this.battleLog = ['A wild Goblin appears!']; // Reset loggen med startmeddelandet
 
-      this.http.get<any>('http://localhost:5051/api/characters/me').subscribe({
+      this.http.get<any>(`${environment.apiUrl}/characters/me`).subscribe({
         next: (playerData) => {
           this.player = {
             name: playerData.name,
@@ -103,7 +103,7 @@ export class BattleComponent implements OnInit {
       action: 'attack'
     };
 
-    this.http.post<BattleResponse>('http://localhost:5051/api/battle/turn', req)
+    this.http.post<BattleResponse>(`${environment.apiUrl}/battle/turn`, req)
     .subscribe({
       next: (res) => {
         this.player!.hp = res.playerHp;
