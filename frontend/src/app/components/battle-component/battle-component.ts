@@ -27,6 +27,43 @@ export class BattleComponent implements OnInit {
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
+  formatBattleLog(log: string): string {
+    let out = log;
+
+    // Matcha när PLAYER gör skada
+    out = out.replace(/The attack deals (\d+) damage to the goblin\./gi, 
+      `<span class="log-damage-friend">The attack deals $1 damage to the goblin.</span>`);
+
+    // Matcha när FIENDEN gör skada
+    out = out.replace(/You take (\d+) damage from the attack\./gi, 
+      `<span class="log-damage-enemy">You take $1 damage from the attack.</span>`);
+
+    // Highlighta crits och victory etc
+    out = out.replace(/Critical hit/gi, `<span class="log-crit">Critical hit</span>`)
+      .replace(/Victory/gi, `<span class="log-victory">Victory</span>`)
+      .replace(/defeated/gi, `<span class="log-defeat">defeated</span>`);
+
+    return out;
+  }
+
+  isEnemyDamageLog(log: string): boolean {
+    if (!this.player?.name) return false;
+    return new RegExp(`${this.player.name} takes \\d+ damage`, 'i').test(log);
+  }
+  isFriendlyDamageLog(log: string): boolean {
+    if (!this.player?.name) return false;
+    return new RegExp(`${this.player.name} deals \\d+ damage`, 'i').test(log);
+  }
+  isCritLog(log: string): boolean {
+    return /critical hit/i.test(log);
+  }
+  isVictoryLog(log: string): boolean {
+    return /victory/i.test(log);
+  }
+  isDefeatLog(log: string): boolean {
+    return /defeated/i.test(log);
+  }
+
   ngOnInit(): void {
     this.loadPlayerData();
   }
@@ -63,8 +100,7 @@ export class BattleComponent implements OnInit {
   startNewBattle(): void {
     if (this.playerEnergy > 0) {
       this.isLoading = true;
-      this.battleEnded = false;  // Viktigt: striden är pågående
-      this.battleLog = ['A wild Goblin appears!']; // Reset loggen med startmeddelandet
+      this.battleEnded = false;
 
       this.http.get<any>(`${environment.apiUrl}/characters/me`).subscribe({
         next: (playerData) => {

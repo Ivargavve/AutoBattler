@@ -80,7 +80,6 @@ export class App implements OnInit {
         tap(({ mins, secs }) => {
           if (mins === 0 && secs <= 1 && !this.rechargeCalled) {
             this.rechargeCalled = true;
-            this.setLastRechargeTimeFromCharacter();
             window.location.reload();
             this.auth.loadUserWithCharacter().finally(() => {
               setTimeout(() => this.rechargeCalled = false, 2000);

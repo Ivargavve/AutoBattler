@@ -1,36 +1,62 @@
-<div class="battle-container">
-  <h2>Battle!</h2>
-  
-  <div class="fighter-row">
-    <div class="player-info">
-      <div class="name">{{ player?.name }}</div>
-      <div class="hp">HP: {{ player?.hp }} / {{ player?.maxHp }}</div>
+<div class="battle-outer">
+  <div class="battle-window">
+    <div class="fighter-row">
+      <div class="player-info">
+        <div class="name">{{ player?.name }}</div>
+        <div class="hp">HP: {{ player?.hp }} / {{ player?.maxHp }}</div>
+      </div>
+      <div class="vs">VS</div>
+      <div class="enemy-info">
+        <div class="name">{{ enemy?.name }}</div>
+        <div class="hp">HP: {{ enemy?.hp }} / {{ enemy?.maxHp }}</div>
+      </div>
     </div>
-    <div class="vs">VS</div>
-    <div class="enemy-info">
-      <div class="name">{{ enemy?.name }}</div>
-      <div class="hp">HP: {{ enemy?.hp }} / {{ enemy?.maxHp }}</div>
+
+    <div class="battle-log-wrapper">
+      <div class="battle-log">
+        <div 
+        *ngFor="let log of battleLog" 
+        [ngClass]="{
+          'battle-victory': isVictoryLog(log),
+          'battle-defeat': isDefeatLog(log),
+          'battle-crit': isCritLog(log),
+          'battle-enemy-damage': isEnemyDamageLog(log),
+          'battle-friendly-damage': isFriendlyDamageLog(log)
+        }"
+      >
+        {{ log }}
+      </div>
+    </div>
+
+    <div class="battle-controls">
+      <div class="battle-actions-left">
+        <button 
+          *ngIf="battleEnded"
+          (click)="startNewBattle()" 
+          [disabled]="playerEnergy <= 0"
+          class="start-battle-btn">
+          Start New Battle
+        </button>
+      </div>
+      <div class="battle-actions-right" *ngIf="!battleEnded">
+        <!-- Expand for multiple attacks later! -->
+        <button 
+          (click)="attack()"
+          [disabled]="isLoading || battleEnded"
+          class="attack-btn">
+          Standard Attack
+        </button>
+        <button
+          disabled
+          class="attack-btn alt">
+          Special Attack
+        </button>
+        <button
+          disabled
+          class="attack-btn alt">
+          Defend
+        </button>
+      </div>
     </div>
   </div>
-  
-  <div class="battle-log">
-    <div *ngFor="let log of battleLog">{{ log }}</div>
-  </div>
-
-  <button 
-    *ngIf="!battleEnded; else startNewBattleBtn"
-    (click)="attack()" 
-    [disabled]="isLoading || battleEnded"
-    class="attack-btn">
-    Attack!
-  </button>
-
-  <ng-template #startNewBattleBtn>
-    <button 
-      (click)="startNewBattle()" 
-      [disabled]="playerEnergy <= 0"
-      class="start-battle-btn">
-      Start New Battle
-    </button>
-  </ng-template>
 </div>

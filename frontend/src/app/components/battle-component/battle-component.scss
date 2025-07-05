@@ -1,139 +1,229 @@
-.battle-container {
-  background: var(--grey-bg);
-  margin: 0 auto;
-  color: var(--text);
-  font-family: 'JetBrains Mono', 'Share Tech Mono', monospace;
-  position: relative;
+.log-damage { color: var(--bar-fill-red, #e74c3c); font-weight: bold; }
+.log-crit { color: var(--accent, #86f7b3); font-weight: bold; }
+.log-victory { color: var(--accent-hover, #baffd8); font-weight: bold; }
+.log-defeat { color: var(--bar-fill-red, #e74c3c); font-weight: bold; }
 
-  h2 {
-    color: var(white);
-    font-size: 2.2rem;
-    letter-spacing: 1.5px;
-    text-shadow: 0 0 12px var(--accent-shadow);
-    margin-bottom: 1.6rem;
-    font-weight: bold;
-    text-align: left;
-  }
+.battle-outer {
+  background: var(--bg, #0b0c0b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  height: 100vh;
+}
 
-  .fighter-row {
+.battle-window {
+  display: flex;
+  flex-direction: column;
+  background: var(--grey-bg, #181818);
+  width: 95%;
+  padding: 0;
+  overflow: hidden;
+  height: 100vh;
+}
+
+.fighter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border: 1px solid var(--sidebar-border, #2c2c2c);
+  border-radius: 6px;
+  background: var(--friend-li-bg, #111);
+  padding: 0.5rem 1.2rem 0.5rem 1.2rem;
+  gap: 1.4rem;
+  margin: 1.1rem 1.1rem 0.6rem 1.1rem;
+
+  .player-info, .enemy-info {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 1.3rem;
-
-    .player-info, .enemy-info {
-      display: flex;
-      flex-direction: column;
-      gap: 0.08rem;
-
-      .name {
-        color: var(--accent);
-        font-size: 1.12rem;
-        font-weight: 700;
-        text-shadow: 0 0 8px var(--accent-logo-shadow);
-        margin-bottom: 0.05rem;
-      }
-
-      .hp {
-        font-size: 1.04rem;
-        color: var(--meta-text);
-        font-weight: 600;
-        text-shadow: 0 0 5px var(--accent-shadow);
-      }
+    flex-direction: column;
+    gap: 0.02rem;
+    .name {
+      color: var(--accent, #86f7b3);
+      font-size: 1.03rem;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      margin-bottom: 0.03rem;
     }
-
-    .vs {
-      color: var(--accent);
-      font-size: 1.25rem;
-      font-weight: bold;
-      text-shadow: 0 0 12px var(--accent-hover-shadow);
-      margin: 0 1.2rem;
-      letter-spacing: 2px;
+    .hp {
+      font-size: 0.93rem;
+      color: var(--meta-text, #7cbfa5);
+      font-weight: 600;
+      letter-spacing: 0.15px;
     }
   }
-
-  .battle-log {
-    background: var(--bg);
-    min-height: 90px;
-    max-height: 180px;
-    overflow-y: auto;
-    border-radius: 6px;
-    margin: 1.1rem 0 1.5rem 0;
-    padding: 0.7rem 1rem 0.7rem 0.8rem;
-    font-size: 1.04rem;
-    box-shadow: 0 0 7px var(--accent-shadow);
-    border: 1px solid var(--card-border);
-
-    div {
-      margin-bottom: 0.2rem;
-      white-space: pre-line;
-      line-height: 1.17;
-      font-family: inherit;
-      letter-spacing: 0.4px;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  .attack-btn,
-  button {
-    background: var(--btn-bg);
-    color: var(--accent);
-    border: 2px solid var(--btn-border);
-    border-radius: 7px;
-    font-family: inherit;
-    font-size: 1.17rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    margin-top: 0.1rem;
-    margin-bottom: 0.4rem;
-    padding: 0.38rem 1.25rem;
-    cursor: pointer;
-    transition: 
-      background 0.2s, 
-      color 0.16s, 
-      border-color 0.18s, 
-      box-shadow 0.2s;
-
-    &:hover:not(:disabled) {
-      background: var(--btn-hover-bg);
-      color: var(--accent-hover);
-      border-color: var(--accent-hover);
-      box-shadow: 0 0 12px 0 var(--accent-hover-shadow);
-    }
-
-    &:disabled {
-      background: var(--sidebar-link-hover-bg);
-      color: var(--offline);
-      cursor: not-allowed;
-      border-color: var(--sidebar-border);
-    }
-  }
-
-  // Victory/Defeat
-  .battle-ended {
-    margin-top: 1rem;
-    font-size: 1.3rem;
+  .vs {
+    color: var(--accent, #86f7b3);
+    font-size: 1.09rem;
     font-weight: bold;
-    color: var(--accent);
-    text-shadow: 0 0 13px var(--accent-hover-shadow);
-  }
-  .defeat {
-    color: #e74c3c;
-    text-shadow: 0 0 8px #e74c3ccc;
+    letter-spacing: 2px;
+    align-self: center;
+    background: var(--btn-bg, #1b1d1b);
+    border-radius: 4px;
+    padding: 0.23rem 1.2rem 0.23rem 1.2rem;
+    border: 1px solid var(--sidebar-border, #2c2c2c);
   }
 }
 
-// Responsiv på mobil
-@media (max-width: 600px) {
-  .battle-container {
-    padding: 1rem 0.6rem 1.2rem 0.6rem;
-    max-width: 98vw;
+.battle-log-wrapper {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 340px;
+  max-height: 100%;
+  overflow: hidden;
+  background: var(--friend-li-bg, #111);
+  margin: 0 1.1rem;
+  border-radius: 4px;
+}
+
+.battle-log {
+  background: var(--friend-li-bg, #111);
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  border-radius: 4px;
+  padding: 0.6rem 1.1rem 1.1rem 1.1rem;
+  font-size: 0.8rem;
+  font-family: 'Fira Mono', 'JetBrains Mono', monospace;
+  color: var(--text, #d1ffe8);
+
+  div {
+    margin-bottom: 0.18rem;
+    white-space: pre-line;
+    line-height: 1.18;
+    letter-spacing: 0.13px;
+    font-family: inherit;
+    font-size: 0.98rem;
+
+    &.battle-victory {
+      color: var(--accent-hover, #baffd8);
+      font-weight: bold;
+    }
+    &.battle-defeat {
+      color: var(--bar-fill-red, #e74c3c);
+      font-weight: bold;
+    }
+    &.battle-crit {
+      color: var(--accent, #86f7b3);
+      font-weight: bold;
+    }
+    &.battle-enemy-damage {
+      color: var(--bar-fill-red, #e74c3c);
+      font-weight: 600;
+    }
+    &.battle-friendly-damage {
+      color: var(--accent, #248221);  
+      font-weight: 600;
+    }
+    &:last-child {
+      margin-bottom: 0;
+      color: var(--accent, #86f7b3);
+      font-weight: 700;
+      font-size: 1.03rem;
+      letter-spacing: 1px;
+    }
   }
-  .battle-log {
-    font-size: 0.95rem;
-    padding: 0.5rem 0.6rem;
+}
+
+.battle-controls {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0.9rem 1.1rem 1.2rem 1.1rem;
+  gap: 1rem;
+  background: transparent;
+  @media (max-width: 900px) {
+    padding: 0.6rem 0.4rem 1rem 0.4rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+}
+
+.battle-actions-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+
+.battle-actions-right {
+  display: flex;
+  flex-direction: row;
+  gap: 1.1rem;
+  align-items: flex-end;
+}
+
+.attack-btn,
+.start-battle-btn,
+button {
+  background: var(--btn-bg, #1b1d1b);
+  color: var(--accent, #86f7b3);
+  border: 2px solid var(--btn-border, #52d798);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 0.27rem 1.7rem;
+  cursor: pointer;
+  transition:
+    background 0.13s,
+    color 0.13s,
+    border-color 0.16s;
+  min-width: 122px;
+  &:hover:not(:disabled) {
+    background: var(--btn-hover-bg, #143d2a);
+    color: var(--accent-hover, #baffd8);
+    border-color: var(--accent-hover, #baffd8);
+  }
+  &:disabled {
+    background: var(--sidebar-link-hover-bg, #2c2c2c);
+    color: var(--offline, #888);
+    cursor: not-allowed;
+    border-color: var(--sidebar-border, #2c2c2c);
+    opacity: 0.7;
+  }
+  &.alt {
+    background: var(--btn-bg, #1b1d1b);
+    color: var(--meta-text, #7cbfa5);
+    border-color: var(--sidebar-border, #2c2c2c);
+    &:hover:not(:disabled) {
+      background: var(--btn-hover-bg, #143d2a);
+      color: var(--accent-hover, #baffd8);
+      border-color: var(--accent, #86f7b3);
+    }
+  }
+}
+
+@media (max-width: 800px) {
+  .battle-window {
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    border-radius: 0;
+    padding: 0;
+  }
+  .fighter-row {
+    gap: 0.15rem;
+    padding: 0.4rem 0.3rem;
+    margin: 0.6rem 0.3rem 0.5rem 0.3rem;
+  }
+  .battle-log-wrapper {
+    min-height: 110px;
+    margin: 0 0.3rem;
+  }
+  .battle-controls {
+    padding: 0.4rem 0.3rem 0.8rem 0.3rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+  }
+  .attack-btn, .start-battle-btn, button {
+    min-width: 90px;
+    font-size: 0.97rem;
+    padding: 0.14rem 0.7rem;
   }
 }
