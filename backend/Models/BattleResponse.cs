@@ -4,6 +4,7 @@ public class BattleResponse
     public int PlayerMaxHp { get; set; }
     public int PlayerEnergy { get; set; }          
     public int EnemyHp { get; set; }
+    public string EnemyName { get; set; } = string.Empty;
     public int EnemyMaxHp { get; set; }
     public List<string> BattleLog { get; set; } = new List<string>();
     public bool BattleEnded { get; set; }

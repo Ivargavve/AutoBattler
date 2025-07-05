@@ -227,3 +227,10 @@ button {
     padding: 0.14rem 0.7rem;
   }
 }
+
+.battle-divider {
+  border-bottom: 1px solid var(--accent, #2c2c2c);
+  margin: 0.65rem 0 0.75rem 0;
+  width: 100%;
+  opacity: 0.65;
+}

@@ -14,18 +14,26 @@
 
     <div class="battle-log-wrapper">
       <div class="battle-log">
-        <div 
-        *ngFor="let log of battleLog" 
-        [ngClass]="{
-          'battle-victory': isVictoryLog(log),
-          'battle-defeat': isDefeatLog(log),
-          'battle-crit': isCritLog(log),
-          'battle-enemy-damage': isEnemyDamageLog(log),
-          'battle-friendly-damage': isFriendlyDamageLog(log)
-        }"
-      >
-        {{ log }}
-      </div>
+  <ng-container *ngFor="let log of battleLog">
+    <div
+          *ngIf="log.trim() === '--- End of turn ---'; else normalLog"
+          class="battle-divider"
+        ></div>
+        <ng-template #normalLog>
+          <div 
+            [ngClass]="{
+              'battle-victory': isVictoryLog(log),
+              'battle-defeat': isDefeatLog(log),
+              'battle-crit': isCritLog(log),
+              'battle-enemy-damage': isEnemyDamageLog(log),
+              'battle-friendly-damage': isFriendlyDamageLog(log)
+            }"
+          >
+            {{ log }}
+          </div>
+        </ng-template>
+      </ng-container>
+    </div>
     </div>
 
     <div class="battle-controls">

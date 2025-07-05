@@ -17,4 +17,5 @@ export interface BattleResponse {
   userXp?: number;
   userLevel?: number;
   playerEnergy?: number;
+  enemyName: string; 
 }
