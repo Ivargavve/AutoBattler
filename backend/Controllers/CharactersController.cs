@@ -21,11 +21,13 @@ namespace backend.Controllers
         private void RechargeEnergyAndHp(Character player)
         {
             var now = DateTime.UtcNow;
-            if ((now - player.LastRechargeTime).TotalSeconds >= 120)
+            var elapsed = (now - player.LastRechargeTime).TotalSeconds;
+
+            if (elapsed >= 120 && player.CurrentEnergy < player.MaxEnergy && player.CurrentHealth <= 90)
             {
                 player.CurrentEnergy = Math.Min(player.CurrentEnergy + 1, player.MaxEnergy);   
                 player.CurrentHealth = Math.Min(player.CurrentHealth + 10, player.MaxHealth); 
-                player.LastRechargeTime = player.LastRechargeTime.AddSeconds(120);
+                player.LastRechargeTime = now; 
             }
         }
 

@@ -138,6 +138,10 @@ body, html {
   background: var(--bar-fill-yellow, #f1c40f);
 }
 
+.bar-container.grey .bar-fill {
+  background: var(--bar-fill-grey, #636363);
+}
+
 .main-content{
   flex: 1;
   display: flex;
@@ -280,13 +284,10 @@ nav a {
     list-style: none;
     padding: 0;
     font-size: 0.95rem;
+    margin: 0;
 
     li {
-      margin-bottom: 0.5rem;
-
-      strong {
-        color: var(--accent, #86f7b3);
-      }
+      margin-bottom: 0.2rem;
     }
   }
 
@@ -377,10 +378,7 @@ nav a {
 
 .currency {
   font-size: 0.85rem;
-  margin-bottom: 0.4rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
+  color: var(--accent, #86f7b3);
 
   strong {
     color: var(--accent, #86f7b3);
@@ -549,29 +547,6 @@ nav a {
   font-size: 0.95rem;
 }
 
-.xp-bar {
-  background: var(--bar-bg, #2c2c2c);
-  position: relative;
-  height: 20px;
-  overflow: hidden;
-  margin-top: 0.3rem;
-  border-radius: 4px;
-}
-
-.xp-fill {
-  background-color: var(--accent, #86f7b3);
-  height: 100%;
-}
-
-.xp-text {
-  position: absolute;
-  width: 100%;
-  text-align: center;
-  font-size: 0.75rem;
-  color: var(--xp-text, #ffffff);
-  top: 2px;
-  font-weight: bold;
-}
 .character-header-row {
   display: flex;
   align-items: center;
@@ -701,4 +676,50 @@ nav a {
   font-weight: bold;
   filter: drop-shadow(0 0 4px var(--accent-shadow));
   pointer-events: none;
+}
+.recharge-block {
+  display: flex;
+  padding: 0.2rem 0;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.22;
+  border: 1px solid var(--sidebar-border, #2c2c2c);
+  border-radius: 4px;
+  background: var(--grey-bg, #181818);
+  margin: 1rem auto 0 auto;
+  max-width: 260px;
+}
+
+.recharge-main-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  justify-content: center;
+}
+
+.recharge-timer {
+  font-family: 'Fira Mono', 'Consolas', monospace;
+  border-radius: 4px;
+  padding: 3px 13px;
+  font-weight: bold;
+  font-size: 1.05rem;
+  margin-left: 6px;
+  letter-spacing: 1px;
+}
+
+.recharge-last-row {
+  margin-top: 5px;
+  color: var(--text-secondary, #888);
+  font-size: 0.94em;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center; 
+}
+
+.recharge-last-label {
+  font-size: 0.97em;
+  color: var(--sidebar-logout, #888);
+  opacity: 0.88;
 }

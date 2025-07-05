@@ -101,7 +101,7 @@
 
 
           <div class="credits">
-            <strong>Credits:</strong> {{ user.credits }} <br>
+            <strong class="currency">Credits:</strong> {{ user.credits }} <br>
           </div>
 
           <hr class="divider" />
@@ -125,9 +125,9 @@
             <ul>
               <li>
                 <strong>Lvl: {{ character.level }}</strong>
-                <div class="xp-bar">
-                  <div class="xp-fill" [style.width.%]="getXpPercentage(character.experiencePoints)"></div>
-                  <span class="xp-text">{{ character.experiencePoints }} / {{ 100 }}</span>
+                <div class="bar-container grey">
+                  <div class="bar-fill" [style.width.%]="getXpPercentage(character.experiencePoints)"></div>
+                  <span class="bar-text">{{ character.experiencePoints }} / {{ 100 }}</span>
                 </div>
               </li>
               <li>
@@ -145,8 +145,16 @@
                 </div>
               </li>
               <li>
-                <strong>Last Recharge:</strong>
-                <span class="recharge-time">{{ character.lastRechargeTime | date:'short' }}</span>
+              <div class="recharge-block">
+                <div class="recharge-main-row">
+                  <strong>Recharge in:</strong>{{ rechargeTimer$ | async }}
+                </div>
+                <div class="recharge-last-row">
+                  <span class="recharge-last-label">Last:</span>
+                  <span class="recharge-time">{{ character.lastRechargeTime | date:'short' }}</span>
+                </div>
+              </div>
+            </li>
             </ul>
           </ng-container>
 

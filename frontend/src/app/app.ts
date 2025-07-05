@@ -18,6 +18,7 @@ import {
   faUserSecret
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -40,8 +41,8 @@ export class App implements OnInit {
 
   lastRechargeTime: Date | null = null;
   rechargeIntervalMinutes = 2;
+  private rechargeCalled = false;
 
-  // Ikoner
   faHome = faHome;
   faFistRaised = faFistRaised;
   faBoxOpen = faBoxOpen;
@@ -51,7 +52,6 @@ export class App implements OnInit {
   faBookOpen = faBookOpen;
   faUserSecret = faUserSecret;
 
-  // Reaktiv recharge-timer
   public rechargeTimer$: Observable<string | null>;
 
   constructor(public auth: AuthService, private router: Router) {
@@ -60,26 +60,36 @@ export class App implements OnInit {
       map(user => user?.character ?? null)
     );
 
-    // --- TIMER LOGIKEN ---
     this.rechargeTimer$ = this.character$.pipe(
-      switchMap(char => {
-        if (!char?.lastRechargeTime) return of('00:00');
-        return timer(0, 1000).pipe(
-          map(() => {
-            const lastRecharge = char.lastRechargeTime;
-            const last = (typeof lastRecharge === 'string' || lastRecharge instanceof Date)
-              ? new Date(lastRecharge)
-              : new Date();
-            const now = new Date();
-            const diffSec = Math.floor((now.getTime() - last.getTime()) / 1000);
-            const intervalSec = this.rechargeIntervalMinutes * 60;
-            const timeUntilNext = intervalSec - (diffSec % intervalSec);
-            const mins = Math.floor(timeUntilNext / 60);
-            const secs = timeUntilNext % 60;
-            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-          })
-        );
-      }),
+    switchMap(char => {
+      if (!char?.lastRechargeTime) return of('00:00');
+      return timer(0, 1000).pipe(
+        map(() => {
+          const lastRecharge = char.lastRechargeTime;
+          const last = (typeof lastRecharge === 'string' || lastRecharge instanceof Date)
+            ? new Date(lastRecharge)
+            : new Date();
+          const now = new Date();
+          const diffSec = Math.floor((now.getTime() - last.getTime()) / 1000);
+          const intervalSec = this.rechargeIntervalMinutes * 60;
+          const timeUntilNext = intervalSec - (diffSec % intervalSec);
+          const mins = Math.floor(timeUntilNext / 60);
+          const secs = timeUntilNext % 60;
+          return { mins, secs, timerString: `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}` };
+        }),
+        tap(({ mins, secs }) => {
+          if (mins === 0 && secs <= 1 && !this.rechargeCalled) {
+            this.rechargeCalled = true;
+            this.setLastRechargeTimeFromCharacter();
+            window.location.reload();
+            this.auth.loadUserWithCharacter().finally(() => {
+              setTimeout(() => this.rechargeCalled = false, 2000);
+            });
+          }
+        }),
+        map(({ timerString }) => timerString)
+      );
+    }),
       startWith('00:00')
     );
   }
