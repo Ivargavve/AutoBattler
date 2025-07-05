@@ -5,20 +5,10 @@ import { AuthService } from './services/auth.service';
 import { User } from './services/user';
 import { Character } from './services/character';
 import { Observable, timer, of } from 'rxjs';
-import { map, switchMap, startWith } from 'rxjs/operators';
+import { map, switchMap, startWith, tap } from 'rxjs/operators';
 import { LoadingSpinnerComponent } from './components/loading-component/loading-component';
-import {
-  faHome,
-  faFistRaised,
-  faBoxOpen,
-  faStore,
-  faUsers,
-  faTrophy,
-  faBookOpen,
-  faUserSecret
-} from '@fortawesome/free-solid-svg-icons';
+import { ICONS } from './icons'; 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { tap, finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -44,15 +34,7 @@ export class App implements OnInit {
   lastRechargeTime: Date | null = null;
   rechargeIntervalMinutes = 2;
   private rechargeCalled = false;
-
-  faHome = faHome;
-  faFistRaised = faFistRaised;
-  faBoxOpen = faBoxOpen;
-  faStore = faStore;
-  faUsers = faUsers;
-  faTrophy = faTrophy;
-  faBookOpen = faBookOpen;
-  faUserSecret = faUserSecret;
+  icons = ICONS;
 
   constructor(public auth: AuthService, private router: Router) {
     this.user$ = this.auth.user$;
@@ -152,11 +134,6 @@ export class App implements OnInit {
   }
 
   getXpPercentage(xp: number): number {
-    const xpForCurrentLevel = xp;
-    return Math.max(0, Math.min((xpForCurrentLevel / 100) * 100, 100));
-  }
-  getUserXpPercentage(user: User) {
-    if (!user) return 0;
-    return Math.max(0, Math.min((user.experiencePoints / 100) * 100, 100));
+    return Math.max(0, Math.min((xp / 100) * 100, 100));
   }
 }

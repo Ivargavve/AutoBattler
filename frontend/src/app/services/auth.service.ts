@@ -1,21 +1,17 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, lastValueFrom } from 'rxjs';
+import { tap, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { User } from '../services/user';
-import { map } from 'rxjs/operators';
 import { Character } from '../services/character';
-import { lastValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = `${environment.apiUrl}/auth`;
   private googleUrl = `${environment.apiUrl}/googleauth`;
-
   private userSubject = new BehaviorSubject<User | null>(this.loadUserFromStorage());
   public user$ = this.userSubject.asObservable();
 
@@ -50,12 +46,7 @@ export class AuthService {
   }
 
   getProfile() {
-    const token = this.getToken();
-    const headers = token
-      ? new HttpHeaders().set('Authorization', `Bearer ${token}`)
-      : undefined;
-
-    return this.http.get<User>(`${environment.apiUrl}/users/me`, { headers });
+    return this.http.get<User>(`${environment.apiUrl}/users/me`);
   }
 
   private loadUserFromStorage(): User | null {
@@ -72,16 +63,8 @@ export class AuthService {
     this.userSubject.next({ ...user });
   }
 
-  getAuthHeaders(): { headers: HttpHeaders } {
-    const token = this.getToken();
-    const headers = token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : new HttpHeaders();
-    return { headers };
-  }
-
   getCharacter() {
-    const token = this.getToken();
-    const headers = token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : undefined;
-    return this.http.get<Character>(`${environment.apiUrl}/characters/me`, { headers });
+    return this.http.get<Character>(`${environment.apiUrl}/characters/me`);
   }
 
   loadUserWithCharacter(): Promise<void> {
@@ -93,15 +76,14 @@ export class AuthService {
         })
         .catch(() => {
           this.setUser({ ...profile, character: undefined });
-          
         });
     });
   }
+
   rechargeCharacter(): Promise<Character> {
-    const token = this.getToken();
-    const headers = token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : undefined;
     return lastValueFrom(
-      this.http.put<Character>(`${environment.apiUrl}/characters/recharge`, {}, { headers })
+      this.http.put<Character>(`${environment.apiUrl}/characters/recharge`, {})
     );
   }
+
 }

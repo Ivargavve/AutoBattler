@@ -9,28 +9,28 @@
           <div routerLink="/home" class="logo">AutoBattler</div>
           <nav class="nav-section">
             <a routerLink="/home">
-              <fa-icon [icon]="faHome"></fa-icon>Home
+              <fa-icon [icon]="icons.faHome"></fa-icon>Home
             </a>
             <a routerLink="/battle">
-              <fa-icon [icon]="faFistRaised"></fa-icon>Battle
+              <fa-icon [icon]="icons.faFistRaised"></fa-icon>Battle
             </a>
             <a routerLink="/vault">
-              <fa-icon [icon]="faBoxOpen"></fa-icon>Vault
+              <fa-icon [icon]="icons.faBoxOpen"></fa-icon>Vault
             </a>
             <a routerLink="/bazaar">
-              <fa-icon [icon]="faStore"></fa-icon>Bazaar
+              <fa-icon [icon]="icons.faStore"></fa-icon>Bazaar
             </a>
             <a routerLink="/social">
-              <fa-icon [icon]="faUsers"></fa-icon>Social
+              <fa-icon [icon]="icons.faUsers"></fa-icon>Social
             </a>
             <a routerLink="/hall-of-legends">
-              <fa-icon [icon]="faTrophy"></fa-icon>Hall of Legends
+              <fa-icon [icon]="icons.faTrophy"></fa-icon>Hall of Legends
             </a>
             <a routerLink="/tales">
-              <fa-icon [icon]="faBookOpen"></fa-icon>Tales
+              <fa-icon [icon]="icons.faBookOpen"></fa-icon>Tales
             </a>
             <a routerLink="/privacy">
-              <fa-icon [icon]="faUserSecret"></fa-icon>Privacy Policy
+              <fa-icon [icon]="icons.faUserSecret"></fa-icon>Privacy Policy
             </a>
           </nav>
 
@@ -126,7 +126,7 @@
               <li>
                 <strong>Lvl: {{ character.level }}</strong>
                 <div class="bar-container grey">
-                  <div class="bar-fill" [style.width.%]="getXpPercentage(character.experiencePoints)"></div>
+                  <div class="bar-fill" [style.width.%]="(character.experiencePoints / 100) * 100"></div>
                   <span class="bar-text">{{ character.experiencePoints }} / {{ 100 }}</span>
                 </div>
               </li>

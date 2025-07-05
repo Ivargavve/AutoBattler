@@ -75,10 +75,9 @@ export class CreateCharacterComponent implements OnInit {
       return;
     }
     this.isSubmitting = true;
-    const options = this.authService.getAuthHeaders();
 
     try {
-      await firstValueFrom(this.http.post(`${environment.apiUrl}/characters`, this.characterForm.value, options));
+      await firstValueFrom(this.http.post(`${environment.apiUrl}/characters`, this.characterForm.value));
       await this.authService.loadUserWithCharacter();
       await this.router.navigate(['/home']);
     } catch (err: any) {
