@@ -18,17 +18,61 @@ namespace backend.Controllers
         {
             _db = db;
         }
-        private void RechargeEnergyAndHp(Character player)
-        {
-            var now = DateTime.UtcNow;
-            var elapsed = (now - player.LastRechargeTime).TotalSeconds;
 
-            if (elapsed >= 120 && player.CurrentEnergy < player.MaxEnergy && player.CurrentHealth <= 90)
+        [HttpPut("recharge")]
+        public async Task<IActionResult> RechargeCharacter()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+                return Unauthorized();
+
+            var chr = await _db.Characters.FirstOrDefaultAsync(c => c.UserId == userId);
+            if (chr == null)
+                return NotFound();
+
+            var now = DateTime.UtcNow;
+            var elapsedSeconds = (now - chr.LastRechargeTime).TotalSeconds;
+
+            const int energyInterval = 120;
+
+            int ticks = (int)(elapsedSeconds / energyInterval);
+
+            if (ticks > 0)
             {
-                player.CurrentEnergy = Math.Min(player.CurrentEnergy + 1, player.MaxEnergy);   
-                player.CurrentHealth = Math.Min(player.CurrentHealth + 10, player.MaxHealth); 
-                player.LastRechargeTime = now; 
+                int energyToAdd = Math.Min(ticks, chr.MaxEnergy - chr.CurrentEnergy);
+                int healthToAdd = Math.Min(ticks * 10, chr.MaxHealth - chr.CurrentHealth);
+
+                chr.CurrentEnergy += energyToAdd;
+                chr.CurrentHealth += healthToAdd;
+
+                chr.LastRechargeTime = chr.LastRechargeTime.AddSeconds(ticks * energyInterval);
+
+                await _db.SaveChangesAsync();
             }
+
+            return Ok(new
+            {
+                chr.Id,
+                chr.Name,
+                chr.Class,
+                chr.ProfileIconUrl,
+                chr.Level,
+                chr.ExperiencePoints,
+                chr.CurrentHealth,
+                chr.MaxHealth,
+                chr.CurrentEnergy,
+                chr.MaxEnergy,
+                chr.Attack,
+                chr.Defense,
+                chr.Agility,
+                chr.CriticalChance,
+                chr.Credits,
+                chr.InventoryJson,
+                chr.EquipmentJson,
+                chr.CreatedAt,
+                chr.UpdatedAt,
+                chr.LastRechargeTime
+            });
         }
 
         [HttpGet("me")]
@@ -43,10 +87,7 @@ namespace backend.Controllers
             if (chr == null)
                 return NotFound();
 
-            RechargeEnergyAndHp(chr);
-
-            await _db.SaveChangesAsync();
-
+            // Ingen recharge här längre!
             return Ok(new
             {
                 chr.Id,
@@ -158,6 +199,7 @@ namespace backend.Controllers
             return NoContent();
         }
     }
+
     public class CreateCharacterDto
     {
         public string Name { get; set; } = string.Empty;

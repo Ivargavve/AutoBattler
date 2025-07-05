@@ -97,5 +97,11 @@ export class AuthService {
         });
     });
   }
-
+  rechargeCharacter(): Promise<Character> {
+    const token = this.getToken();
+    const headers = token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : undefined;
+    return lastValueFrom(
+      this.http.put<Character>(`${environment.apiUrl}/characters/recharge`, {}, { headers })
+    );
+  }
 }

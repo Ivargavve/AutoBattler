@@ -18,7 +18,7 @@ import {
   faUserSecret
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { tap } from 'rxjs/operators';
+import { tap, finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -37,6 +37,8 @@ export class App implements OnInit {
   public currentTheme: 'light' | 'dark' = 'light';
   public user$: Observable<User | null>;
   public character$: Observable<Character | null>;
+  public rechargeTimer$: Observable<string | null>;
+
   public loading = true;
 
   lastRechargeTime: Date | null = null;
@@ -52,8 +54,6 @@ export class App implements OnInit {
   faBookOpen = faBookOpen;
   faUserSecret = faUserSecret;
 
-  public rechargeTimer$: Observable<string | null>;
-
   constructor(public auth: AuthService, private router: Router) {
     this.user$ = this.auth.user$;
     this.character$ = this.user$.pipe(
@@ -61,34 +61,41 @@ export class App implements OnInit {
     );
 
     this.rechargeTimer$ = this.character$.pipe(
-    switchMap(char => {
-      if (!char?.lastRechargeTime) return of('00:00');
-      return timer(0, 1000).pipe(
-        map(() => {
-          const lastRecharge = char.lastRechargeTime;
-          const last = (typeof lastRecharge === 'string' || lastRecharge instanceof Date)
-            ? new Date(lastRecharge)
-            : new Date();
-          const now = new Date();
-          const diffSec = Math.floor((now.getTime() - last.getTime()) / 1000);
-          const intervalSec = this.rechargeIntervalMinutes * 60;
-          const timeUntilNext = intervalSec - (diffSec % intervalSec);
-          const mins = Math.floor(timeUntilNext / 60);
-          const secs = timeUntilNext % 60;
-          return { mins, secs, timerString: `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}` };
-        }),
-        tap(({ mins, secs }) => {
-          if (mins === 0 && secs <= 1 && !this.rechargeCalled) {
-            this.rechargeCalled = true;
-            window.location.reload();
-            this.auth.loadUserWithCharacter().finally(() => {
-              setTimeout(() => this.rechargeCalled = false, 2000);
-            });
-          }
-        }),
-        map(({ timerString }) => timerString)
-      );
-    }),
+      switchMap(char => {
+        if (!char?.lastRechargeTime) return of('00:00');
+        return timer(0, 1000).pipe(
+          map(() => {
+            const lastRecharge = char.lastRechargeTime;
+            const last = (typeof lastRecharge === 'string' || lastRecharge instanceof Date)
+              ? new Date(lastRecharge)
+              : new Date();
+            const now = new Date();
+            const diffSec = Math.floor((now.getTime() - last.getTime()) / 1000);
+            const intervalSec = this.rechargeIntervalMinutes * 60;
+            const timeUntilNext = intervalSec - (diffSec % intervalSec);
+            const mins = Math.floor(timeUntilNext / 60);
+            const secs = timeUntilNext % 60;
+            return { mins, secs, timerString: `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}` };
+          }),
+          tap(({ mins, secs }) => {
+            if (mins === 0 && secs <= 1 && !this.rechargeCalled) {
+              this.rechargeCalled = true;
+              this.auth.rechargeCharacter()
+                .then(character => {
+                  const user = this.auth.user;
+                  if (user) {
+                    user.character = character;
+                    this.auth.setUser(user);
+                  }
+                })
+                .finally(() => {
+                  setTimeout(() => this.rechargeCalled = false, 2000);
+                });
+            }
+          }),
+          map(({ timerString }) => timerString)
+        );
+      }),
       startWith('00:00')
     );
   }
