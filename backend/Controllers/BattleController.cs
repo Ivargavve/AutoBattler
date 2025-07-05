@@ -4,6 +4,9 @@ using backend.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using backend.Utils;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace backend.Controllers
 {
@@ -36,7 +39,7 @@ namespace backend.Controllers
             if (player.CurrentEnergy <= 0)
                 return BadRequest("Not enough energy to perform an attack.");
 
-            var rand = new Random();
+            var rand = new System.Random();
             var enemyTemplates = EnemyTemplates.All;
 
             EnemyTemplate selectedEnemy;
@@ -65,41 +68,45 @@ namespace backend.Controllers
                 CritChance = selectedEnemy.CritChance
             };
 
-            var log = new List<string>();
+            var log = new List<BattleLogEntry>();
             if (req.Action == "attack")
             {
                 if ((enemy.Hp == enemy.MaxHp) && (player.CurrentHealth == player.MaxHealth))
                 {
                     var encounterLines = BattleDialogLines.EncounterOpeners(player.Name, player.Level, enemy.Name.ToLower());
-                    foreach (var line in encounterLines) log.Add(line);
+                    log.Add(new BattleLogEntry { Message = encounterLines[rand.Next(encounterLines.Length)], Type = "encounter" });
                 }
                 var playerOpeners = BattleDialogLines.PlayerOpeners(player.Name, enemy.Name.ToLower());
-                log.Add(playerOpeners[rand.Next(playerOpeners.Length)]);
+                log.Add(new BattleLogEntry { Message = playerOpeners[rand.Next(playerOpeners.Length)], Type = "player-attack" });
 
                 int basePlayerDamage = Math.Max(player.Attack - enemy.Defense, 1);
                 double rngFactor = 0.8 + rand.NextDouble() * 0.4;
-                int rolledDamage = (int)Math.Round(basePlayerDamage * rngFactor);
+                int rolledDamage = (int)System.Math.Round(basePlayerDamage * rngFactor);
                 double critRoll = rand.NextDouble();
                 bool isCrit = critRoll < player.CriticalChance;
 
                 int playerDamage = rolledDamage;
                 if (isCrit)
                 {
-                    playerDamage = (int)Math.Round((double)playerDamage * 2);
+                    playerDamage = (int)System.Math.Round((double)playerDamage * 2);
                     var critLines = BattleDialogLines.CritLines(player.Name, playerDamage);
-                    log.Add(critLines[rand.Next(critLines.Length)]);
+                    log.Add(new BattleLogEntry { Message = critLines[rand.Next(critLines.Length)], Type = "player-crit" });
                 }
-                log.Add($"{player.Name} deals {playerDamage} damage to the {enemy.Name.ToLower()}.");
+                log.Add(new BattleLogEntry
+                {
+                    Message = $"{player.Name} deals {playerDamage} damage to the {enemy.Name.ToLower()}.",
+                    Type = isCrit ? "player-crit-damage" : "player-attack-damage"
+                });
 
                 int enemyHpNew = enemy.Hp - playerDamage;
-                var enemyHpLines = BattleDialogLines.EnemyHpLines(enemy.Name, Math.Max(enemyHpNew, 0), enemy.MaxHp);
-                log.Add(enemyHpLines[rand.Next(enemyHpLines.Length)]);
+                var enemyHpLines = BattleDialogLines.EnemyHpLines(enemy.Name, System.Math.Max(enemyHpNew, 0), enemy.MaxHp);
+                log.Add(new BattleLogEntry { Message = enemyHpLines[rand.Next(enemyHpLines.Length)], Type = "enemy-hp" });
 
                 if (enemyHpNew <= 0)
                 {
                     var victoryLines = BattleDialogLines.VictoryLines(player.Name, enemy.Name.ToLower());
-                    log.Add(victoryLines[rand.Next(victoryLines.Length)]);
-                    log.Add($"{player.Name} gains {enemy.xp} XP from the battle.");
+                    log.Add(new BattleLogEntry { Message = victoryLines[rand.Next(victoryLines.Length)], Type = "victory" });
+                    log.Add(new BattleLogEntry { Message = $"{player.Name} gains {enemy.xp} XP from the battle.", Type = "xp" });
                     player.CurrentEnergy -= 1;
 
                     int gainedXp = enemy.xp;
@@ -114,7 +121,7 @@ namespace backend.Controllers
                         player.Attack += 2;
                         player.Defense += 1;
                         player.CriticalChance += 0.01;
-                        log.Add($"🎉 {player.Name} has reached level {player.Level}!");
+                        log.Add(new BattleLogEntry { Message = $"🎉 {player.Name} has reached level {player.Level}!", Type = "levelup" });
 
                         if (player.User != null)
                         {
@@ -124,15 +131,24 @@ namespace backend.Controllers
                                 player.User.ExperiencePoints = 0;
                                 player.User.Level += 1;
                                 player.User.Credits += 100;
-                                log.Add($"🎉 Your account has reached user level {player.User.Level}!");
+                                log.Add(new BattleLogEntry { Message = $"🎉 Your account has reached user level {player.User.Level}!", Type = "user-levelup" });
                             }
                         }
                     }
                     await _db.SaveChangesAsync();
 
-                    log.Add($"Status: {player.Name} is now Level {player.Level}, XP: {player.ExperiencePoints}/100, Energy: {player.CurrentEnergy}/{player.MaxEnergy}");
+                    log.Add(new BattleLogEntry
+                    {
+                        Message = $"Status: {player.Name} is now Level {player.Level}, XP: {player.ExperiencePoints}/100, Energy: {player.CurrentEnergy}/{player.MaxEnergy}",
+                        Type = "status"
+                    });
+                    log.Add(new BattleLogEntry
+                    {
+                        Message = $"{player.Name}: {player.CurrentHealth}/{player.MaxHealth} HP | {enemy.Name}: 0/{enemy.MaxHp} HP",
+                        Type = "hp-row"
+                    });
 
-                    return Ok(new BattleResponse
+                    return Ok(new
                     {
                         PlayerHp = player.CurrentHealth,
                         PlayerMaxHp = player.MaxHealth,
@@ -151,46 +167,60 @@ namespace backend.Controllers
                 }
 
                 var enemyActions = BattleDialogLines.EnemyActions(enemy.Name.ToLower());
-                log.Add(enemyActions[rand.Next(enemyActions.Length)]);
+                log.Add(new BattleLogEntry { Message = enemyActions[rand.Next(enemyActions.Length)], Type = "enemy-action" });
 
                 var enemyAttackLines = BattleDialogLines.EnemyAttackLines(enemy.Name.ToLower());
-                log.Add(enemyAttackLines[rand.Next(enemyAttackLines.Length)]);
+                log.Add(new BattleLogEntry { Message = enemyAttackLines[rand.Next(enemyAttackLines.Length)], Type = "enemy-attack" });
 
-                int baseEnemyDamage = Math.Max(enemy.Attack - player.Defense, 1);
+                int baseEnemyDamage = System.Math.Max(enemy.Attack - player.Defense, 1);
                 double enemyRng = 0.8 + rand.NextDouble() * 0.4;
-                int enemyRolledDamage = (int)Math.Round(baseEnemyDamage * enemyRng);
+                int enemyRolledDamage = (int)System.Math.Round(baseEnemyDamage * enemyRng);
                 double enemyCritRoll = rand.NextDouble();
                 bool enemyCrit = enemyCritRoll < enemy.CritChance;
 
                 int enemyDamage = enemyRolledDamage;
                 if (enemyCrit)
                 {
-                    enemyDamage = (int)Math.Round((double)enemyDamage * 2);
+                    enemyDamage = (int)System.Math.Round((double)enemyDamage * 2);
                     var enemyCritLines = BattleDialogLines.EnemyCritLines(enemy.Name.ToLower(), enemyDamage);
-                    log.Add(enemyCritLines[rand.Next(enemyCritLines.Length)]);
+                    log.Add(new BattleLogEntry { Message = enemyCritLines[rand.Next(enemyCritLines.Length)], Type = "enemy-crit" });
                 }
 
-                log.Add($"{player.Name} takes {enemyDamage} damage from the attack.");
+                log.Add(new BattleLogEntry
+                {
+                    Message = $"{player.Name} takes {enemyDamage} damage from the attack.",
+                    Type = enemyCrit ? "enemy-crit-damage" : "enemy-attack-damage"
+                });
 
                 int playerHpNew = player.CurrentHealth - enemyDamage;
-                var playerHpLines = BattleDialogLines.PlayerHpLines(player.Name, Math.Max(playerHpNew, 0), player.MaxHealth);
-                log.Add(playerHpLines[rand.Next(playerHpLines.Length)]);
+                var playerHpLines = BattleDialogLines.PlayerHpLines(player.Name, System.Math.Max(playerHpNew, 0), player.MaxHealth);
+                log.Add(new BattleLogEntry { Message = playerHpLines[rand.Next(playerHpLines.Length)], Type = "player-hp" });
 
-                player.CurrentHealth = Math.Max(0, playerHpNew);
+                player.CurrentHealth = System.Math.Max(0, playerHpNew);
 
                 if (playerHpNew <= 0)
                 {
                     var defeatLines = BattleDialogLines.DefeatLines(player.Name, enemy.Name.ToLower());
-                    log.Add(defeatLines[rand.Next(defeatLines.Length)]);
+                    log.Add(new BattleLogEntry { Message = defeatLines[rand.Next(defeatLines.Length)], Type = "defeat" });
                     player.CurrentHealth = 0;
                     player.CurrentEnergy = 0;
                     player.ExperiencePoints = 0;
                     player.Level = 1;
                     await _db.SaveChangesAsync();
 
-                    log.Add($"Status: {player.Name} has reset to Level {player.Level}, XP: {player.ExperiencePoints}, Energy: {player.CurrentEnergy}/{player.MaxEnergy}");
+                    log.Add(new BattleLogEntry
+                    {
+                        Message = $"Status: {player.Name} has reset to Level {player.Level}, XP: {player.ExperiencePoints}, Energy: {player.CurrentEnergy}/{player.MaxEnergy}",
+                        Type = "status"
+                    });
 
-                    return Ok(new BattleResponse
+                    log.Add(new BattleLogEntry
+                    {
+                        Message = $"{player.Name}: 0/{player.MaxHealth} HP | {enemy.Name}: {enemyHpNew}/{enemy.MaxHp} HP",
+                        Type = "hp-row"
+                    });
+
+                    return Ok(new
                     {
                         PlayerHp = 0,
                         PlayerMaxHp = player.MaxHealth,
@@ -209,12 +239,19 @@ namespace backend.Controllers
                 }
 
                 await _db.SaveChangesAsync();
+                log.Add(new BattleLogEntry
+                {
+                    Message = $"{player.Name}: {player.CurrentHealth}/{player.MaxHealth} HP | {enemy.Name}: {enemyHpNew}/{enemy.MaxHp} HP",
+                    Type = "hp-row"
+                });
 
-                log.Add($"--- End of turn ---");
-                log.Add($"{player.Name} HP: {player.CurrentHealth}/{player.MaxHealth} | Energy: {player.CurrentEnergy}/{player.MaxEnergy}");
-                log.Add($"{enemy.Name} HP: {enemyHpNew}/{enemy.MaxHp}");
+                log.Add(new BattleLogEntry
+                {
+                    Message = "--- End of turn ---",
+                    Type = "turn-end"
+                });
 
-                return Ok(new BattleResponse
+                return Ok(new
                 {
                     PlayerHp = playerHpNew,
                     PlayerMaxHp = player.MaxHealth,
@@ -237,16 +274,21 @@ namespace backend.Controllers
         [HttpGet("encounter")]
         public IActionResult EncounterEnemy()
         {
-            var rand = new Random();
-
+            var rand = new System.Random();
             var enemyTemplates = EnemyTemplates.All;
             var selectedEnemy = enemyTemplates[rand.Next(enemyTemplates.Count)];
 
-            return Ok(new {
+            return Ok(new
+            {
                 enemyName = selectedEnemy.Name,
                 enemyHp = selectedEnemy.MaxHp,
                 enemyMaxHp = selectedEnemy.MaxHp,
             });
         }
+    }
+    public class BattleLogEntry
+    {
+        public string Message { get; set; } = "";
+        public string Type { get; set; } = ""; 
     }
 }

@@ -19,3 +19,8 @@ export interface BattleResponse {
   playerEnergy?: number;
   enemyName: string; 
 }
+
+export interface BattleLogEntry {
+  message: string;
+  type: string; 
+}

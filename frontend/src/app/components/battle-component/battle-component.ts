@@ -1,23 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Fighter, BattleResponse } from '../../services/battle-interfaces';
+import { Fighter, BattleLogEntry } from '../../services/battle-interfaces';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-battle',
   standalone: true,
-  imports: [
-    CommonModule
-  ],
+  imports: [ CommonModule ],
   templateUrl: './battle-component.html',
   styleUrl: './battle-component.scss'
 })
-export class BattleComponent implements OnInit {
+export class BattleComponent implements OnInit, AfterViewInit {
   player: Fighter | null = null;
   enemy: Fighter | null = null;
-  battleLog: string[] = [];
+  battleLog: BattleLogEntry[] = [];
   isLoading = false;
   battleEnded = false;
   gainedXp: number | null = null;
@@ -26,52 +24,27 @@ export class BattleComponent implements OnInit {
   playerEnergy: number = 0;
   enemyName: string | null = null;
 
+  @ViewChild('battleLogContainer') battleLogContainer!: ElementRef;
+
   constructor(private http: HttpClient, private authService: AuthService) {}
-
-  formatBattleLog(log: string): string {
-    let out = log;
-    if (this.enemyName) {
-      out = out.replace(
-        new RegExp(`The attack deals (\\d+) damage to the ${this.enemyName.toLowerCase()}\\.`,"gi"),
-        `<span class="log-damage-friend">The attack deals $1 damage to the ${this.enemyName}.</span>`
-      );
-      out = out.replace(
-        new RegExp(`${this.player?.name} deals (\\d+) damage to the ${this.enemyName.toLowerCase()}`,"gi"),
-        `<span class="log-damage-friend">${this.player?.name} deals $1 damage to the ${this.enemyName}.</span>`
-      );
-    }
-    if (this.player?.name) {
-      out = out.replace(
-        new RegExp(`${this.player.name} takes (\\d+) damage`, "gi"),
-        `<span class="log-damage-enemy">${this.player?.name} takes $1 damage</span>`
-      );
-    }
-    out = out.replace(/Critical hit/gi, `<span class="log-crit">Critical hit</span>`)
-      .replace(/Victory/gi, `<span class="log-victory">Victory</span>`)
-      .replace(/defeated/gi, `<span class="log-defeat">defeated</span>`);
-    return out;
-  }
-
-  isEnemyDamageLog(log: string): boolean {
-    if (!this.player?.name) return false;
-    return new RegExp(`${this.player.name} takes \\d+ damage`, 'i').test(log);
-  }
-  isFriendlyDamageLog(log: string): boolean {
-    if (!this.player?.name) return false;
-    return new RegExp(`${this.player.name} deals \\d+ damage`, 'i').test(log);
-  }
-  isCritLog(log: string): boolean {
-    return /critical hit/i.test(log);
-  }
-  isVictoryLog(log: string): boolean {
-    return /victory/i.test(log);
-  }
-  isDefeatLog(log: string): boolean {
-    return /defeated/i.test(log);
-  }
 
   ngOnInit(): void {
     this.loadPlayerData();
+  }
+
+  ngAfterViewInit(): void {
+    this.scrollToBottom();
+  }
+
+  scrollToBottom(): void {
+    setTimeout(() => {
+      if (this.battleLogContainer && this.battleLogContainer.nativeElement) {
+        this.battleLogContainer.nativeElement.scrollTo({
+          top: this.battleLogContainer.nativeElement.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
+    }, 30);
   }
 
   loadPlayerData(): void {
@@ -86,16 +59,15 @@ export class BattleComponent implements OnInit {
         this.playerEnergy = playerData.currentEnergy;
         this.userLevel = playerData.level;
         this.userXp = playerData.experiencePoints;
-
         this.battleLog = [];
-        
         this.battleEnded = true; 
-
         this.isLoading = false;
+        this.scrollToBottom();
       },
       error: (err) => {
-        this.battleLog = ["ERROR: " + (err.error?.message || err.statusText)];
+        this.battleLog = [{ message: "ERROR: " + (err.error?.message || err.statusText), type: "error" }];
         this.isLoading = false;
+        this.scrollToBottom();
       }
     });
   }
@@ -106,7 +78,8 @@ export class BattleComponent implements OnInit {
       this.battleEnded = false;
       this.enemyName = null;
       this.enemy = null;
-      this.battleLog = ["Starting new battle..."];
+      this.battleLog = [{ message: "Starting new battle...", type: "start" }];
+      this.scrollToBottom();
 
       this.http.get<any>(`${environment.apiUrl}/battle/encounter`).subscribe({
         next: (enemyData) => {
@@ -116,19 +89,21 @@ export class BattleComponent implements OnInit {
             hp: enemyData.enemyHp,
             maxHp: enemyData.enemyMaxHp
           };
-
-          this.battleLog.push(`You encounter a wild ${this.enemyName}! Prepare for battle!`);
+          this.battleLog.push({ message: `You encounter a wild ${this.enemyName}! Prepare for battle!`, type: "encounter" });
           this.isLoading = false;
+          this.scrollToBottom();
         },
         error: (err) => {
-          this.battleLog = ["ERROR: " + (err.error?.message || err.statusText)];
+          this.battleLog = [{ message: "ERROR: " + (err.error?.message || err.statusText), type: "error" }];
           this.isLoading = false;
+          this.scrollToBottom();
         }
       });
 
     } else {
-      this.battleLog.push("You have no energy left to battle! Please rest or visit the shop.");
+      this.battleLog.push({ message: "You have no energy left to battle! Please rest or visit the shop.", type: "info" });
       this.battleEnded = true;
+      this.scrollToBottom();
     }
   }
 
@@ -143,7 +118,7 @@ export class BattleComponent implements OnInit {
       action: 'attack'
     };
 
-    this.http.post<BattleResponse>(`${environment.apiUrl}/battle/turn`, req)
+    this.http.post<any>(`${environment.apiUrl}/battle/turn`, req)
       .subscribe({
         next: (res) => {
           this.player!.hp = res.playerHp;
@@ -165,11 +140,36 @@ export class BattleComponent implements OnInit {
             this.gainedXp = null;
           }
           this.isLoading = false;
+          this.scrollToBottom();
         },
         error: (err) => {
-          this.battleLog.push("ERROR: " + (err.error?.message || err.statusText));
+          this.battleLog.push({ message: "ERROR: " + (err.error?.message || err.statusText), type: "error" });
           this.isLoading = false;
+          this.scrollToBottom();
         }
       });
+  }
+
+  getLogClass(log: BattleLogEntry): string {
+    switch (log.type) {
+      case 'victory':        return 'battle-victory';
+      case 'defeat':         return 'battle-defeat';
+      case 'player-crit':    return 'battle-crit';
+      case 'enemy-crit':     return 'battle-crit-enemy';
+      case 'player-attack-damage': return 'battle-friendly-damage';
+      case 'enemy-attack-damage':  return 'battle-enemy-damage';
+      case 'player-crit-damage':   return 'battle-crit';
+      case 'enemy-crit-damage':    return 'battle-crit-enemy';
+      case 'status':         return 'battle-status';
+      case 'turn-end':       return 'battle-divider';
+      case 'hp-row':         return 'battle-hp-row';
+      case 'xp':             return 'battle-xp';
+      case 'levelup':        return 'battle-levelup';
+      case 'user-levelup':   return 'battle-user-levelup';
+      case 'enemy-hp':       return 'battle-enemy-hp';
+      case 'player-hp':      return 'battle-player-hp';
+      case 'encounter':      return 'battle-encounter';
+      default:               return '';
+    }
   }
 }

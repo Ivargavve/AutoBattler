@@ -95,36 +95,144 @@
     letter-spacing: 0.13px;
     font-family: inherit;
     font-size: 0.98rem;
+    transition: color 0.18s;
 
-    &.battle-victory {
-      color: var(--accent-hover, #baffd8);
+    // "Vanlig" log (neutral eller systemtext)
+    &.battle-encounter,
+    &.battle-start {
+      color: #e0ffef;
+      font-weight: 500;
+      letter-spacing: 0.7px;
+    }
+
+    // Spelarens skada (GRÖN, tydlig och stark)
+    &.battle-friendly-damage {
+      color: #38ff92;
+      font-weight: 700;
+      text-shadow: 0 0 5px #27d53b55;
+    }
+    // Fiendes skada (RÖD, mörk och distinkt)
+    &.battle-enemy-damage {
+      color: #ff5567;
+      font-weight: 700;
+      text-shadow: 0 0 4px #e74c3c55;
+    }
+    // Player/Enemy HP-row (grön för spelare, röd för fiende)
+    &.battle-hp-row {
+      font-size: 1.08rem;
+      font-weight: 700;
+      .player-hp {
+        color: #64ffb7;
+        font-weight: 700;
+      }
+      .enemy-hp {
+        color: #ff6060;
+        font-weight: 700;
+      }
+      .hp-separator {
+        color: #b9d6ce;
+        font-weight: 400;
+        padding: 0 4px;
+      }
+    }
+    // Crit hits: ljusgrön för player, mörkröd för enemy
+    &.battle-crit {
+      color: #86f7b3;
       font-weight: bold;
+      text-shadow: 0 0 8px #86f7b388;
+      letter-spacing: 1.1px;
+    }
+    &.battle-crit-enemy {
+      color: #d6342a;
+      font-weight: bold;
+      text-shadow: 0 0 7px #f1373788;
+      letter-spacing: 1.1px;
+    }
+
+    // Victory, defeat, levelup, status etc
+    &.battle-victory {
+      color: #f5ff99;
+      font-weight: bold;
+      text-shadow: 0 0 8px #ecffb788;
     }
     &.battle-defeat {
-      color: var(--bar-fill-red, #e74c3c);
+      color: #fa4242;
       font-weight: bold;
+      text-shadow: 0 0 8px #f17f7f88;
     }
-    &.battle-crit {
-      color: var(--accent, #86f7b3);
-      font-weight: bold;
+    &.battle-levelup {
+      color: #c7ffda;
+      font-weight: 700;
+      text-shadow: 0 0 8px #77ffe788;
     }
-    &.battle-enemy-damage {
-      color: var(--bar-fill-red, #e74c3c);
-      font-weight: 600;
+    &.battle-user-levelup {
+      color: #c7deff;
+      font-weight: 700;
+      text-shadow: 0 0 8px #77d3ff88;
     }
-    &.battle-friendly-damage {
-      color: var(--accent, #248221);  
-      font-weight: 600;
+    &.battle-xp {
+      color: #51b88b;
+      font-weight: 500;
+    }
+    &.battle-status {
+      color: #ffe666;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      font-size: 1.02rem;
+      text-shadow: 0 0 6px #ffefb26e;
+    }
+    &.error {
+      color: #ffd6d6;
+      background: #480f0f;
+      padding: 3px 7px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    &.info {
+      color: #87c3ff;
+      font-weight: 500;
+    }
+    // Divider/turn line
+    &.battle-divider,
+    &.turn-end {
+      border-bottom: 1px dashed #4c4c4c;
+      margin: 0.4rem 0 0.4rem 0;
+      height: 1px;
+      width: 94%;
+      opacity: 0.7;
+      background: none;
+      color: transparent;
     }
     &:last-child {
       margin-bottom: 0;
-      color: var(--accent, #86f7b3);
+      color: #86f7b3;
       font-weight: 700;
       font-size: 1.03rem;
       letter-spacing: 1px;
     }
   }
+
+  .battle-hp-row {
+    font-size: 1.09rem;
+    font-weight: 600;
+    .player-hp {
+      color: #38ff92;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+    .enemy-hp {
+      color: #ff6060;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+    .hp-separator {
+      color: #b9d6ce;
+      font-weight: 400;
+      padding: 0 4px;
+    }
+  }
 }
+
 
 .battle-controls {
   width: 100%;

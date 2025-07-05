@@ -13,27 +13,32 @@
     </div>
 
     <div class="battle-log-wrapper">
-      <div class="battle-log">
-  <ng-container *ngFor="let log of battleLog">
-    <div
-          *ngIf="log.trim() === '--- End of turn ---'; else normalLog"
-          class="battle-divider"
-        ></div>
-        <ng-template #normalLog>
-          <div 
-            [ngClass]="{
-              'battle-victory': isVictoryLog(log),
-              'battle-defeat': isDefeatLog(log),
-              'battle-crit': isCritLog(log),
-              'battle-enemy-damage': isEnemyDamageLog(log),
-              'battle-friendly-damage': isFriendlyDamageLog(log)
-            }"
-          >
-            {{ log }}
-          </div>
-        </ng-template>
-      </ng-container>
-    </div>
+      <div class="battle-log" #battleLogContainer>
+        <ng-container *ngFor="let log of battleLog">
+          <!-- Divider för turn -->
+          <div *ngIf="log.message.trim() === '--- End of turn ---'" class="battle-divider"></div>
+          
+          <!-- HP-row: två färger på samma rad -->
+          <ng-container *ngIf="log.type === 'hp-row'">
+            <div class="battle-hp-row">
+              <span class="player-hp">
+                {{ log.message.split('|')[0].trim() }}
+              </span>
+              <span class="hp-separator">|</span>
+              <span class="enemy-hp">
+                {{ log.message.split('|')[1].trim() }}
+              </span>
+            </div>
+          </ng-container>
+
+          <!-- Alla andra loggar -->
+          <ng-container *ngIf="log.type !== 'hp-row' && log.message.trim() !== '--- End of turn ---'">
+            <div [ngClass]="getLogClass(log)">
+              {{ log.message }}
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
     </div>
 
     <div class="battle-controls">
@@ -47,23 +52,14 @@
         </button>
       </div>
       <div class="battle-actions-right" *ngIf="!battleEnded">
-        <!-- Expand for multiple attacks later! -->
         <button 
           (click)="attack()"
           [disabled]="isLoading || battleEnded"
           class="attack-btn">
           Standard Attack
         </button>
-        <button
-          disabled
-          class="attack-btn alt">
-          Special Attack
-        </button>
-        <button
-          disabled
-          class="attack-btn alt">
-          Defend
-        </button>
+        <button disabled class="attack-btn alt">Special Attack</button>
+        <button disabled class="attack-btn alt">Defend</button>
       </div>
     </div>
   </div>
