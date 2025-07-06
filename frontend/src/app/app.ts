@@ -108,15 +108,6 @@ export class App implements OnInit {
     this.loading = false;
   }
 
-  setLastRechargeTimeFromCharacter(): void {
-    const user = this.auth.user;
-    if (user && user.character && user.character.lastRechargeTime) {
-      this.lastRechargeTime = new Date(user.character.lastRechargeTime);
-    } else {
-      this.lastRechargeTime = null;
-    }
-  }
-
   get showPanels$(): Observable<boolean> {
     return this.auth.user$.pipe(
       map(user => !!user && !user.needsUsernameSetup)
