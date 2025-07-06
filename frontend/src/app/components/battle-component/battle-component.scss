@@ -171,11 +171,11 @@
       text-shadow: 0 0 8px #77d3ff88;
     }
     &.battle-xp {
-      color: #51b88b;
+      color: #7c7c7c;
       font-weight: 500;
     }
     &.battle-status {
-      color: #ffe666;
+      color: #e6e6e6;
       font-weight: 700;
       letter-spacing: 1.2px;
       font-size: 1.02rem;
@@ -192,7 +192,6 @@
       color: #87c3ff;
       font-weight: 500;
     }
-    // Divider/turn line
     &.battle-divider,
     &.turn-end {
       border-bottom: 1px dashed #4c4c4c;

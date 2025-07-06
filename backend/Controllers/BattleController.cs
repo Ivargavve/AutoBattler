@@ -4,9 +4,6 @@ using backend.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using backend.Utils;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace backend.Controllers
 {

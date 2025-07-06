@@ -44,23 +44,24 @@ export class App implements OnInit {
 
     this.rechargeTimer$ = this.character$.pipe(
       switchMap(char => {
-        if (!char?.lastRechargeTime) return of('00:00');
+        if (!char || typeof char.nextTickInSeconds !== 'number') return of('00:00');
+
+        if (
+          char.currentEnergy === char.maxEnergy &&
+          char.currentHealth === char.maxHealth
+        ) {
+          return of('Full!');
+        }
+
         return timer(0, 1000).pipe(
-          map(() => {
-            const lastRecharge = char.lastRechargeTime;
-            const last = (typeof lastRecharge === 'string' || lastRecharge instanceof Date)
-              ? new Date(lastRecharge)
-              : new Date();
-            const now = new Date();
-            const diffSec = Math.floor((now.getTime() - last.getTime()) / 1000);
-            const intervalSec = this.rechargeIntervalMinutes * 60;
-            const timeUntilNext = intervalSec - (diffSec % intervalSec);
-            const mins = Math.floor(timeUntilNext / 60);
-            const secs = timeUntilNext % 60;
-            return { mins, secs, timerString: `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}` };
+          map(tickNum => {
+            const tick = Math.max(0, (char.nextTickInSeconds ?? 0) - tickNum);
+            const mins = Math.floor(tick / 60);
+            const secs = tick % 60;
+            return { mins, secs, tick };
           }),
-          tap(({ mins, secs }) => {
-            if (mins === 0 && secs <= 1 && !this.rechargeCalled) {
+          tap(({ tick }) => {
+            if (tick === 0 && !this.rechargeCalled) {
               this.rechargeCalled = true;
               this.auth.rechargeCharacter()
                 .then(character => {
@@ -68,6 +69,7 @@ export class App implements OnInit {
                   if (user) {
                     user.character = character;
                     this.auth.setUser(user);
+                    this.auth.loadUserWithCharacter();
                   }
                 })
                 .finally(() => {
@@ -75,10 +77,10 @@ export class App implements OnInit {
                 });
             }
           }),
-          map(({ timerString }) => timerString)
+          map(({ mins, secs }) => `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`),
+          startWith('00:00')
         );
-      }),
-      startWith('00:00')
+      })
     );
   }
 
@@ -92,6 +94,7 @@ export class App implements OnInit {
 
     if (this.auth.isLoggedIn) {
       try {
+        await this.auth.rechargeCharacter();
         await this.auth.loadUserWithCharacter();
 
         if (currentUrl === '/login' || currentUrl === '/') {

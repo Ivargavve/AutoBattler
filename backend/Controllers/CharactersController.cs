@@ -44,11 +44,17 @@ namespace backend.Controllers
 
                 chr.CurrentEnergy += energyToAdd;
                 chr.CurrentHealth += healthToAdd;
+                if (chr.CurrentEnergy > chr.MaxEnergy)
+                    chr.CurrentEnergy = chr.MaxEnergy;
+                if (chr.CurrentHealth > chr.MaxHealth)
+                    chr.CurrentHealth = chr.MaxHealth;
 
                 chr.LastRechargeTime = chr.LastRechargeTime.AddSeconds(ticks * energyInterval);
 
                 await _db.SaveChangesAsync();
             }
+
+            var nextTickInSeconds = energyInterval - ((int)elapsedSeconds % energyInterval);
 
             return Ok(new
             {
@@ -71,7 +77,8 @@ namespace backend.Controllers
                 chr.EquipmentJson,
                 chr.CreatedAt,
                 chr.UpdatedAt,
-                chr.LastRechargeTime
+                chr.LastRechargeTime,
+                nextTickInSeconds
             });
         }
 
@@ -87,7 +94,12 @@ namespace backend.Controllers
             if (chr == null)
                 return NotFound();
 
-            // Ingen recharge här längre!
+            const int energyInterval = 120;
+            var now = DateTime.UtcNow;
+            var elapsedSeconds = (now - chr.LastRechargeTime).TotalSeconds;
+            var nextTickInSeconds = energyInterval - ((int)elapsedSeconds % energyInterval);
+            if (nextTickInSeconds <= 0) nextTickInSeconds = energyInterval;
+
             return Ok(new
             {
                 chr.Id,
@@ -109,7 +121,8 @@ namespace backend.Controllers
                 chr.EquipmentJson,
                 chr.CreatedAt,
                 chr.UpdatedAt,
-                chr.LastRechargeTime
+                chr.LastRechargeTime,
+                nextTickInSeconds
             });
         }
 
