@@ -1,9 +1,11 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Fighter, BattleLogEntry } from '../../services/battle-interfaces';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
+import { Subscription } from 'rxjs';
+import { Character } from '../../services/character';
 
 @Component({
   selector: 'app-battle',
@@ -12,7 +14,7 @@ import { environment } from '../../../environments/environment';
   templateUrl: './battle-component.html',
   styleUrl: './battle-component.scss'
 })
-export class BattleComponent implements OnInit, AfterViewInit {
+export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
   player: Fighter | null = null;
   enemy: Fighter | null = null;
   battleLog: BattleLogEntry[] = [];
@@ -24,16 +26,42 @@ export class BattleComponent implements OnInit, AfterViewInit {
   playerEnergy: number = 0;
   enemyName: string | null = null;
 
+  private characterSub!: Subscription;
+
   @ViewChild('battleLogContainer') battleLogContainer!: ElementRef;
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.loadPlayerData();
+    this.characterSub = this.authService.character$.subscribe(character => {
+      if (character) {
+        this.player = {
+          name: character.name,
+          hp: character.currentHealth,
+          maxHp: character.maxHealth
+        };
+        this.playerEnergy = character.currentEnergy;
+        this.userLevel = character.level;
+        this.userXp = character.experiencePoints;
+      } else {
+        this.player = null;
+        this.playerEnergy = 0;
+        this.userLevel = null;
+        this.userXp = null;
+      }
+    });
+    this.battleLog = [];
+    this.battleEnded = true;
   }
 
   ngAfterViewInit(): void {
     this.scrollToBottom();
+  }
+
+  ngOnDestroy(): void {
+    if (this.characterSub) {
+      this.characterSub.unsubscribe();
+    }
   }
 
   scrollToBottom(): void {
@@ -45,31 +73,6 @@ export class BattleComponent implements OnInit, AfterViewInit {
         });
       }
     }, 30);
-  }
-
-  loadPlayerData(): void {
-    this.isLoading = true;
-    this.http.get<any>(`${environment.apiUrl}/characters/me`).subscribe({
-      next: (playerData) => {
-        this.player = {
-          name: playerData.name,
-          hp: playerData.currentHealth,
-          maxHp: playerData.maxHealth
-        };
-        this.playerEnergy = playerData.currentEnergy;
-        this.userLevel = playerData.level;
-        this.userXp = playerData.experiencePoints;
-        this.battleLog = [];
-        this.battleEnded = true; 
-        this.isLoading = false;
-        this.scrollToBottom();
-      },
-      error: (err) => {
-        this.battleLog = [{ message: "ERROR: " + (err.error?.message || err.statusText), type: "error" }];
-        this.isLoading = false;
-        this.scrollToBottom();
-      }
-    });
   }
 
   startNewBattle(): void {
@@ -132,13 +135,10 @@ export class BattleComponent implements OnInit, AfterViewInit {
 
           if (res.battleEnded && this.player!.hp > 0) {
             this.gainedXp = res.gainedXp ?? null;
-            this.userLevel = res.userLevel ?? this.userLevel;
-            this.userXp = res.newExperiencePoints ?? this.userXp;
-            this.playerEnergy = res.playerEnergy ?? this.playerEnergy;
-            this.authService.loadUserWithCharacter();
           } else {
             this.gainedXp = null;
           }
+          this.authService.loadUserWithCharacter();
           this.isLoading = false;
           this.scrollToBottom();
         },

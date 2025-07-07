@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../services/user';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -11,32 +11,36 @@ import { Observable } from 'rxjs';
   templateUrl: './profile-component.html',
   styleUrls: ['./profile-component.scss']
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent {
   user$: Observable<User | null>;
-  achievementsCount = 0;
-  cosmeticsCount = 0;
+  achievementsCount$: Observable<number>;
+  cosmeticsCount$: Observable<number>;
 
   constructor(private authService: AuthService) {
     this.user$ = this.authService.user$;
-  }
 
-  ngOnInit(): void {
-    this.user$.subscribe((user) => {
-      if (user) {
+    this.achievementsCount$ = this.user$.pipe(
+      map(user => {
+        if (!user) return 0;
         try {
           const ach = JSON.parse(user.achievementsJson || '{}');
-          this.achievementsCount = Object.keys(ach).length;
+          return Object.keys(ach).length;
         } catch {
-          this.achievementsCount = 0;
+          return 0;
         }
+      })
+    );
 
+    this.cosmeticsCount$ = this.user$.pipe(
+      map(user => {
+        if (!user) return 0;
         try {
           const cos = JSON.parse(user.cosmeticItemsJson || '{}');
-          this.cosmeticsCount = Object.keys(cos).length;
+          return Object.keys(cos).length;
         } catch {
-          this.cosmeticsCount = 0;
+          return 0;
         }
-      }
-    });
+      })
+    );
   }
 }

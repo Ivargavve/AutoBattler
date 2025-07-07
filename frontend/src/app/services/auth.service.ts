@@ -15,6 +15,9 @@ export class AuthService {
   private userSubject = new BehaviorSubject<User | null>(this.loadUserFromStorage());
   public user$ = this.userSubject.asObservable();
 
+  private characterSubject = new BehaviorSubject<Character | null>(null);
+  public character$ = this.characterSubject.asObservable();
+
   constructor(private http: HttpClient, private router: Router) {}
 
   googleLogin(credential: string) {
@@ -42,6 +45,7 @@ export class AuthService {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.userSubject.next(null);
+    this.characterSubject.next(null); 
     this.router.navigate(['/login']);
   }
 
@@ -61,6 +65,10 @@ export class AuthService {
   public setUser(user: User): void {
     localStorage.setItem('user', JSON.stringify(user));
     this.userSubject.next({ ...user });
+
+    if (user.character) {
+      this.characterSubject.next(user.character);
+    }
   }
 
   getCharacter() {
@@ -71,19 +79,22 @@ export class AuthService {
     return lastValueFrom(this.getProfile()).then(profile => {
       return lastValueFrom(this.getCharacter())
         .then(character => {
+          this.characterSubject.next(character);
           const newUser = { ...profile, character };
           this.setUser(newUser);
         })
         .catch(() => {
+          this.characterSubject.next(null);
           this.setUser({ ...profile, character: undefined });
         });
     });
   }
-
   rechargeCharacter(): Promise<Character> {
     return lastValueFrom(
       this.http.put<Character>(`${environment.apiUrl}/characters/recharge`, {})
-    );
+    ).then(character => {
+      this.characterSubject.next(character);
+      return character;
+    });
   }
-
 }

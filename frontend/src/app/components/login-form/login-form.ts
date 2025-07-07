@@ -43,9 +43,11 @@ export class LoginForm implements OnInit {
       localStorage.setItem('token', token);
 
       await this.authService.loadUserWithCharacter();
-      const profile = await firstValueFrom(this.authService.user$);
-      if (profile) {
-        this.authService.setUser(profile);
+
+      const user = this.authService.user;
+      if (user && user.character) {
+        await this.authService.rechargeCharacter();
+        await this.authService.loadUserWithCharacter();
       }
 
       if (needsUsernameSetup) {
@@ -60,4 +62,5 @@ export class LoginForm implements OnInit {
       this.loading = false;
     }
   }
+
 }

@@ -26,7 +26,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 export class App implements OnInit {
   public currentTheme: 'light' | 'dark' = 'light';
   public user$: Observable<User | null>;
-  public character$: Observable<Character | null>;
+  public character$: Observable<Character | null>; // <- OBS! Nu från service
   public rechargeTimer$: Observable<string | null>;
 
   public loading = true;
@@ -38,9 +38,9 @@ export class App implements OnInit {
 
   constructor(public auth: AuthService, private router: Router) {
     this.user$ = this.auth.user$;
-    this.character$ = this.user$.pipe(
-      map(user => user?.character ?? null)
-    );
+
+    // ÄNDRAT HÄR: Nu direkt från authService
+    this.character$ = this.auth.character$;
 
     this.rechargeTimer$ = this.character$.pipe(
       switchMap(char => {
@@ -65,12 +65,9 @@ export class App implements OnInit {
               this.rechargeCalled = true;
               this.auth.rechargeCharacter()
                 .then(character => {
-                  const user = this.auth.user;
-                  if (user) {
-                    user.character = character;
-                    this.auth.setUser(user);
-                    this.auth.loadUserWithCharacter();
-                  }
+                  // characterSubject.next() sker i service, inget mer krävs här!
+                  // Kan slopa setUser-logik (sker i loadUserWithCharacter ändå)
+                  this.auth.loadUserWithCharacter();
                 })
                 .finally(() => {
                   setTimeout(() => this.rechargeCalled = false, 2000);
