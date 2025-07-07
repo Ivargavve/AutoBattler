@@ -52,6 +52,12 @@ export class AuthService {
   getProfile() {
     return this.http.get<User>(`${environment.apiUrl}/users/me`);
   }
+  
+  // NY FUNKTION: Hämta annan användares profil via username
+  getProfileByUsername(username: string) {
+    return this.http.get<User>(`${environment.apiUrl}/users/${encodeURIComponent(username)}`);
+  }
+
   getCharacter() {
     return this.http.get<Character>(`${environment.apiUrl}/characters/me`);
   }

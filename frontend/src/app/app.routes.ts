@@ -13,6 +13,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard] 
   },
   { 
+    path: 'profile/:username', 
+    loadComponent: () => import('./components/profile-component/profile-component').then(m => m.ProfileComponent),
+    canActivate: [AuthGuard]
+  },
+  { 
     path: 'profile', 
     loadComponent: () => import('./components/profile-component/profile-component').then(m => m.ProfileComponent),
     canActivate: [AuthGuard]
@@ -44,11 +49,6 @@ export const routes: Routes = [
   { 
     path: 'bazaar', 
     loadComponent: () => import('./components/bazaar-component/bazaar-component').then(m => m.BazaarComponent),
-    canActivate: [AuthGuard]
-  },
-  { 
-    path: 'social', 
-    loadComponent: () => import('./components/social-component/social-component').then(m => m.SocialComponent),
     canActivate: [AuthGuard]
   },
   { 

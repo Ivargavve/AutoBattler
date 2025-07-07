@@ -1,20 +1,21 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FriendsService, Friend, UserSearchResult } from '../../services/friends.service';
+import { FriendsService, Friend, UserSearchResult, PendingRequest } from '../../services/friends.service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, map, startWith } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Router, RouterModule } from '@angular/router'; 
 
 @Component({
   selector: 'app-friends-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './friends-list.html',
   styleUrl: './friends-list.scss'
 })
 export class FriendsListComponent implements OnInit {
   friends: Friend[] = [];
   filteredFriends: Friend[] = [];
+  pendingRequests: PendingRequest[] = [];
   loading = true;
   error: string = '';
 
@@ -22,25 +23,24 @@ export class FriendsListComponent implements OnInit {
   userSearchResults: UserSearchResult[] = [];
   searchingUsers = false;
   addLoadingUserId: number | null = null;
+  acceptLoadingUserId: number | null = null;
 
   @Output() friendClicked = new EventEmitter<Friend>();
 
-  constructor(private friendsService: FriendsService) {}
+  // Injektera router
+  constructor(private friendsService: FriendsService, private router: Router) {}
 
   ngOnInit() {
-    console.log('FriendsListComponent ngOnInit'); // <-- startar komponenten
-
     this.loadFriends();
+    this.loadPendingRequests();
 
     this.searchControl.valueChanges.pipe(
       startWith(''),
       debounceTime(250),
       map(value => (value ?? '').trim())
     ).subscribe(search => {
-      console.log('[searchControl] Changed:', search); // <-- logga varje ändring i fältet
       this.filterFriends(search);
       if (search.length >= 2) {
-        console.log('[searchControl] Trigger searchUsers:', search); // <-- logga att vi söker
         this.searchUsers(search);
       } else {
         this.userSearchResults = [];
@@ -50,18 +50,26 @@ export class FriendsListComponent implements OnInit {
 
   loadFriends() {
     this.loading = true;
-    console.log('[loadFriends] Called');
     this.friendsService.getFriends().subscribe({
       next: (friends: Friend[]) => {
-        console.log('[loadFriends] Loaded friends:', friends);
         this.friends = friends;
         this.filterFriends(this.searchControl.value ?? '');
         this.loading = false;
       },
       error: (err) => {
-        console.error('[loadFriends] Error loading friends:', err);
         this.error = 'Could not load friends.';
         this.loading = false;
+      }
+    });
+  }
+
+  loadPendingRequests() {
+    this.friendsService.getPendingRequests().subscribe({
+      next: (requests: PendingRequest[]) => {
+        this.pendingRequests = requests;
+      },
+      error: (err) => {
+        this.pendingRequests = [];
       }
     });
   }
@@ -76,21 +84,16 @@ export class FriendsListComponent implements OnInit {
         (friend.fullName?.toLowerCase().includes(lower) ?? false)
       );
     }
-    // Log varje gång friend-listan filtreras
-    console.log('[filterFriends] Filtered:', this.filteredFriends);
   }
 
   searchUsers(query: string) {
     this.searchingUsers = true;
-    console.log('[searchUsers] Called with:', query);
     this.friendsService.searchUsers(query).subscribe({
       next: (results: UserSearchResult[]) => {
-        console.log('[searchUsers] Results:', results);
         this.userSearchResults = results;
         this.searchingUsers = false;
       },
       error: (err) => {
-        console.error('[searchUsers] Error:', err);
         this.userSearchResults = [];
         this.searchingUsers = false;
       }
@@ -100,19 +103,53 @@ export class FriendsListComponent implements OnInit {
   addFriendById(userId: number) {
     if (!userId) return;
     this.addLoadingUserId = userId;
-    console.log('[addFriendById] Trying to add friend with id:', userId);
     this.friendsService.addFriendById(userId).subscribe({
       next: () => {
-        console.log('[addFriendById] Friend added:', userId);
         this.loadFriends();
+        this.loadPendingRequests();
         this.searchUsers(this.searchControl.value ?? '');
         this.addLoadingUserId = null;
       },
       error: (err) => {
-        console.error('[addFriendById] Error:', err);
         this.addLoadingUserId = null;
       }
     });
+  }
+
+  acceptFriendRequest(user: UserSearchResult) {
+    let req = this.pendingRequests.find(r => r.requesterId === user.id);
+
+    if (!req) {
+      req = this.pendingRequests.find(r =>
+        r.requesterUsername?.toLowerCase() === user.username?.toLowerCase()
+      );
+    }
+
+    if (!req) {
+      return;
+    }
+    this.acceptFriendRequestById(req.id, user.id);
+  }
+
+  acceptFriendRequestById(requestId: number, userId: number) {
+    this.acceptLoadingUserId = userId;
+    this.friendsService.acceptFriendRequest(requestId).subscribe({
+      next: () => {
+        this.loadFriends();
+        this.loadPendingRequests();
+        this.searchUsers(this.searchControl.value ?? '');
+        this.acceptLoadingUserId = null;
+      },
+      error: (err) => {
+        this.acceptLoadingUserId = null;
+      }
+    });
+  }
+
+  // Navigering till användarprofil (username-baserad)
+  goToProfile(username: string) {
+    if (!username) return;
+    this.router.navigate(['/profile', username]);
   }
 
   trackByFriendId(_: number, friend: Friend) {
@@ -121,7 +158,10 @@ export class FriendsListComponent implements OnInit {
   trackByUserId(_: number, user: UserSearchResult) {
     return user.id;
   }
+
+  // Den här behöver du inte längre om du använder goToProfile direkt från html,
+  // men kan finnas kvar om du vill hooka vidare logik:
   onFriendClick(friend: Friend) {
-    this.friendClicked.emit(friend);
+    this.goToProfile(friend.username);
   }
 }

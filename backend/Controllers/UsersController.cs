@@ -17,6 +17,7 @@ namespace backend.Controllers
             _db = db;
         }
 
+        // GET: api/users/me
         [HttpGet("me")]
         [Authorize]
         public async Task<IActionResult> GetMyProfile()
@@ -49,6 +50,38 @@ namespace backend.Controllers
                 user.AchievementsJson,
                 user.NeedsUsernameSetup,
                 user.GoogleId,
+                user.CreatedAt,
+                user.LastLogin
+            });
+        }
+
+        // GET: api/users/{username}
+        [HttpGet("{username}")]
+        [Authorize]
+        public async Task<IActionResult> GetUserByUsername(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                return BadRequest(new { message = "Username is required" });
+
+            var user = await _db.Users.AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
+
+            if (user == null)
+                return NotFound();
+
+            return Ok(new 
+            {
+                user.Id,
+                user.Username,
+                user.FullName,
+                user.ProfilePictureUrl,
+                user.Role,
+                user.ExperiencePoints,
+                user.Level,
+                user.Credits,
+                user.CosmeticItemsJson,
+                user.SettingsJson,
+                user.AchievementsJson,
                 user.CreatedAt,
                 user.LastLogin
             });

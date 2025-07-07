@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../services/user';
-import { Observable, map } from 'rxjs';
+import { Observable, of, map, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -11,13 +12,27 @@ import { Observable, map } from 'rxjs';
   templateUrl: './profile-component.html',
   styleUrls: ['./profile-component.scss']
 })
-export class ProfileComponent {
-  user$: Observable<User | null>;
-  achievementsCount$: Observable<number>;
-  cosmeticsCount$: Observable<number>;
+export class ProfileComponent implements OnInit {
+  user$: Observable<User | null> = of(null);
+  achievementsCount$: Observable<number> = of(0);
+  cosmeticsCount$: Observable<number> = of(0);
 
-  constructor(private authService: AuthService) {
-    this.user$ = this.authService.user$;
+  constructor(
+    private authService: AuthService,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit() {
+    this.user$ = this.route.paramMap.pipe(
+      switchMap(params => {
+        const username = params.get('username');
+        if (username) {
+          return this.authService.getProfileByUsername(username);
+        } else {
+          return this.authService.user$;
+        }
+      })
+    );
 
     this.achievementsCount$ = this.user$.pipe(
       map(user => {

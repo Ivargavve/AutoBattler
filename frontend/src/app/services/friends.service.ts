@@ -49,4 +49,12 @@ export class FriendsService {
   addFriendById(userId: number): Observable<any> {
     return this.http.post(`${this.baseUrl}/friendships/request/${userId}`, {});
   }
+
+  getPendingRequests(): Observable<PendingRequest[]> {
+    return this.http.get<PendingRequest[]>(`${this.baseUrl}/friendships/requests`);
+  }
+
+  acceptFriendRequest(requestId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/friendships/accept/${requestId}`, {});
+  }
 }
