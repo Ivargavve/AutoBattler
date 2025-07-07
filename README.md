@@ -1,4 +1,4 @@
-# AutoBattler (Working Title)
+# AutoBattler
 
 **AutoBattler** is a hardcore, text-based autobattler RPG. Players control one character at a time — when they die, they're gone for good. The user's account persists across playthroughs and accumulates legacy progress like XP, cosmetics, and achievements.
 
