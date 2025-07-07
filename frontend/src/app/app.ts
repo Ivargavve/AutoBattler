@@ -93,13 +93,8 @@ export class App implements OnInit {
           this.router.navigate(['/home']);
         }
       } catch (error) {
-        const status = (error as { status?: number })?.status;
-        if (status === 404) {
-          this.router.navigate(['/create-character']);
-        } else {
-          this.auth.logout();
-          this.router.navigate(['/login']);
-        }
+        this.auth.logout();
+        this.router.navigate(['/login']);
       }
     }
     this.loading = false;

@@ -18,15 +18,13 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
   player: Fighter | null = null;
   enemy: Fighter | null = null;
   battleLog: BattleLogEntry[] = [];
-  isLoading = false;
+  isLoading = false; // Indicates if a request is in progress, used to disable buttons
   battleEnded = false;
   gainedXp: number | null = null;
   userLevel: number | null = null;
   userXp: number | null = null;
   playerEnergy: number = 0;
   enemyName: string | null = null;
-
-  showDeathPopup = false;
 
   private characterSub!: Subscription;
 
@@ -141,10 +139,8 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
             this.isLoading = true;
             try {
               await firstValueFrom(this.http.delete(`${environment.apiUrl}/characters`));
-              this.authService.clearCharacter();
             } catch {}
             this.isLoading = false;
-            this.showDeathPopup = true;
             this.gainedXp = null;
           } else {
             this.gainedXp = null;
@@ -159,11 +155,6 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
           this.scrollToBottom();
         }
       });
-  }
-
-  onDeathPopupOk(): void {
-    this.showDeathPopup = false;
-    this.router.navigate(['/home']);
   }
 
   getLogClass(log: BattleLogEntry): string {

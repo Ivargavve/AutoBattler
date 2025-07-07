@@ -87,15 +87,11 @@ export class AuthService {
         });
     });
   }
-  rechargeCharacter(): Promise<Character | null> {
+  rechargeCharacter(): Promise<void> {
     return lastValueFrom(
       this.http.put<Character>(`${environment.apiUrl}/characters/recharge`, {})
     ).then(character => {
       this.characterSubject.next(character);
-      return character;
     });
-  }
-  clearCharacter(): void {
-    (this as any).characterSubject?.next(null);
   }
 }

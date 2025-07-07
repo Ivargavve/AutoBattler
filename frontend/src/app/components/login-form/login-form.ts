@@ -41,7 +41,6 @@ export class LoginForm implements OnInit {
       const res: any = await firstValueFrom(this.authService.googleLogin(idToken));
       const { token, needsUsernameSetup } = res;
       localStorage.setItem('token', token);
-      await this.authService.rechargeCharacter();
       await this.authService.loadUserWithCharacter();
 
       if (needsUsernameSetup) {
