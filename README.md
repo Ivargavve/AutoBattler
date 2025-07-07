@@ -49,3 +49,5 @@ Victory! You win 5 silver coins and gain +17 XP (+2 User XP).
 - Cosmetic-only store linked to persistent User account
 - Deep social integration and achievements
 - Full legacy system and stat tracking
+
+###
