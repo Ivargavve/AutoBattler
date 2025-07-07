@@ -42,14 +42,15 @@ export class LoginForm implements OnInit {
       const { token, needsUsernameSetup } = res;
       localStorage.setItem('token', token);
 
-      await this.authService.loadUserWithCharacter();
+      const profile = await firstValueFrom(this.authService.getProfile());
 
-      const user = this.authService.user;
-      if (user && user.character) {
-        await this.authService.rechargeCharacter();
+      if (profile && profile.character) {
         await this.authService.loadUserWithCharacter();
+        await this.authService.rechargeCharacter();
+      } else if (profile) {
+        this.authService.setUser({ ...profile, character: undefined });
+        this.authService.clearCharacter();
       }
-
       if (needsUsernameSetup) {
         await this.router.navigate(['/username-form']);
       } else {
@@ -62,5 +63,4 @@ export class LoginForm implements OnInit {
       this.loading = false;
     }
   }
-
 }

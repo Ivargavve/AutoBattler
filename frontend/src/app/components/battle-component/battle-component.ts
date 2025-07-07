@@ -4,8 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { Fighter, BattleLogEntry } from '../../services/battle-interfaces';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
-import { Subscription } from 'rxjs';
-import { Character } from '../../services/character';
+import { Subscription, firstValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-battle',
@@ -26,11 +26,13 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
   playerEnergy: number = 0;
   enemyName: string | null = null;
 
+  showDeathPopup = false;
+
   private characterSub!: Subscription;
 
   @ViewChild('battleLogContainer') battleLogContainer!: ElementRef;
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient, private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
     this.characterSub = this.authService.character$.subscribe(character => {
@@ -123,7 +125,7 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.http.post<any>(`${environment.apiUrl}/battle/turn`, req)
       .subscribe({
-        next: (res) => {
+        next: async (res) => {
           this.player!.hp = res.playerHp;
           this.player!.maxHp = res.playerMaxHp;
           this.enemy!.hp = res.enemyHp;
@@ -135,6 +137,22 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
 
           if (res.battleEnded && this.player!.hp > 0) {
             this.gainedXp = res.gainedXp ?? null;
+          } else if (res.battleEnded && this.player!.hp <= 0) {
+            this.isLoading = true;
+            try {
+              await firstValueFrom(this.http.delete(`${environment.apiUrl}/characters`));
+              try {
+                const profile = await firstValueFrom(this.authService.getProfile());
+                this.authService.setUser({ ...profile, character: undefined });
+                this.authService.clearCharacter();
+              } catch {
+                this.authService.setUser(null as any);
+                this.authService.clearCharacter();
+              }
+            } catch {}
+            this.isLoading = false;
+            this.showDeathPopup = true;
+            this.gainedXp = null;
           } else {
             this.gainedXp = null;
           }
@@ -148,6 +166,11 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
           this.scrollToBottom();
         }
       });
+  }
+
+  onDeathPopupOk(): void {
+    this.showDeathPopup = false;
+    this.router.navigate(['/home']);
   }
 
   getLogClass(log: BattleLogEntry): string {

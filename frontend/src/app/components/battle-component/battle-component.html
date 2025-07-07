@@ -64,3 +64,9 @@
     </div>
   </div>
 </div>
+<div *ngIf="showDeathPopup" class="death-popup-backdrop">
+  <div class="death-popup">
+    <p>Your character <b>{{ player?.name }}</b> died!</p>
+    <button (click)="onDeathPopupOk()">OK</button>
+  </div>
+</div>

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, lastValueFrom } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, firstValueFrom } from 'rxjs';
 import { tap, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { User } from '../services/user';
@@ -52,6 +52,9 @@ export class AuthService {
   getProfile() {
     return this.http.get<User>(`${environment.apiUrl}/users/me`);
   }
+  getCharacter() {
+    return this.http.get<Character>(`${environment.apiUrl}/characters/me`);
+  }
 
   private loadUserFromStorage(): User | null {
     const raw = localStorage.getItem('user');
@@ -70,11 +73,6 @@ export class AuthService {
       this.characterSubject.next(user.character);
     }
   }
-
-  getCharacter() {
-    return this.http.get<Character>(`${environment.apiUrl}/characters/me`);
-  }
-
   loadUserWithCharacter(): Promise<void> {
     return lastValueFrom(this.getProfile()).then(profile => {
       return lastValueFrom(this.getCharacter())
@@ -89,12 +87,15 @@ export class AuthService {
         });
     });
   }
-  rechargeCharacter(): Promise<Character> {
+  rechargeCharacter(): Promise<Character | null> {
     return lastValueFrom(
       this.http.put<Character>(`${environment.apiUrl}/characters/recharge`, {})
     ).then(character => {
       this.characterSubject.next(character);
       return character;
     });
+  }
+  clearCharacter(): void {
+    (this as any).characterSubject?.next(null);
   }
 }

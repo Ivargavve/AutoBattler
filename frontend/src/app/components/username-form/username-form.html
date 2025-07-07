@@ -1,10 +1,10 @@
 <div class="login-container">
+  <app-loading-spinner *ngIf="isSubmitting"></app-loading-spinner>
   <div class="login-card">
     <h1 class="login-title">Choose Your Username</h1>
     <p class="login-subtext">
       <em>Your username is for your profile, not your in-game character.</em>
     </p>
-
     <form [formGroup]="usernameForm" (ngSubmit)="onSubmit()">
       <input
         type="text"

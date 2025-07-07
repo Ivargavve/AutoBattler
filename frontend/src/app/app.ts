@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
 import { User } from './services/user';
 import { Character } from './services/character';
-import { Observable, timer, of } from 'rxjs';
+import { Observable, timer, of, firstValueFrom } from 'rxjs';
 import { map, switchMap, startWith, tap } from 'rxjs/operators';
 import { LoadingSpinnerComponent } from './components/loading-component/loading-component';
 import { ICONS } from './icons'; 
@@ -26,7 +26,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 export class App implements OnInit {
   public currentTheme: 'light' | 'dark' = 'light';
   public user$: Observable<User | null>;
-  public character$: Observable<Character | null>; // <- OBS! Nu från service
+  public character$: Observable<Character | null>;
   public rechargeTimer$: Observable<string | null>;
 
   public loading = true;
@@ -38,8 +38,6 @@ export class App implements OnInit {
 
   constructor(public auth: AuthService, private router: Router) {
     this.user$ = this.auth.user$;
-
-    // ÄNDRAT HÄR: Nu direkt från authService
     this.character$ = this.auth.character$;
 
     this.rechargeTimer$ = this.character$.pipe(
@@ -65,8 +63,6 @@ export class App implements OnInit {
               this.rechargeCalled = true;
               this.auth.rechargeCharacter()
                 .then(character => {
-                  // characterSubject.next() sker i service, inget mer krävs här!
-                  // Kan slopa setUser-logik (sker i loadUserWithCharacter ändå)
                   this.auth.loadUserWithCharacter();
                 })
                 .finally(() => {
@@ -91,19 +87,32 @@ export class App implements OnInit {
 
     if (this.auth.isLoggedIn) {
       try {
-        await this.auth.rechargeCharacter();
-        await this.auth.loadUserWithCharacter();
+        const profile = await firstValueFrom(this.auth.getProfile());
 
+        if (profile && profile.character) {
+          console.log(profile.character);
+          await this.auth.loadUserWithCharacter();
+          await this.auth.rechargeCharacter();
+        } else if (profile) {
+          this.auth.setUser({ ...profile, character: undefined });
+          this.auth.clearCharacter();
+        }
         if (currentUrl === '/login' || currentUrl === '/') {
           this.router.navigate(['/home']);
         }
       } catch (error) {
-        this.auth.logout();
-        this.router.navigate(['/login']);
+        const status = (error as { status?: number })?.status;
+        if (status === 404) {
+          this.router.navigate(['/create-character']);
+        } else {
+          this.auth.logout();
+          this.router.navigate(['/login']);
+        }
       }
     }
     this.loading = false;
   }
+
 
   get showPanels$(): Observable<boolean> {
     return this.auth.user$.pipe(
