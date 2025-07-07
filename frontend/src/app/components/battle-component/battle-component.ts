@@ -141,6 +141,7 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
             this.isLoading = true;
             try {
               await firstValueFrom(this.http.delete(`${environment.apiUrl}/characters`));
+              this.authService.clearCharacter();
             } catch {}
             this.isLoading = false;
             this.showDeathPopup = true;
