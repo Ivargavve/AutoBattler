@@ -141,14 +141,6 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
             this.isLoading = true;
             try {
               await firstValueFrom(this.http.delete(`${environment.apiUrl}/characters`));
-              try {
-                const profile = await firstValueFrom(this.authService.getProfile());
-                this.authService.setUser({ ...profile, character: undefined });
-                this.authService.clearCharacter();
-              } catch {
-                this.authService.setUser(null as any);
-                this.authService.clearCharacter();
-              }
             } catch {}
             this.isLoading = false;
             this.showDeathPopup = true;

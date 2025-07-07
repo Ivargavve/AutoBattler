@@ -87,16 +87,8 @@ export class App implements OnInit {
 
     if (this.auth.isLoggedIn) {
       try {
-        const profile = await firstValueFrom(this.auth.getProfile());
-
-        if (profile && profile.character) {
-          console.log(profile.character);
-          await this.auth.loadUserWithCharacter();
-          await this.auth.rechargeCharacter();
-        } else if (profile) {
-          this.auth.setUser({ ...profile, character: undefined });
-          this.auth.clearCharacter();
-        }
+        await this.auth.rechargeCharacter();
+        await this.auth.loadUserWithCharacter();
         if (currentUrl === '/login' || currentUrl === '/') {
           this.router.navigate(['/home']);
         }
@@ -112,7 +104,6 @@ export class App implements OnInit {
     }
     this.loading = false;
   }
-
 
   get showPanels$(): Observable<boolean> {
     return this.auth.user$.pipe(
