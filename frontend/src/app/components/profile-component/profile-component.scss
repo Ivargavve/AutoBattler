@@ -8,14 +8,14 @@
 
 .profile-page {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 3rem;
   justify-content: center;
   align-items: flex-start;
   width: 100%;
 }
 
-.profile-card, .character-card {
+.profile-card {
   background: var(--bg);
   color: var(--text);
   border: 1.5px solid var(--sidebar-border);
@@ -27,7 +27,7 @@
   align-items: center;
 }
 
-.profile-header, .character-header-row {
+.profile-header {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -36,7 +36,7 @@
   width: 100%;
 }
 
-.profile-pic, .character-profile-icon {
+.profile-pic {
   width: 108px;
   height: 108px;
   border-radius: 50%;
@@ -45,7 +45,7 @@
   background: var(--friend-li-bg); // Nära svart, funkar som neutral bg
 }
 
-.username, .character-name {
+.username {
   font-size: 2.15rem;
   color: var(--accent);
   letter-spacing: 1.5px;
@@ -53,21 +53,15 @@
   text-shadow: 0 0 7px var(--accent-shadow);
 }
 
-.character-class {
-  font-size: 1rem;
-  color: var(--section-title); // Vit text
-  opacity: 0.75;
-}
-
-.profile-body, .character-stats {
+.profile-body {
   width: 100%;
   padding: 0 0.4rem;
 }
 
-.profile-body p, .character-stats li {
+.profile-body p {
   margin: 0.59rem 0;
   font-size: 1.13rem;
-  color: var(--section-title); // Vit text
+  color: var(--section-title);
   text-shadow: 0 0 2px var(--meta-text);
   display: flex;
   flex-wrap: wrap;
@@ -89,63 +83,9 @@
   letter-spacing: 0.3px;
 }
 
-.bar-container {
-  width: 100%;
-  background: var(--bar-bg);
-  height: 23px;
-  border-radius: 4px;
-  margin-top: 0.18rem;
-  position: relative;
-  margin-bottom: 0.39rem;
-  overflow: hidden;
-}
-
-.bar-fill {
-  height: 100%;
-  border-radius: 4px;
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-}
-
-.bar-container.red .bar-fill {
-  background: var(--bar-fill-red);
-}
-.bar-container.yellow .bar-fill {
-  background: var(--bar-fill-yellow);
-}
-.bar-text {
-  position: absolute;
-  width: 100%;
-  font-size: 1.07rem;
-  text-align: center;
-  color: var(--bar-text);
-  line-height: 23px;
-  letter-spacing: 0.3px;
-}
-
-.character-card.empty {
-  text-align: center;
-  opacity: 0.8;
-  background: var(--friend-li-bg);
-  border: 1.5px dashed var(--sidebar-border);
-  color: var(--text);
-  font-style: italic;
-  font-size: 1.09rem;
-
-  a {
-    color: var(--accent);
-    text-decoration: underline;
-    margin-left: 2px;
-    &:hover {
-      color: var(--section-title);
-      cursor: pointer;
-    }
-  }
-}
-
 @media (max-width: 900px) {
   .profile-bg { padding: 0 0.1rem; }
   .profile-page { grid-template-columns: 1fr; gap: 1.4rem; }
-  .profile-card, .character-card { padding: 1.6rem 0.5rem 1.2rem 0.5rem; }
-  .profile-header .profile-pic, .character-header-row .character-profile-icon { width: 72px; height: 72px; }
+  .profile-card { padding: 1.6rem 0.5rem 1.2rem 0.5rem; }
+  .profile-header .profile-pic { width: 72px; height: 72px; }
 }

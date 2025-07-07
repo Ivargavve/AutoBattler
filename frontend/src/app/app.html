@@ -108,7 +108,7 @@
 
           <!-- Character -->
           <ng-container *ngIf="character$ | async as character; else createCharacterPrompt">
-            <div class="character-header-row" routerLink="/profile">
+            <div class="character-header-row" routerLink="/hero">
               <img 
                 *ngIf="character.profileIconUrl"
                 [src]="character.profileIconUrl"

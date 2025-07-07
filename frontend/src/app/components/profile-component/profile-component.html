@@ -1,6 +1,5 @@
 <div class="profile-bg">
   <div class="profile-page">
-    <!-- Profile Card -->
     <ng-container *ngIf="user$ | async as user; else loading">
       <div class="profile-card">
         <div class="profile-header">
@@ -19,48 +18,7 @@
           <p><strong>Registered:</strong> {{ user.createdAt | date:'short' }}</p>
         </div>
       </div>
-
-      <!-- Character Card -->
-      <div class="character-card" *ngIf="user.character as character; else noCharacter">
-        <div class="character-header-row">
-          <img [src]="character.profileIconUrl" alt="Character Icon" class="character-profile-icon" />
-          <div>
-            <h2 class="character-name">{{ character.name }}</h2>
-            <div class="character-class">Class: {{ character.class }}</div>
-          </div>
-        </div>
-        <ul class="character-stats">
-          <li><strong>Level:</strong> {{ character.level }}</li>
-          <li><strong>XP:</strong> {{ character.experiencePoints }}</li>
-          <li>
-            <strong>HP:</strong> {{ character.currentHealth }} / {{ character.maxHealth }}
-            <div class="bar-container red">
-              <div class="bar-fill" [style.width.%]="(character.currentHealth / character.maxHealth) * 100"></div>
-              <span class="bar-text">{{ character.currentHealth }} / {{ character.maxHealth }}</span>
-            </div>
-          </li>
-          <li>
-            <strong>Energy:</strong> {{ character.currentEnergy }} / {{ character.maxEnergy }}
-            <div class="bar-container yellow">
-              <div class="bar-fill" [style.width.%]="(character.currentEnergy / character.maxEnergy) * 100"></div>
-              <span class="bar-text">{{ character.currentEnergy }} / {{ character.maxEnergy }}</span>
-            </div>
-          </li>
-          <li><strong>Attack:</strong> {{ character.attack }}</li>
-          <li><strong>Defense:</strong> {{ character.defense }}</li>
-          <li><strong>Agility:</strong> {{ character.agility }}</li>
-          <li><strong>Critical Chance:</strong> {{ character.criticalChance }}%</li>
-          <li><strong>Credits:</strong> {{ character.credits }}</li>
-          <li><strong>Created:</strong> {{ character.createdAt | date:'short' }}</li>
-        </ul>
-      </div>
-      <ng-template #noCharacter>
-        <div class="character-card empty">
-          <p>No character found. <a routerLink="/create-character">Create one here!</a></p>
-        </div>
-      </ng-template>
     </ng-container>
-
     <ng-template #loading>
       <div class="profile-card" style="text-align:center; font-size:1.2rem;">Loading profile...</div>
     </ng-template>
