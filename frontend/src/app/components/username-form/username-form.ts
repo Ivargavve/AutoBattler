@@ -51,7 +51,6 @@ export class UsernameSetupComponent {
 
     try {
       await firstValueFrom(this.http.put(`${environment.apiUrl}/googleauth/set-username`, { userId, newUsername }));
-      await this.authService.rechargeCharacter();
       await this.authService.loadUserWithCharacter();
 
       await this.router.navigate(['/home']);
