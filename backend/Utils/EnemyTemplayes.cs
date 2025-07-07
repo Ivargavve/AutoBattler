@@ -30,6 +30,7 @@ namespace backend.Utils
             new EnemyTemplate { Name = "Dad Joke Golem", MaxHp = 34, Attack = 11, Defense = 8, XP = 55, CritChance = 0.06 },
             new EnemyTemplate { Name = "Shadow Influencer", MaxHp = 40, Attack = 30, Defense = 3, XP = 110, CritChance = 0.13 },
             new EnemyTemplate { Name = "Flat Earth Lizard", MaxHp = 25, Attack = 17, Defense = 2, XP = 47, CritChance = 0.12 },
+            new EnemyTemplate { Name = "Dragon Daddy", MaxHp = 300, Attack = 34, Defense = 9, XP = 300, CritChance = 0.22 },
             new EnemyTemplate { Name = "Angry Barista", MaxHp = 18, Attack = 19, Defense = 1, XP = 39, CritChance = 0.11 },
             new EnemyTemplate { Name = "Social Media Troll", MaxHp = 19, Attack = 15, Defense = 0, XP = 38, CritChance = 0.17 },
             new EnemyTemplate { Name = "Crypto Bro", MaxHp = 21, Attack = 24, Defense = 1, XP = 41, CritChance = 0.09 },
