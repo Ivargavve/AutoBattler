@@ -10,9 +10,10 @@ namespace backend.Data
         {
         }
 
-        public DbSet<User> Users => Set<User>();
+        public DbSet<User> Users { get; set; }
         public DbSet<Character> Characters { get; set; }
-        public DbSet<Friendship> Friendships => Set<Friendship>();
+        public DbSet<Friendship> Friendships { get; set; }
+
         
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

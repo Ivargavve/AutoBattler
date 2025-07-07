@@ -1,0 +1,75 @@
+<div class="friends-list-container">
+  <div *ngIf="loading" class="friends-loading">
+    <span>Loading friends...</span>
+  </div>
+
+  <div *ngIf="!loading" class="friends-error">
+    <span>{{ error }}</span>
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- User search field -->
+    <div class="friend-controls search-users">
+      <input
+        [formControl]="searchControl"
+        placeholder="Search users..."
+        autocomplete="off"
+      />
+    </div>
+    <div *ngIf="searchingUsers" class="friends-loading"><span>Searching users...</span></div>
+    <div *ngIf="userSearchResults.length > 0 && (searchControl.value?.length ?? 0) >= 2" class="search-results-wrapper">
+      <ul class="friend-list">
+        <li *ngFor="let user of userSearchResults; trackBy: trackByUserId" class="user-search-result">
+          <div class="friend-entry">
+            <span class="icon">👤</span>
+            <span class="friend-name">{{ user.username }}</span>
+            <span class="friend-status">
+              <ng-container [ngSwitch]="user.status">
+                <span *ngSwitchCase="'friend'" class="badge friend">Friend</span>
+                <span *ngSwitchCase="'pending_sent'" class="badge pending">Pending</span>
+                <span *ngSwitchCase="'pending_received'" class="badge pending">Request received</span>
+                <button *ngSwitchCase="'none'" (click)="addFriendById(user.id)" [disabled]="addLoadingUserId === user.id">
+                  {{ addLoadingUserId === user.id ? '...' : 'Add' }}
+                </button>
+              </ng-container>
+            </span>
+          </div>
+          <div class="friend-info">
+            <span class="friend-fullname">{{ user.fullName }}</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="userSearchResults.length > 0 && (searchControl.value?.length ?? 0) >= 2" class="no-users">
+      <small>No users found...</small>
+    </div>
+
+    <!-- Divider -->
+    <hr class="divider" />
+
+    <!-- Friend list (same styling as before) -->
+    <h3 class="section-title">Your Friends</h3>
+    <div class="friends-wrapper">
+      <ul class="friend-list">
+        <li *ngFor="let friend of filteredFriends; trackBy: trackByFriendId" (click)="onFriendClick(friend)">
+          <div class="friend-entry">
+            <span class="icon">👤</span>
+            <span class="friend-name">
+              {{ friend.username }}
+              <i class="fas fa-circle" *ngIf="friend.online"
+                 style="color: #6ed99e; font-size: 0.5rem;"></i>
+              <span *ngIf="!friend.online" class="offline">(offline)</span>
+            </span>
+          </div>
+          <div class="friend-info">
+            <span class="friend-fullname">{{ friend.fullName }}</span>
+            <span class="last-login" *ngIf="friend.lastLogin">- {{ friend.lastLogin | date:'shortTime' }}</span>
+          </div>
+        </li>
+      </ul>
+      <div *ngIf="filteredFriends.length === 0 && !loading" class="no-friends">
+        <small>You don't have any friends yet...</small>
+      </div>
+    </div>
+  </div>
+</div>

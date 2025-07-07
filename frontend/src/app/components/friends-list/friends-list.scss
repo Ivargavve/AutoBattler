@@ -1,0 +1,107 @@
+.friends-list-container {
+  margin-top: 0.5rem;
+}
+
+.friends-loading,
+.friends-error,
+.no-friends,
+.add-error {
+  color: var(--offline, #888);
+  text-align: center;
+  margin: 0.4rem 0;
+  font-size: 0.9rem;
+}
+
+.add-error {
+  color: #f66;
+  margin-top: 0.2rem;
+}
+
+.friend-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+
+  input {
+    flex: 1;
+    background-color: var(--input-bg, #313131);
+    border: 1px solid var(--input-border, #333);
+    padding: 0.3rem 0.4rem;
+    font-size: 0.7rem;
+    color: var(--input-color, #ccc);
+    margin-right: 0.4rem;
+    width: 100%;
+    border-radius: 4px;
+    min-width: 0;
+  }
+
+  button {
+    background-color: var(--button-bg, #222);
+    border: 1px solid var(--button-border, #444);
+    color: var(--accent, #86f7b3);
+    padding: 0.3rem 0.5rem;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+    border-radius: 4px;
+    min-width: 2.6rem;
+
+    &:hover {
+      background-color: var(--button-hover-bg, #2c2c2c);
+    }
+  }
+}
+
+.friends-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.3rem;
+}
+
+.friend-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    background-color: var(--nav-bg, #181f1a);
+    padding: 0 0.6rem;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 0.2rem;
+
+    &:hover {
+      background-color: var(--friend-li-hover-bg, #232f22);
+      text-shadow: 0 0 6px var(--friend-li-hover-shadow, rgba(134, 247, 179, 0.4));
+    }
+
+    .friend-entry {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      color: var(--accent, #86f7b3);
+    }
+
+    .offline {
+      color: var(--offline, #888);
+      opacity: 0.6;
+      margin-left: 0.3rem;
+    }
+
+    .friend-fullname {
+      font-size: 0.75rem;
+      color: var(--friend-fullname, #888);
+      padding-left: 1.5rem;
+    }
+
+    .last-login {
+      white-space: nowrap;
+      font-style: italic;
+      color: var(--last-login, #6ed99e);
+      padding-left: 1rem;
+      font-size: 0.75rem;
+    }
+  }
+}
