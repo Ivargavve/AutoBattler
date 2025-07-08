@@ -13,7 +13,7 @@
       <li
         *ngFor="let user of userSearchResults; trackBy: trackByUserId"
         class="user-search-result"
-        [routerLink]="['/profile', user.username]"
+        [routerLink]="user.username ? ['/profile', user.username] : ['/profile/id', user.id]"
         style="cursor:pointer;"
       >
         <div class="friend-entry">
@@ -74,7 +74,7 @@
     <div *ngIf="pendingRequests && pendingRequests.length > 0" class="pending-requests-wrapper">
       <ul class="friend-list">
         <li *ngFor="let req of pendingRequests"
-            [routerLink]="['/profile', req.requesterUsername]"
+            [routerLink]="req.requesterUsername ? ['/profile', req.requesterUsername] : ['/profile/id', req.id]"
             style="cursor:pointer;">
           <div class="friend-entry">
             <img
@@ -109,7 +109,7 @@
       <ul class="friend-list">
         <li
           *ngFor="let friend of filteredFriends; trackBy: trackByFriendId"
-          [routerLink]="['/profile', friend.username]"
+          [routerLink]="friend.username ? ['/profile', friend.username] : ['/profile/id', friend.id]"
           style="cursor:pointer;"
         >
           <div class="friend-entry">
@@ -139,9 +139,14 @@
           </div>
         </li>
       </ul>
-      <div *ngIf="filteredFriends.length === 0 && !loading" class="no-friends">
-        <small>You don't have any friends yet...</small>
-      </div>
+     <div *ngIf="filteredFriends.length === 0 && !loading" class="no-friends">
+      <small *ngIf="(searchControl.value?.length ?? 0) > 0">
+        No friends called "{{ searchControl.value }}"
+      </small>
+      <small *ngIf="!searchControl.value">
+        No friends yet...
+      </small>
+    </div>
     </div>
   </div>
 </div>

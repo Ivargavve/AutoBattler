@@ -47,6 +47,7 @@ export class LoginForm implements OnInit {
         await this.router.navigate(['/username-form']);
       } else {
         await this.router.navigate(['/home']);
+        await this.authService.rechargeCharacter();
       }
     } catch (error) {
       this.errorMessage = 'Login failed. Please try again.';
