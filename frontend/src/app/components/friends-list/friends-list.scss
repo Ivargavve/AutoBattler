@@ -1,6 +1,7 @@
 .friends-list-container {
   height: 100%;
-  overflow: auto;
+  overflow: hidden;
+  max-height: 350px;
 }
 
 .friends-loading,
