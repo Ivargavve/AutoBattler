@@ -1,8 +1,13 @@
 <div class="profile-bg">
   <div class="profile-page">
+
+    <!-- Profile data (user) and character both load after user$ resolves -->
     <ng-container *ngIf="user$ | async as user; else loading">
+
+      <!-- User Profile Card -->
       <div class="profile-card">
         <div class="profile-header">
+          <!-- User profile picture -->
           <img [src]="user.profilePictureUrl" alt="Profile Picture" class="profile-pic" />
           <h2 class="username">{{ user.username }}</h2>
         </div>
@@ -18,9 +23,49 @@
           <p><strong>Registered:</strong> {{ user.createdAt | date:'short' }}</p>
         </div>
       </div>
+
+      <!-- Character Profile Card (same classes as user) -->
+      <ng-container *ngIf="character$ | async as character; else noCharacter">
+        <div class="profile-card character-profile-card">
+          <div class="profile-header">
+            <!-- Character profile icon -->
+            <img [src]="character.profileIconUrl" alt="Character Image" class="profile-pic" />
+            <h2 class="username">{{ character.name || 'Character' }}</h2>
+          </div>
+          <div class="profile-body">
+            <p><strong>Class:</strong> {{ character.class }}</p>
+            <p><strong>HP:</strong> {{ character.currentHealth }}</p>
+            <p><strong>Attack:</strong> {{ character.attack }}</p>
+            <p><strong>Defense:</strong> {{ character.defense }}</p>
+            <p><strong>Speed:</strong> {{ character.agility }}</p>
+            <p><strong>Crit Chance:</strong> {{ character.criticalChance }}%</p>
+            <p><strong>Level:</strong> {{ character.level }}</p>
+            <p><strong>Credits:</strong> {{ character.credits }}</p>
+            <p><strong>Created:</strong> {{ character.createdAt | date:'short' }}</p>
+            <p><strong>Last updated:</strong> {{ character.updatedAt | date:'short' }}</p>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- If character does not exist -->
+      <ng-template #noCharacter>
+        <div class="profile-card character-profile-card character-empty">
+          <div class="profile-header">
+            <img src="assets/char1.jpeg" alt="No Character" class="profile-pic" />
+            <h2 class="username">No character</h2>
+          </div>
+          <div class="profile-body">
+            <p>No character created yet.</p>
+          </div>
+        </div>
+      </ng-template>
+
     </ng-container>
+
+    <!-- Loading spinner while user data is loading -->
     <ng-template #loading>
       <app-loading-spinner></app-loading-spinner>
     </ng-template>
+
   </div>
 </div>

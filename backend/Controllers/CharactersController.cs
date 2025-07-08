@@ -34,7 +34,6 @@ namespace backend.Controllers
             var elapsedSeconds = (now - chr.LastRechargeTime).TotalSeconds;
 
             const int energyInterval = 120;
-
             int ticks = (int)(elapsedSeconds / energyInterval);
 
             if (ticks > 0)
@@ -90,6 +89,58 @@ namespace backend.Controllers
                 return Unauthorized();
 
             var chr = await _db.Characters.FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (chr == null)
+                return NotFound();
+
+            const int energyInterval = 120;
+            var now = DateTime.UtcNow;
+            var elapsedSeconds = (now - chr.LastRechargeTime).TotalSeconds;
+            var nextTickInSeconds = energyInterval - ((int)elapsedSeconds % energyInterval);
+            if (nextTickInSeconds <= 0) nextTickInSeconds = energyInterval;
+
+            return Ok(new
+            {
+                chr.Id,
+                chr.Name,
+                chr.Class,
+                chr.ProfileIconUrl,
+                chr.Level,
+                chr.ExperiencePoints,
+                chr.CurrentHealth,
+                chr.MaxHealth,
+                chr.CurrentEnergy,
+                chr.MaxEnergy,
+                chr.Attack,
+                chr.Defense,
+                chr.Agility,
+                chr.CriticalChance,
+                chr.Credits,
+                chr.InventoryJson,
+                chr.EquipmentJson,
+                chr.CreatedAt,
+                chr.UpdatedAt,
+                chr.LastRechargeTime,
+                nextTickInSeconds
+            });
+        }
+
+        [HttpGet("{username}")]
+        public async Task<IActionResult> GetCharacterByUsername(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                return BadRequest(new { message = "Username is required" });
+
+            var user = await _db.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
+
+            if (user == null)
+                return NotFound();
+
+            var chr = await _db.Characters
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.UserId == user.Id);
 
             if (chr == null)
                 return NotFound();

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../services/user';
+import { Character } from '../../services/character';
 import { Observable, of, map, switchMap } from 'rxjs';
 import { LoadingSpinnerComponent } from '../loading-component/loading-component';
 
@@ -15,6 +16,7 @@ import { LoadingSpinnerComponent } from '../loading-component/loading-component'
 })
 export class ProfileComponent implements OnInit {
   user$: Observable<User | null> = of(null);
+  character$: Observable<Character | null> = of(null);
   achievementsCount$: Observable<number> = of(0);
   cosmeticsCount$: Observable<number> = of(0);
 
@@ -24,6 +26,7 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // User-data (för inloggad eller annan användare)
     this.user$ = this.route.paramMap.pipe(
       switchMap(params => {
         const username = params.get('username');
@@ -31,6 +34,25 @@ export class ProfileComponent implements OnInit {
           return this.authService.getProfileByUsername(username);
         } else {
           return this.authService.user$;
+        }
+      })
+    );
+
+    // Character-data (separat anrop)
+    this.character$ = this.route.paramMap.pipe(
+      switchMap(params => {
+        const username = params.get('username');
+        if (username) {
+          // Annan användares karaktär
+          return this.authService.getCharacterByUsername(username).pipe(
+            // Om character saknas (404) returnera null istället för error
+            map(char => char),
+            // fångar http error
+            // catchError(() => of(null))   // <-- lägg till import för catchError och avkommentera om du vill fånga 404-fel snyggt
+          );
+        } else {
+          // Egen karaktär
+          return this.authService.character$;
         }
       })
     );
