@@ -4,8 +4,7 @@
   gap: 2rem;
   padding: 2rem 0.7rem;
   width: 100%;
-  min-height: 100vh;
-  background: var(--bg, #0b0c0b);
+  background: var(--grey-bg, #0b0c0b);
 }
 
 .planner-row {
@@ -22,13 +21,10 @@
   background: var(--grey-bg, #181818);
   padding: 1.7rem 2.1rem 1.5rem 2.1rem;
   flex: 1 1 0;
-  min-width: 0;
-  border-radius: 11px;
-  box-shadow: 0 0 22px #1ed47d1e;
-  border: 1.5px solid var(--sidebar-border, #2c2c2c);
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+  border-radius: 0;
 
   h1 {
     font-size: 2.2rem;
@@ -58,10 +54,8 @@
       justify-content: space-between;
       align-items: flex-start;
       background: var(--friend-li-bg, #101914);
-      border-radius: 7px;
       padding: 0.6rem 1rem 0.6rem 1rem;
       margin-bottom: 0.7rem;
-      box-shadow: 0 0 10px #31ffb928;
       font-size: 1.04rem;
       gap: 0.7rem;
 
@@ -105,16 +99,15 @@
 }
 
 .welcome-block {
-  background: radial-gradient(circle at top left, var(--bg, #181818), var(--bg, #111));
+  background: radial-gradient(circle at top left, var(--grey-bg, #181818), var(--grey-bg, #111));
   text-align: center;
-  border: 1.5px solid var(--sidebar-border, #2c2c2c);
   margin-bottom: 0.7rem;
 }
 
 .btn-fight, .btn-join {
   min-width: 100px;
   height: 40px;
-  border-radius: 5px;
+  border-radius: 4px;
   border: 2px solid var(--sidebar-border, #2c2c2c);
   background: var(--btn-bg, #18261c);
   color: var(--accent, #86f7b3);

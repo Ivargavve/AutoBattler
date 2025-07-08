@@ -54,9 +54,8 @@
 }
 
 .welcome-block {
-  background: radial-gradient(circle at top left, var(--bg, #181818), var(--bg, #111));
+  background: radial-gradient(circle at top left, var(--grey-bg, #181818), var(--grey-bg, #111));
   text-align: center;
-  border: 1.5px solid var(--sidebar-border, #2c2c2c);
 
   h1 {
     font-size: 2.2rem;
