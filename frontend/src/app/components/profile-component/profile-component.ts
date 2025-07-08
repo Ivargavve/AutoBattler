@@ -4,11 +4,12 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../services/user';
 import { Observable, of, map, switchMap } from 'rxjs';
+import { LoadingSpinnerComponent } from '../loading-component/loading-component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LoadingSpinnerComponent],
   templateUrl: './profile-component.html',
   styleUrls: ['./profile-component.scss']
 })
