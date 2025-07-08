@@ -129,6 +129,8 @@ namespace backend.Controllers
                 requesterId = f.Requester.Id,
                 requesterUsername = f.Requester.Username,
                 requesterProfilePictureUrl = f.Requester.ProfilePictureUrl,
+                profilePictureUrl = f.Requester.ProfilePictureUrl,
+                fullName = f.Requester.FullName, 
                 createdAt = f.CreatedAt.ToUniversalTime().ToString("o")
             });
 

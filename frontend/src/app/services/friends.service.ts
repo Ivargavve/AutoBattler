@@ -26,6 +26,8 @@ export interface PendingRequest {
   requesterUsername: string;
   requesterProfilePictureUrl?: string;
   createdAt: string;
+  profilePictureUrl?: string;
+  fullName: string;
 }
 
 @Injectable({ providedIn: 'root' })

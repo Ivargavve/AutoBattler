@@ -4,11 +4,12 @@ import { FriendsService, Friend, UserSearchResult, PendingRequest } from '../../
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, map, startWith } from 'rxjs/operators';
 import { Router, RouterModule } from '@angular/router'; 
+import { LoadingSpinnerComponent } from '../loading-component/loading-component';
 
 @Component({
   selector: 'app-friends-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, LoadingSpinnerComponent],
   templateUrl: './friends-list.html',
   styleUrl: './friends-list.scss'
 })
@@ -27,7 +28,6 @@ export class FriendsListComponent implements OnInit {
 
   @Output() friendClicked = new EventEmitter<Friend>();
 
-  // Injektera router
   constructor(private friendsService: FriendsService, private router: Router) {}
 
   ngOnInit() {
@@ -146,7 +146,6 @@ export class FriendsListComponent implements OnInit {
     });
   }
 
-  // Navigering till användarprofil (username-baserad)
   goToProfile(username: string) {
     if (!username) return;
     this.router.navigate(['/profile', username]);
@@ -157,11 +156,5 @@ export class FriendsListComponent implements OnInit {
   }
   trackByUserId(_: number, user: UserSearchResult) {
     return user.id;
-  }
-
-  // Den här behöver du inte längre om du använder goToProfile direkt från html,
-  // men kan finnas kvar om du vill hooka vidare logik:
-  onFriendClick(friend: Friend) {
-    this.goToProfile(friend.username);
   }
 }

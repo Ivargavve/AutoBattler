@@ -9,6 +9,7 @@ import { map, switchMap, startWith, tap } from 'rxjs/operators';
 import { LoadingSpinnerComponent } from './components/loading-component/loading-component';
 import { ICONS } from './icons'; 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FriendsListComponent } from './components/friends-list/friends-list';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +19,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     RouterModule,
     CommonModule,
     LoadingSpinnerComponent,
-    FontAwesomeModule
+    FontAwesomeModule,
+    FriendsListComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
@@ -77,28 +79,58 @@ export class App implements OnInit {
     );
   }
 
-  async ngOnInit(): Promise<void> {
-    this.loading = true;
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
-    this.currentTheme = savedTheme || 'dark';
-    this.applyTheme();
+async ngOnInit(): Promise<void> {
+  this.loading = true;
+  const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
+  this.currentTheme = savedTheme || 'dark';
+  this.applyTheme();
 
-    const currentUrl = this.router.url;
+  const currentUrl = this.router.url;
 
-    if (this.auth.isLoggedIn) {
-      try {
-        await this.auth.rechargeCharacter();
-        await this.auth.loadUserWithCharacter();
-        if (currentUrl === '/login' || currentUrl === '/') {
-          this.router.navigate(['/home']);
-        }
-      } catch (error) {
-        this.auth.logout();
-        this.router.navigate(['/login']);
-      }
-    }
+  if (!this.auth.isLoggedIn) {
     this.loading = false;
+    return;
   }
+
+  try {
+    const user: User | null = await firstValueFrom(this.auth.getProfile());
+    if (!user) {
+      this.auth.logout();
+      this.router.navigate(['/login']);
+      this.loading = false;
+      return;
+    }
+    this.auth.setUser(user);
+    let character: Character | null = null;
+    try {
+      character = await firstValueFrom(this.auth.getCharacter());
+      this.auth['characterSubject'].next(character); 
+    } catch {
+      character = null;
+      this.auth['characterSubject'].next(null);
+    }
+    if (!character) {
+      if (currentUrl !== '/') {
+        this.router.navigate(['/']);
+      }
+      this.loading = false;
+      return;
+    }
+    this.auth.rechargeCharacter();
+    this.auth.loadUserWithCharacter();
+    if (currentUrl === '/login' || currentUrl === '/') {
+      this.router.navigate(['/home']);
+    }
+  } catch (error) {
+    this.auth.logout();
+    this.router.navigate(['/login']);
+  }
+
+  this.loading = false;
+}
+
+
+
 
   get showPanels$(): Observable<boolean> {
     return this.auth.user$.pipe(

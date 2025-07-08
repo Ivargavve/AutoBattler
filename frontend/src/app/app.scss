@@ -723,3 +723,11 @@ nav a {
   color: var(--sidebar-logout, #888);
   opacity: 0.88;
 }
+
+.friends-list-fullheight {
+  height: 100%;
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;       // Gör så att barnen kan flexa ut hela ytan om du använder flex internt
+  flex-direction: column;
+}

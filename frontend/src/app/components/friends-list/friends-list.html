@@ -1,12 +1,63 @@
 <div class="friends-list-container">
   <div *ngIf="loading" class="friends-loading">
-    <span>Loading friends...</span>
+    <app-loading-spinner></app-loading-spinner>
   </div>
 
   <div *ngIf="!loading && error" class="friends-error">
     <span>{{ error }}</span>
   </div>
 
+  <!-- Sökresultat -->
+  <div *ngIf="userSearchResults.length > 0 && (searchControl.value?.length ?? 0) >= 2" class="search-results-wrapper">
+    <ul class="friend-list">
+      <li
+        *ngFor="let user of userSearchResults; trackBy: trackByUserId"
+        class="user-search-result"
+        [routerLink]="['/profile', user.username]"
+        style="cursor:pointer;"
+      >
+        <div class="friend-entry">
+          <img
+            *ngIf="user.profilePictureUrl; else defaultIcon"
+            [src]="user.profilePictureUrl"
+            alt="{{ user.username }}"
+            class="user-avatar"
+          />
+          <ng-template #defaultIcon>
+            <span class="icon">👤</span>
+          </ng-template>
+          <div class="friend-text-block">
+            <div class="friend-name-row">
+              <span class="friend-username">{{ user.username }}</span>
+            </div>
+            <span class="friend-fullname">{{ user.fullName }}</span>
+          </div>
+          <button
+            *ngIf="user.status === 'none'"
+            class="friend-action-btn"
+            (click)="addFriendById(user.id); $event.stopPropagation()"
+            [disabled]="addLoadingUserId === user.id"
+          >
+            {{ addLoadingUserId === user.id ? '...' : 'Add' }}
+          </button>
+          <span class="search-span friend-request-sent" *ngIf="user.status === 'pending_sent'" class="friend-request-sent">
+            Request sent
+          </span>
+          <span class="search-span friend-request-sent" *ngIf="user.status === 'friend'" class="friend-request-sent">
+            Already friends
+          </span>
+          <span class="search-span friend-request-sent" *ngIf="user.status === 'pending_received'" class="friend-request-sent">
+            Request received
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div *ngIf="userSearchResults.length === 0 && (searchControl.value?.length ?? 0) >= 2" class="no-friends">
+    <small>No users found...</small>
+  </div>
+
+  <!-- Friend Requests -->
   <div *ngIf="!loading">
     <!-- User search field -->
     <div class="friend-controls search-users">
@@ -17,75 +68,43 @@
       />
     </div>
     <div *ngIf="searchingUsers" class="friends-loading">
-      <span>Searching users...</span>
+      <app-loading-spinner></app-loading-spinner>
     </div>
 
-    <!-- Sökresultat -->
-    <div *ngIf="userSearchResults.length > 0 && (searchControl.value?.length ?? 0) >= 2" class="search-results-wrapper">
-      <ul class="friend-list">
-        <li
-          *ngFor="let user of userSearchResults; trackBy: trackByUserId"
-          class="user-search-result"
-          [routerLink]="['/profile', user.username]"
-          style="cursor:pointer;"
-        >
-          <div class="friend-entry">
-            <span class="icon">👤</span>
-            <span class="friend-name">{{ user.username }}</span>
-            <span class="friend-status">
-              <ng-container [ngSwitch]="user.status">
-                <span *ngSwitchCase="'friend'" class="badge friend">Friend</span>
-                <span *ngSwitchCase="'pending_sent'" class="badge pending">Pending</span>
-                <span *ngSwitchCase="'pending_received'" class="badge pending">
-                  Request received
-                  <button 
-                    (click)="acceptFriendRequest(user); $event.stopPropagation()"
-                    [disabled]="acceptLoadingUserId === user.id">
-                    {{ acceptLoadingUserId === user.id ? '...' : 'Accept' }}
-                  </button>
-                </span>
-                <button *ngSwitchCase="'none'" (click)="addFriendById(user.id); $event.stopPropagation()" [disabled]="addLoadingUserId === user.id">
-                  {{ addLoadingUserId === user.id ? '...' : 'Add' }}
-                </button>
-              </ng-container>
-            </span>
-          </div>
-          <div class="friend-info">
-            <span class="friend-fullname">{{ user.fullName }}</span>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div *ngIf="userSearchResults.length === 0 && (searchControl.value?.length ?? 0) >= 2" class="no-users">
-      <small>No users found...</small>
-    </div>
-
-    <!-- Divider -->
-    <hr class="divider" />
-
-    <!-- Friend Requests -->
-    <h3 class="section-title" *ngIf="pendingRequests?.length">Friend Requests</h3>
     <div *ngIf="pendingRequests && pendingRequests.length > 0" class="pending-requests-wrapper">
       <ul class="friend-list">
-        <li *ngFor="let req of pendingRequests">
+        <li *ngFor="let req of pendingRequests"
+            [routerLink]="['/profile', req.requesterUsername]"
+            style="cursor:pointer;">
           <div class="friend-entry">
-            <span class="icon">👤</span>
-            <span class="friend-name">
-              <a [routerLink]="['/profile', req.requesterUsername]" style="text-decoration:none;">{{ req.requesterUsername }}</a>
-            </span>
+            <img
+              *ngIf="req.profilePictureUrl; else defaultIcon"
+              [src]="req.profilePictureUrl"
+              alt="{{ req.requesterUsername }}"
+              class="user-avatar"
+            />
+            <ng-template #defaultIcon>
+              <span class="icon">👤</span>
+            </ng-template>
+            <div class="friend-text-block">
+              <div class="friend-name-row">
+                <span class="friend-username">{{ req.requesterUsername }}</span>
+              </div>
+              <span class="friend-fullname">{{ req.fullName }}</span>
+            </div>
             <button
-                (click)="acceptFriendRequestById(req.id, req.requesterId)"
-                [disabled]="acceptLoadingUserId === req.id"
-                >
-                {{ acceptLoadingUserId === req.id ? '...' : 'Accept' }}
+              class="friend-action-btn"
+              (click)="acceptFriendRequestById(req.id, req.requesterId); $event.stopPropagation()"
+              [disabled]="acceptLoadingUserId === req.id"
+            >
+              {{ acceptLoadingUserId === req.id ? '...' : 'Accept' }}
             </button>
           </div>
         </li>
       </ul>
     </div>
 
-    <!-- Friend list (same styling as before) -->
-    <h3 class="section-title">Your Friends</h3>
+    <!-- Friend list  -->
     <div class="friends-wrapper">
       <ul class="friend-list">
         <li
@@ -94,17 +113,29 @@
           style="cursor:pointer;"
         >
           <div class="friend-entry">
-            <span class="icon">👤</span>
-            <span class="friend-name">
-              {{ friend.username }}
-              <i class="fas fa-circle" *ngIf="friend.online"
-                 style="color: #6ed99e; font-size: 0.5rem;"></i>
-              <span *ngIf="!friend.online" class="offline">(offline)</span>
-            </span>
-          </div>
-          <div class="friend-info">
-            <span class="friend-fullname">{{ friend.fullName }}</span>
-            <span class="last-login" *ngIf="friend.lastLogin">- {{ friend.lastLogin | date:'shortTime' }}</span>
+            <img 
+              *ngIf="friend.profilePictureUrl; else defaultIcon" 
+              [src]="friend.profilePictureUrl" 
+              alt="{{ friend.username }}" 
+              class="user-avatar" 
+            />
+            <ng-template #defaultIcon>
+              <span class="icon">👤</span>
+            </ng-template>
+            <div class="friend-text-block">
+              <div class="friend-name-row">
+                <span class="friend-username">{{ friend.username }}</span>
+                <i 
+                  class="fas fa-circle status-dot"
+                  [ngClass]="friend.online ? 'online' : 'offline'"
+                  aria-label="Online status"
+                ></i>
+              </div>
+              <div class="friend-info">
+                <span class="friend-fullname">{{ friend.fullName }}</span>
+                <span class="last-login" *ngIf="friend.lastLogin">- {{ friend.lastLogin | date:'shortTime' }}</span>
+              </div>
+            </div>
           </div>
         </li>
       </ul>
