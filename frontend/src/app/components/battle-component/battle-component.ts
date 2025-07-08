@@ -5,7 +5,7 @@ import { Fighter, BattleLogEntry } from '../../services/battle-interfaces';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { Subscription, firstValueFrom } from 'rxjs';
-import { Router } from '@angular/router';
+import {  ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-battle',
@@ -18,7 +18,7 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
   player: Fighter | null = null;
   enemy: Fighter | null = null;
   battleLog: BattleLogEntry[] = [];
-  isLoading = false; // Indicates if a request is in progress, used to disable buttons
+  isLoading = false; 
   battleEnded = false;
   gainedXp: number | null = null;
   userLevel: number | null = null;
@@ -52,6 +52,7 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.battleLog = [];
     this.battleEnded = true;
+    this.startNewBattle();
   }
 
   ngAfterViewInit(): void {
@@ -135,6 +136,7 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
 
           if (res.battleEnded && this.player!.hp > 0) {
             this.gainedXp = res.gainedXp ?? null;
+            this.onBattleEnd();
           } else if (res.battleEnded && this.player!.hp <= 0) {
             this.isLoading = true;
             try {
@@ -142,7 +144,9 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
             } catch {}
             this.isLoading = false;
             this.gainedXp = null;
-          } else {
+            this.onBattleEnd();
+          } 
+          else {
             this.gainedXp = null;
           }
           this.authService.loadUserWithCharacter();
@@ -155,6 +159,12 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
           this.scrollToBottom();
         }
       });
+  }
+
+  onBattleEnd() {
+    setTimeout(() => {
+      this.router.navigate(['/battle-planner']);
+    }, 4000);
   }
 
   getLogClass(log: BattleLogEntry): string {

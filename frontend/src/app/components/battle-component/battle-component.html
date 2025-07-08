@@ -1,17 +1,14 @@
 <div class="battle-outer">
   <div class="battle-window">
-    <div class="fighter-row">
-      <div class="player-info">
-        <div class="name">{{ player?.name }}</div>
-        <div class="hp">HP: {{ player?.hp }} / {{ player?.maxHp }}</div>
-      </div>
-      <div class="vs">VS</div>
-      <div class="enemy-info">
-        <div class="name">{{ enemy?.name }}</div>
-        <div class="hp">HP: {{ enemy?.hp }} / {{ enemy?.maxHp }}</div>
-      </div>
+
+    <!-- VS Headline -->
+    <div class="battle-vs-headline">
+      <span class="vs-headline-text">
+        {{ player?.name }} <span class="vs-green">VS</span> {{ enemy?.name }}
+      </span>
     </div>
 
+    <!-- Battle Log -->
     <div class="battle-log-wrapper">
       <div class="battle-log" #battleLogContainer>
         <ng-container *ngFor="let log of battleLog">
@@ -41,25 +38,41 @@
       </div>
     </div>
 
-    <div class="battle-controls">
-      <div class="battle-actions-left">
-        <button 
-          *ngIf="battleEnded"
-          (click)="startNewBattle()" 
-          [disabled]="playerEnergy <= 0"
-          class="start-battle-btn">
-          Start New Battle
-        </button>
+    <div class="battle-main-row">
+      <div class="battle-graphic-col">
+        <img 
+          src="assets/battle/.jpg" 
+          alt="Battle Graphic Placeholder" 
+          cclass="battle-graphic-img">
       </div>
-      <div class="battle-actions-right" *ngIf="!battleEnded">
-        <button 
-          (click)="attack()"
-          [disabled]="isLoading || battleEnded"
-          class="attack-btn">
-          Standard Attack
-        </button>
-        <button disabled class="attack-btn alt">Special Attack</button>
-        <button disabled class="attack-btn alt">Defend</button>
+      <div class="battle-controls-col">
+        <div class="fighter-row">
+          <div class="player-info">
+            <div class="name">{{ player?.name }}</div>
+            <div class="hp">HP: {{ player?.hp }} / {{ player?.maxHp }}</div>
+          </div>
+          <div class="vs">VS</div>
+          <div class="enemy-info">
+            <div class="name">{{ enemy?.name }}</div>
+            <div class="hp">HP: {{ enemy?.hp }} / {{ enemy?.maxHp }}</div>
+          </div>
+        </div>
+        <!-- Attack Buttons -->
+        <div class="battle-attack-buttons">
+          <button 
+            (click)="attack()"
+            [disabled]="isLoading || battleEnded"
+            class="attack-btn">
+            Standard Attack (18/20)
+          </button>
+          <button disabled class="attack-btn alt">Special Attack (11/20)</button>
+          <button disabled class="attack-btn alt">Defend (9/10)</button>
+          <button disabled class="attack-btn alt">Fourth Move (2/5)</button>
+        </div>
+        <!-- Run Button -->
+        <div class="battle-run-btn-row">
+          <button class="attack-btn run-btn" style="color:#fff; background:#b33;">Run</button>
+        </div>
       </div>
     </div>
   </div>

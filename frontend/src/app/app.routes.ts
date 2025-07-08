@@ -42,6 +42,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   { 
+    path: 'battle-planner', 
+    loadComponent: () => import('./components/battle-planner/battle-planner').then(m => m.BattlePlannerComponent),
+    canActivate: [AuthGuard]
+  },
+  { 
     path: 'battle', 
     loadComponent: () => import('./components/battle-component/battle-component').then(m => m.BattleComponent),
     canActivate: [AuthGuard]

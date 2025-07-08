@@ -1,0 +1,85 @@
+<div class="planner-wrapper">
+  <!-- Intro / Välkomstblock -->
+  <section class="planner-block welcome-block">
+    <h1>Battle Planner</h1>
+    <p>
+      Choose your next challenge! Fight solo, gather friends for dungeons, or join epic raids. Each challenge has a recommended level – earn XP, unlock new content and climb the ranks!
+    </p>
+  </section>
+
+  <!-- Grid: Fights & Dungeons/Raids -->
+  <div class="planner-row">
+    <!-- Fights -->
+    <section class="planner-block block-fights">
+      <h2>⚔️ Solo Fights</h2>
+      <ul class="planner-list">
+        <li>
+          <span>
+            <strong>Kung Fu Grandma</strong>
+            <span class="tag-unlocked">Lv 1+</span>
+            <span class="desc">Perfect for beginners. Old but gold.</span>
+          </span>
+          <button class="btn-fight" (click)="fight('Kung Fu Grandma')">Fight!</button>
+        </li>
+        <li>
+          <span>
+            <strong>Zombie Accountant</strong>
+            <span class="tag-unlocked">Lv 2+</span>
+            <span class="desc">Calculates your doom (slowly).</span>
+          </span>
+          <button class="btn-fight" disabled>Fight!</button>
+        </li>
+        <li>
+          <span>
+            <strong>L33t Hacker Kid</strong>
+            <span class="tag-locked">Lv 4+</span>
+            <span class="desc">He's cracked... and dangerous.</span>
+          </span>
+          <button class="btn-fight" disabled>Fight!</button>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Dungeons & Raids -->
+    <section class="planner-block block-dungeons">
+      <h2>🗺️ Dungeons & Raids</h2>
+      <ul class="planner-list">
+        <li>
+          <span>
+            <strong>Suburban Sewer</strong>
+            <span class="tag-unlocked">Dungeon • Lv 3+ <span class="party-size">(2-4)</span></span>
+            <span class="desc">Form a team and clear the pipes.</span>
+          </span>
+          <button class="btn-join" disabled>Join Lobby</button>
+        </li>
+        <li>
+          <span>
+            <strong>The Forgotten Library</strong>
+            <span class="tag-locked">Dungeon • Lv 6+ <span class="party-size">(3-5)</span></span>
+            <span class="desc">Lost knowledge, angry spirits.</span>
+          </span>
+          <button class="btn-join" disabled>Join Lobby</button>
+        </li>
+        <li>
+          <span>
+            <strong>Mega Shiba Tower</strong>
+            <span class="tag-locked">Raid • Lv 10+ <span class="party-size">(5-8)</span></span>
+            <span class="desc">A colossal boss fight. Doge level: MAX.</span>
+          </span>
+          <button class="btn-join" disabled>Join Raid</button>
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <!-- Tips block ensam -->
+  <section class="planner-block block-tips">
+    <h2>📘 Tips & Info</h2>
+    <ul>
+      <li>💡 Join a dungeon to team up with friends (or randoms) for bigger rewards!</li>
+      <li>🏆 Unlock new enemies and dungeons by leveling up your character.</li>
+      <li>🤝 Raids require teamwork and unlock at level 10.</li>
+      <li>More content is coming soon – keep leveling!</li>
+    </ul>
+  </section>
+</div>
