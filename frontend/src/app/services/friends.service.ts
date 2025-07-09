@@ -59,4 +59,9 @@ export class FriendsService {
   acceptFriendRequest(requestId: number): Observable<any> {
     return this.http.post(`${this.baseUrl}/friendships/accept/${requestId}`, {});
   }
+
+  rejectFriendRequest(requestId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/friendships/${requestId}`);
+  }
+
 }

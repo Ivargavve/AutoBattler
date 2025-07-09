@@ -1,6 +1,6 @@
 .friends-list-container {
   height: 100%;
-  overflow: hidden;
+  overflow: auto;
   max-height: 350px;
 }
 
@@ -207,6 +207,22 @@
     opacity: 0.65;
     cursor: not-allowed;
     box-shadow: none;
+  }
+  &.accept {
+    border-color: #38fa9a;
+    box-shadow: 0 0 16px #38fa9a77;
+    &:hover {
+      background: #14281c;
+      box-shadow: 0 0 18px #38fa9a99;
+    }
+  }
+  &.reject {
+    border-color: #ff4667;
+    box-shadow: 0 0 16px #ff466788;
+    &:hover {
+      background: #281417;
+      box-shadow: 0 0 18px #ff466799;
+    }
   }
 }
 .friend-request-sent,

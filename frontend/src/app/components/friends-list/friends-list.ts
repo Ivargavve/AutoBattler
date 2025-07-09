@@ -25,6 +25,7 @@ export class FriendsListComponent implements OnInit {
   searchingUsers = false;
   addLoadingUserId: number | null = null;
   acceptLoadingUserId: number | null = null;
+  rejectLoadingUserId: number | null = null;
 
   @Output() friendClicked = new EventEmitter<Friend>();
 
@@ -116,21 +117,6 @@ export class FriendsListComponent implements OnInit {
     });
   }
 
-  acceptFriendRequest(user: UserSearchResult) {
-    let req = this.pendingRequests.find(r => r.requesterId === user.id);
-
-    if (!req) {
-      req = this.pendingRequests.find(r =>
-        r.requesterUsername?.toLowerCase() === user.username?.toLowerCase()
-      );
-    }
-
-    if (!req) {
-      return;
-    }
-    this.acceptFriendRequestById(req.id, user.id);
-  }
-
   acceptFriendRequestById(requestId: number, userId: number) {
     this.acceptLoadingUserId = userId;
     this.friendsService.acceptFriendRequest(requestId).subscribe({
@@ -142,6 +128,22 @@ export class FriendsListComponent implements OnInit {
       },
       error: (err) => {
         this.acceptLoadingUserId = null;
+      }
+    });
+  }
+
+
+  rejectFriendRequestById(requestId: number, userId: number) {
+    this.rejectLoadingUserId = userId;
+    this.friendsService.rejectFriendRequest(requestId).subscribe({
+      next: () => {
+        this.loadFriends();
+        this.loadPendingRequests();
+        this.searchUsers(this.searchControl.value ?? '');
+        this.rejectLoadingUserId = null;
+      },
+      error: (err) => {
+        this.rejectLoadingUserId = null;
       }
     });
   }

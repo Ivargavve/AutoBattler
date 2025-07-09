@@ -92,13 +92,25 @@
               </div>
               <span class="friend-fullname">{{ req.fullName }}</span>
             </div>
+            <div class="friend-action-btns">
             <button
-              class="friend-action-btn"
+              class="friend-action-btn accept"
               (click)="acceptFriendRequestById(req.id, req.requesterId); $event.stopPropagation()"
               [disabled]="acceptLoadingUserId === req.id"
+              aria-label="Accept friend request"
             >
-              {{ acceptLoadingUserId === req.id ? '...' : 'Accept' }}
+              <i class="fas fa-check"></i>
             </button>
+            <button
+              class="friend-action-btn reject"
+              (click)="rejectFriendRequestById(req.id, req.requesterId); $event.stopPropagation()"
+              [disabled]="rejectLoadingUserId === req.id"
+              aria-label="Reject friend request"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
           </div>
         </li>
       </ul>
