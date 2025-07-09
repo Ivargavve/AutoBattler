@@ -116,8 +116,8 @@
   </div>
 
   <!-- ADD FRIEND PANEL/POPUP -->
-  <div *ngIf="addFriendMode" class="add-friend-overlay">
-    <div class="add-friend-panel">
+  <div *ngIf="addFriendMode" class="add-friend-overlay" (click)="closeAddFriendPanel()">
+    <div class="add-friend-panel" (click)="$event.stopPropagation()">
       <div class="friend-controls add-friend-search">
         <input
           [formControl]="addFriendSearchControl"

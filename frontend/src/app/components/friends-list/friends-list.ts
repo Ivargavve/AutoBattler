@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FriendsService, Friend, UserSearchResult, PendingRequest } from '../../services/friends.service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -35,7 +35,7 @@ export class FriendsListComponent implements OnInit {
 
   @Output() friendClicked = new EventEmitter<Friend>();
 
-  constructor(private friendsService: FriendsService, private router: Router) {}
+  constructor(private friendsService: FriendsService, private router: Router, private elRef: ElementRef) {}
 
   ngOnInit() {
     this.loadFriends();
@@ -191,4 +191,25 @@ export class FriendsListComponent implements OnInit {
   trackByUserId(_: number, user: UserSearchResult) {
     return user.id;
   }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const clickedInside = this.elRef.nativeElement.contains(event.target);
+
+    if (!clickedInside) {
+      if (this.addFriendMode) {
+        this.closeAddFriendPanel();
+      }
+      if (this.searchControl.value) {
+        this.searchControl.setValue('');
+      }
+    }
+  }
+
+  closeAddFriendPanel() {
+    this.addFriendMode = false;
+    this.addFriendSearchControl.setValue('');
+    this.addFriendResults = [];
+  }
 }
+
