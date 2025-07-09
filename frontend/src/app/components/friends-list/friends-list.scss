@@ -51,11 +51,11 @@
   margin: 0;
 
   li {
-    background-color: var(--nav-bg, #181f1a);
+    background-color: var(--sidebar-bg, #232323);
     cursor: pointer;
     border-radius: 4px;
     margin-bottom: 0.2rem;
-    padding: 0.1rem 0.8rem;
+    padding: 0 0.8rem;
 
     &:hover {
       background-color: var(--friend-li-hover-bg, #232f22);
