@@ -21,8 +21,14 @@ export class FriendsListComponent implements OnInit {
   error: string = '';
 
   searchControl = new FormControl('');
+  addFriendSearchControl = new FormControl('');
+
   userSearchResults: UserSearchResult[] = [];
   searchingUsers = false;
+  addFriendResults: UserSearchResult[] = [];
+  addFriendSearching = false;
+
+  addFriendMode = false;
   addLoadingUserId: number | null = null;
   acceptLoadingUserId: number | null = null;
   rejectLoadingUserId: number | null = null;
@@ -35,18 +41,44 @@ export class FriendsListComponent implements OnInit {
     this.loadFriends();
     this.loadPendingRequests();
 
+    // Vänlistans sökruta (filtrerar bara egna vänner)
     this.searchControl.valueChanges.pipe(
       startWith(''),
       debounceTime(250),
       map(value => (value ?? '').trim())
     ).subscribe(search => {
       this.filterFriends(search);
-      if (search.length >= 2) {
-        this.searchUsers(search);
+    });
+
+    // Sökfältet i modal för att lägga till nya vänner
+    this.addFriendSearchControl.valueChanges.pipe(
+      debounceTime(250),
+      map(value => (value ?? '').trim())
+    ).subscribe(query => {
+      if (query.length >= 2) {
+        this.addFriendSearching = true;
+        this.friendsService.searchUsers(query).subscribe({
+          next: (results: UserSearchResult[]) => {
+            this.addFriendResults = results;
+            this.addFriendSearching = false;
+          },
+          error: (err) => {
+            this.addFriendResults = [];
+            this.addFriendSearching = false;
+          }
+        });
       } else {
-        this.userSearchResults = [];
+        this.addFriendResults = [];
       }
     });
+  }
+
+  toggleAddFriendMode() {
+    this.addFriendMode = !this.addFriendMode;
+    if (!this.addFriendMode) {
+      this.addFriendResults = [];
+      this.addFriendSearchControl.setValue('');
+    }
   }
 
   loadFriends() {
@@ -87,6 +119,7 @@ export class FriendsListComponent implements OnInit {
     }
   }
 
+  // OBS! userSearchResults används bara om du har gamla sök på alla – annars kan du ta bort searchUsers helt.
   searchUsers(query: string) {
     this.searchingUsers = true;
     this.friendsService.searchUsers(query).subscribe({
@@ -108,7 +141,9 @@ export class FriendsListComponent implements OnInit {
       next: () => {
         this.loadFriends();
         this.loadPendingRequests();
-        this.searchUsers(this.searchControl.value ?? '');
+        // Nollställ även popup-resultat direkt efter add, för tydlig feedback
+        this.addFriendResults = [];
+        this.addFriendSearchControl.setValue('');
         this.addLoadingUserId = null;
       },
       error: (err) => {
@@ -123,7 +158,6 @@ export class FriendsListComponent implements OnInit {
       next: () => {
         this.loadFriends();
         this.loadPendingRequests();
-        this.searchUsers(this.searchControl.value ?? '');
         this.acceptLoadingUserId = null;
       },
       error: (err) => {
@@ -132,14 +166,12 @@ export class FriendsListComponent implements OnInit {
     });
   }
 
-
   rejectFriendRequestById(requestId: number, userId: number) {
     this.rejectLoadingUserId = userId;
     this.friendsService.rejectFriendRequest(requestId).subscribe({
       next: () => {
         this.loadFriends();
         this.loadPendingRequests();
-        this.searchUsers(this.searchControl.value ?? '');
         this.rejectLoadingUserId = null;
       },
       error: (err) => {

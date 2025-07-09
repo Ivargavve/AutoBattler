@@ -7,70 +7,24 @@
     <span>{{ error }}</span>
   </div>
 
-  <!-- Sökresultat -->
-  <div *ngIf="userSearchResults.length > 0 && (searchControl.value?.length ?? 0) >= 2" class="search-results-wrapper">
-    <ul class="friend-list">
-      <li
-        *ngFor="let user of userSearchResults; trackBy: trackByUserId"
-        class="user-search-result"
-        [routerLink]="user.username ? ['/profile', user.username] : ['/profile/id', user.id]"
-        style="cursor:pointer;"
-      >
-        <div class="friend-entry">
-          <img
-            *ngIf="user.profilePictureUrl; else defaultIcon"
-            [src]="user.profilePictureUrl"
-            alt="{{ user.username }}"
-            class="user-avatar"
-          />
-          <ng-template #defaultIcon>
-            <span class="icon">👤</span>
-          </ng-template>
-          <div class="friend-text-block">
-            <div class="friend-name-row">
-              <span class="friend-username">{{ user.username }}</span>
-            </div>
-            <span class="friend-fullname">{{ user.fullName }}</span>
-          </div>
-          <button
-            *ngIf="user.status === 'none'"
-            class="friend-action-btn"
-            (click)="addFriendById(user.id); $event.stopPropagation()"
-            [disabled]="addLoadingUserId === user.id"
-          >
-            {{ addLoadingUserId === user.id ? '...' : 'Add' }}
-          </button>
-          <span class="search-span friend-request-sent" *ngIf="user.status === 'pending_sent'" class="friend-request-sent">
-            Request sent
-          </span>
-          <span class="search-span friend-request-sent" *ngIf="user.status === 'friend'" class="friend-request-sent">
-            Already friends
-          </span>
-          <span class="search-span friend-request-sent" *ngIf="user.status === 'pending_received'" class="friend-request-sent">
-            Request received
-          </span>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div *ngIf="userSearchResults.length === 0 && (searchControl.value?.length ?? 0) >= 2" class="no-friends">
-    <small>No users found...</small>
-  </div>
-
-  <!-- Friend Requests -->
+  <!-- Vänlista-sök + Plus-knapp -->
   <div *ngIf="!loading">
-    <!-- User search field -->
     <div class="friend-controls search-users">
       <input
         [formControl]="searchControl"
         placeholder="Search users..."
         autocomplete="off"
       />
-    </div>
-    <div *ngIf="searchingUsers" class="friends-loading">
-      <app-loading-spinner></app-loading-spinner>
+      <button
+        class="friend-action-btn accept"
+        aria-label="Add new friend"
+        (click)="toggleAddFriendMode(); $event.stopPropagation()"
+      >
+        <i class="fas fa-plus"></i>
+      </button>
     </div>
 
+    <!-- Friend requests -->
     <div *ngIf="pendingRequests && pendingRequests.length > 0" class="pending-requests-wrapper">
       <ul class="friend-list">
         <li *ngFor="let req of pendingRequests"
@@ -93,30 +47,29 @@
               <span class="friend-fullname">{{ req.fullName }}</span>
             </div>
             <div class="friend-action-btns">
-            <button
-              class="friend-action-btn accept"
-              (click)="acceptFriendRequestById(req.id, req.requesterId); $event.stopPropagation()"
-              [disabled]="acceptLoadingUserId === req.id"
-              aria-label="Accept friend request"
-            >
-              <i class="fas fa-check"></i>
-            </button>
-            <button
-              class="friend-action-btn reject"
-              (click)="rejectFriendRequestById(req.id, req.requesterId); $event.stopPropagation()"
-              [disabled]="rejectLoadingUserId === req.id"
-              aria-label="Reject friend request"
-            >
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-
+              <button
+                class="friend-action-btn accept"
+                (click)="acceptFriendRequestById(req.id, req.requesterId); $event.stopPropagation()"
+                [disabled]="acceptLoadingUserId === req.id"
+                aria-label="Accept friend request"
+              >
+                <i class="fas fa-check"></i>
+              </button>
+              <button
+                class="friend-action-btn reject"
+                (click)="rejectFriendRequestById(req.id, req.requesterId); $event.stopPropagation()"
+                [disabled]="rejectLoadingUserId === req.id"
+                aria-label="Reject friend request"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
           </div>
         </li>
       </ul>
     </div>
 
-    <!-- Friend list  -->
+    <!-- Friend list -->
     <div class="friends-wrapper">
       <ul class="friend-list">
         <li
@@ -151,14 +104,74 @@
           </div>
         </li>
       </ul>
-     <div *ngIf="filteredFriends.length === 0 && !loading" class="no-friends">
-      <small *ngIf="(searchControl.value?.length ?? 0) > 0">
-        No friends called "{{ searchControl.value }}"
-      </small>
-      <small *ngIf="!searchControl.value">
-        No friends yet...
-      </small>
+      <div *ngIf="filteredFriends.length === 0 && !loading" class="no-friends">
+        <small *ngIf="(searchControl.value?.length ?? 0) > 0">
+          No friends called "{{ searchControl.value }}"
+        </small>
+        <small *ngIf="!searchControl.value">
+          No friends yet...
+        </small>
+      </div>
     </div>
+  </div>
+
+  <!-- ADD FRIEND PANEL/POPUP -->
+  <div *ngIf="addFriendMode" class="add-friend-overlay">
+    <div class="add-friend-panel">
+      <div class="friend-controls add-friend-search">
+        <input
+          [formControl]="addFriendSearchControl"
+          placeholder="Search new users..."
+          autocomplete="off"
+        />
+        <button (click)="toggleAddFriendMode()" aria-label="Close" class="close-btn">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div *ngIf="addFriendSearching" class="friends-loading">
+        <app-loading-spinner></app-loading-spinner>
+      </div>
+      <ul class="friend-list">
+        <li *ngFor="let user of addFriendResults; trackBy: trackByUserId" class="user-search-result">
+          <div class="friend-entry">
+            <img
+              *ngIf="user.profilePictureUrl; else defaultIcon"
+              [src]="user.profilePictureUrl"
+              alt="{{ user.username }}"
+              class="user-avatar"
+            />
+            <ng-template #defaultIcon>
+              <span class="icon">👤</span>
+            </ng-template>
+            <div class="friend-text-block">
+              <div class="friend-name-row">
+                <span class="friend-username">{{ user.username }}</span>
+              </div>
+              <span class="friend-fullname">{{ user.fullName }}</span>
+            </div>
+            <button
+              *ngIf="user.status === 'none'"
+              class="friend-action-btn"
+              (click)="addFriendById(user.id); $event.stopPropagation()"
+              [disabled]="addLoadingUserId === user.id"
+            >
+              {{ addLoadingUserId === user.id ? '...' : 'Add' }}
+            </button>
+            <span class="search-span friend-request-sent" *ngIf="user.status === 'pending_sent'">
+              Request sent
+            </span>
+            <span class="search-span friend-request-sent" *ngIf="user.status === 'friend'">
+              Already friends
+            </span>
+            <span class="search-span friend-request-sent" *ngIf="user.status === 'pending_received'">
+              Request received
+            </span>
+          </div>
+        </li>
+      </ul>
+      <div *ngIf="addFriendResults.length === 0 && (addFriendSearchControl.value?.length ?? 0) >= 2" class="no-friends">
+        <small>No users found...</small>
+      </div>
     </div>
   </div>
 </div>

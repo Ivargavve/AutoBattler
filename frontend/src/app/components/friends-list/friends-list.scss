@@ -2,6 +2,7 @@
   height: 100%;
   overflow: auto;
   max-height: 350px;
+  position:relative;
 }
 
 .friends-loading,
@@ -51,11 +52,11 @@
   margin: 0;
 
   li {
-    background-color: var(--bg, #232323);
+    background-color: var(--friendlist-bg, #232323);
     cursor: pointer;
     border-radius: 4px;
-    margin-bottom: 0.2rem;
     padding: 0 0.8rem;
+    margin-bottom: 0.2rem;
 
     &:hover {
       background-color: var(--friend-li-hover-bg, #232f22);
@@ -69,7 +70,7 @@
       font-size: 0.95rem;
       color: var(--accent, #ffffff);
       position: relative;
-      padding: 0.6rem 0;
+      padding: 0.3rem 0;
     }
 
     .user-avatar {
@@ -228,10 +229,55 @@
 .friend-request-sent,
 .search-span {
   font-size: 0.70rem;
-  color: var(--friend-fullname, #aaffcc); // eller vad du vill
+  color: var(--friend-fullname, #aaffcc); 
   font-weight: 400;
   opacity: 0.82;
   margin-left: 1em;
   letter-spacing: 0.04em;
   align-self: flex-start;
+}
+
+.add-friend-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  pointer-events: auto;
+}
+.add-friend-panel {
+  background-color:  var(--bg-transparent, rgba(11, 12, 11, 0.9));
+  border-radius: 4px;
+  margin-top: 0;
+  min-width: 0;
+  max-width: none;
+  width: 100%;
+  min-height: 100%;
+  position: relative;
+  z-index: 100;
+}
+.add-friend-search {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  input { flex: 1; }
+  .close-btn {
+    background-color: var(--btn-bg, #1b1d1b);
+    border: 1px solid var(--btn-border, #52d798);
+    color: var(--accent, #86f7b3);
+    padding: 0.2rem 0.8rem;
+    font-size: 0.88em;
+    font-family: inherit;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 2px 7px 0 var(--accent-shadow, #86f7b366);
+    letter-spacing: 0.8px;
+    transition: 
+      background 0.18s, 
+      color 0.18s, 
+      border-color 0.18s, 
+      box-shadow 0.18s;
+    }
 }
