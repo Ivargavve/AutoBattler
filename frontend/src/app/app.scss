@@ -734,18 +734,25 @@ nav a {
 
 .return-battle-popup {
   position: fixed;
-  top: 24px;
-  left: 50%;
+  top: 85%;
+  left:50%;
   transform: translateX(-50%);
   background: #111;
   color: #56ffb2;
-  border: 2px solid #56ffb2;
-  border-radius: 16px;
-  padding: 12px 32px;
-  font-size: 1.3rem;
+  border: 1px solid #56ffb2;
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
   z-index: 9999;
   box-shadow: 0 2px 16px #000a;
   animation: popup-bounce 0.4s;
+
+  &:hover {
+    background: #222;
+    color: #86f7b3;
+    border-color: #86f7b3;
+    cursor: pointer;
+  }
 }
 
 .return-battle-link {
@@ -759,5 +766,13 @@ nav a {
   0% { transform: translateX(-50%) scale(0.9); opacity: 0; }
   60% { transform: translateX(-50%) scale(1.05); opacity: 1; }
   100% { transform: translateX(-50%) scale(1); }
+}
+
+.sword-icon {
+  color: #ff2222;
+  transition: transform 0.1s;
+}
+.sword-icon:hover {
+  transform: scale(1.15) rotate(-10deg);
 }
 

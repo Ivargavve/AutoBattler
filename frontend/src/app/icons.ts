@@ -6,7 +6,8 @@ import {
   faUsers,
   faTrophy,
   faBookOpen,
-  faUserSecret
+  faUserSecret,
+  faBolt
 } from '@fortawesome/free-solid-svg-icons';
 
 export const ICONS = {
@@ -17,5 +18,6 @@ export const ICONS = {
   faUsers,
   faTrophy,
   faBookOpen,
-  faUserSecret
+  faUserSecret,
+  faBolt
 };
