@@ -5,14 +5,13 @@ import { Fighter, BattleLogEntry } from '../../services/battle-interfaces';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { Subscription, firstValueFrom } from 'rxjs';
-import {  Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { BattleService } from '../../services/battle.service';
 
 @Component({
   selector: 'app-battle',
   standalone: true,
-  imports: [ CommonModule
-  ],
+  imports: [ CommonModule ],
   templateUrl: './battle-component.html',
   styleUrl: './battle-component.scss'
 })
@@ -29,43 +28,48 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
   enemyName: string | null = null;
 
   attacks = [
-  { 
-    name: 'Standard Attack',
-    currentCharges: 18,
-    maxCharges: 20,
-    disabled: false,
-    action: () => this.attack()
-  },
-  { 
-    name: 'Special Attack',
-    currentCharges: 11,
-    maxCharges: 20,
-    disabled: true,
-    action: null
-  },
-  {
-    name: 'Defend',
-    currentCharges: 9,
-    maxCharges: 10,
-    disabled: true,
-    action: null
-  },
-  {
-    name: 'Fourth Move',
-    currentCharges: 2,
-    maxCharges: 5,
-    disabled: true,
-    action: null
-  }
-];
+    { 
+      name: 'Standard Attack',
+      currentCharges: 18,
+      maxCharges: 20,
+      disabled: false,
+      action: () => this.attack()
+    },
+    { 
+      name: 'Special Attack',
+      currentCharges: 11,
+      maxCharges: 20,
+      disabled: true,
+      action: null
+    },
+    {
+      name: 'Defend',
+      currentCharges: 9,
+      maxCharges: 10,
+      disabled: true,
+      action: null
+    },
+    {
+      name: 'Fourth Move',
+      currentCharges: 2,
+      maxCharges: 5,
+      disabled: true,
+      action: null
+    }
+  ];
 
   private characterSub!: Subscription;
 
   @ViewChild('battleLogContainer') battleLogContainer!: ElementRef;
 
-  constructor(private http: HttpClient, private authService: AuthService, private router: Router, private battleService : BattleService) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    private router: Router,
+    private battleService: BattleService
+  ) {}
 
-ngOnInit(): void {
+  ngOnInit(): void {
     this.characterSub = this.authService.character$.subscribe(character => {
       if (character) {
         this.player = {
@@ -83,9 +87,24 @@ ngOnInit(): void {
         this.userXp = null;
       }
     });
-    this.battleLog = [];
-    this.battleEnded = true;
-    this.startNewBattle();
+
+    // Ladda eventuell sparad battle-state via service
+    const loadedState = this.battleService.loadBattleState();
+    if (loadedState) {
+      this.player = loadedState.player;
+      this.enemy = loadedState.enemy;
+      this.battleLog = loadedState.battleLog || [];
+      this.battleEnded = loadedState.battleEnded;
+      this.enemyName = loadedState.enemyName;
+      this.userLevel = loadedState.userLevel;
+      this.userXp = loadedState.userXp;
+      this.playerEnergy = loadedState.playerEnergy;
+      // Lägg till fler properties om du har!
+    } else {
+      this.battleLog = [];
+      this.battleEnded = true;
+      this.startNewBattle();
+    }
   }
 
   ngAfterViewInit(): void {
@@ -130,11 +149,13 @@ ngOnInit(): void {
           this.battleLog.push({ message: `You encounter a wild ${this.enemyName}! Prepare for battle!`, type: "encounter" });
           this.isLoading = false;
           this.scrollToBottom();
+          this.saveBattleState();
         },
         error: (err) => {
           this.battleLog = [{ message: "ERROR: " + (err.error?.message || err.statusText), type: "error" }];
           this.isLoading = false;
           this.scrollToBottom();
+          this.saveBattleState();
         }
       });
 
@@ -142,8 +163,8 @@ ngOnInit(): void {
       this.battleLog.push({ message: "You have no energy left to battle! Please rest or visit the shop.", type: "info" });
       this.battleEnded = true;
       this.scrollToBottom();
+      this.saveBattleState();
     }
-    this.saveBattleState();
   }
 
   attack(): void {
@@ -187,17 +208,15 @@ ngOnInit(): void {
           this.authService.loadUserWithCharacter();
           this.isLoading = false;
           this.scrollToBottom();
+          this.saveBattleState();
         },
         error: (err) => {
           this.battleLog.push({ message: "ERROR: " + (err.error?.message || err.statusText), type: "error" });
           this.isLoading = false;
           this.scrollToBottom();
+          this.saveBattleState();
         }
       });
-  }
-
-  clearBattleState() {
-    localStorage.removeItem('battleState');
   }
 
   onBattleEnd() {
@@ -215,7 +234,7 @@ ngOnInit(): void {
   }
 
   saveBattleState() {
-    const state = {
+    this.battleService.saveBattleState({
       player: this.player,
       enemy: this.enemy,
       battleLog: this.battleLog,
@@ -224,8 +243,11 @@ ngOnInit(): void {
       userLevel: this.userLevel,
       userXp: this.userXp,
       playerEnergy: this.playerEnergy
-    };
-    localStorage.setItem('battleState', JSON.stringify(state));
+    });
+  }
+
+  clearBattleState() {
+    this.battleService.clearBattleState();
   }
 
   getLogClass(log: BattleLogEntry): string {
