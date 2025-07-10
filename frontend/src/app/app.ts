@@ -1,11 +1,11 @@
 import { Component, OnInit} from '@angular/core';
-import { RouterOutlet, RouterModule, Router } from '@angular/router';
+import { RouterOutlet, RouterModule, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
 import { User } from './services/user';
 import { Character } from './services/character';
 import { Observable, timer, of, firstValueFrom, combineLatest } from 'rxjs';
-import { map, switchMap, startWith, tap } from 'rxjs/operators';
+import { map, switchMap, startWith, tap, delay, filter } from 'rxjs/operators';
 import { LoadingSpinnerComponent } from './components/loading-component/loading-component';
 import { ICONS } from './icons'; 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -17,7 +17,7 @@ import { BattleService } from './services/battle.service';
   standalone: true,
   imports: [
     RouterOutlet,
-    RouterModule,
+    RouterModule, 
     CommonModule,
     LoadingSpinnerComponent,
     FontAwesomeModule,
@@ -46,10 +46,16 @@ export class App implements OnInit {
     this.showReturnToBattle$ = combineLatest([
       this.battleService.inBattle$,
       this.router.events.pipe(
-        map(() => this.router.url)
+        filter(e => e instanceof NavigationEnd),
+        map(() => this.router.url),
+        startWith(this.router.url) 
       )
     ]).pipe(
-      map(([inBattle, url]) => inBattle && url !== '/battle')
+      map(([inBattle, url]) => {
+        const onBattlePage = /^\/battle($|\?)/.test(url);
+        return inBattle && !onBattlePage;
+      }),
+      delay(0)
     );
 
     this.rechargeTimer$ = this.character$.pipe(

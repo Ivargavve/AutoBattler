@@ -87,7 +87,6 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
         this.userXp = null;
       }
     });
-
     // Ladda eventuell sparad battle-state via service
     const loadedState = this.battleService.loadBattleState();
     if (loadedState) {
@@ -219,11 +218,30 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
-  onBattleEnd() {
-    this.battleService.setInBattle(false);
-    this.clearBattleState();
-    setTimeout(() => {
+  private resetBattleAndNavigate(): void {
+    try {
+      this.saveBattleState();              
+      this.battleService.setInBattle(false);
+      this.battleService.clearBattleState();
+      this.player = null;
+      this.enemy = null;
+      this.battleLog = [];
+      this.battleEnded = true;
+      this.gainedXp = null;
+      this.enemyName = null;
+      this.userLevel = null;
+      this.userXp = null;
+      this.playerEnergy = 0;
+    } catch (err) {} finally {
+      this.isLoading = false;
       this.router.navigate(['/battle-planner']);
+    }
+  }
+
+
+  onBattleEnd() {
+    setTimeout(() => {
+      this.resetBattleAndNavigate();
     }, 4000);
   }
 
@@ -231,24 +249,14 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.playerEnergy > 0) {
       this.isLoading = true;
       this.authService.useEnergy(1).then(() => {
-        this.saveBattleState();
-        this.battleService.setInBattle(false);
-        this.clearBattleState();
-        this.router.navigate(['/battle-planner']);
-        this.isLoading = false;
+        this.resetBattleAndNavigate();
       }).catch(() => {
-        this.battleService.setInBattle(false);
-        this.clearBattleState();
-        this.router.navigate(['/battle-planner']);
-        this.isLoading = false;
+        this.resetBattleAndNavigate();
       });
     } else {
-      this.battleService.setInBattle(false);
-      this.clearBattleState();
-      this.router.navigate(['/battle-planner']);
+      this.resetBattleAndNavigate();
     }
   }
-
 
   saveBattleState() {
     this.battleService.saveBattleState({
@@ -261,10 +269,6 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       userXp: this.userXp,
       playerEnergy: this.playerEnergy
     });
-  }
-
-  clearBattleState() {
-    this.battleService.clearBattleState();
   }
 
   getLogClass(log: BattleLogEntry): string {
