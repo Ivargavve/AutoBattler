@@ -228,10 +228,27 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   runFromBattle() {
-    this.battleService.setInBattle(false);
-    this.clearBattleState();
-    this.router.navigate(['/battle-planner']); 
+    if (this.playerEnergy > 0) {
+      this.isLoading = true;
+      this.authService.useEnergy(1).then(() => {
+        this.saveBattleState();
+        this.battleService.setInBattle(false);
+        this.clearBattleState();
+        this.router.navigate(['/battle-planner']);
+        this.isLoading = false;
+      }).catch(() => {
+        this.battleService.setInBattle(false);
+        this.clearBattleState();
+        this.router.navigate(['/battle-planner']);
+        this.isLoading = false;
+      });
+    } else {
+      this.battleService.setInBattle(false);
+      this.clearBattleState();
+      this.router.navigate(['/battle-planner']);
+    }
   }
+
 
   saveBattleState() {
     this.battleService.saveBattleState({

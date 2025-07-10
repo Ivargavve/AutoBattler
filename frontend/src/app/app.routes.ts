@@ -1,11 +1,13 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './auth-guard'; 
+import { NoAuthGuard } from './no-auth-guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { 
     path: 'login', 
-    loadComponent: () => import('./components/login-form/login-form').then(m => m.LoginForm) 
+    loadComponent: () => import('./components/login-form/login-form').then(m => m.LoginForm),
+    canActivate: [NoAuthGuard]  
   },
   { 
     path: 'username-form',
@@ -35,6 +37,7 @@ export const routes: Routes = [
   { 
     path: 'privacy', 
     loadComponent: () => import('./components/privacy-component/privacy-component').then(m => m.PrivacyComponent),
+    canActivate: [NoAuthGuard] 
   },
   { 
     path: 'home', 

@@ -262,6 +262,39 @@ namespace backend.Controllers
             await _db.SaveChangesAsync();
             return NoContent();
         }
+
+        [HttpPost("use-energy")]
+        public async Task<IActionResult> UseEnergy([FromBody] UseEnergyDto? dto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+                return Unauthorized();
+
+            var chr = await _db.Characters.FirstOrDefaultAsync(c => c.UserId == userId);
+            if (chr == null)
+                return NotFound();
+
+            int amount = dto?.Amount ?? 1;
+            if (amount <= 0)
+                amount = 1;
+
+            if (chr.CurrentEnergy < amount)
+                return BadRequest(new { message = "Not enough energy" });
+
+            chr.CurrentEnergy -= amount;
+            await _db.SaveChangesAsync();
+
+            return Ok(new
+            {
+                chr.CurrentEnergy
+            });
+        }
+
+    }
+
+    public class UseEnergyDto
+    {
+        public int Amount { get; set; } = 1;
     }
 
     public class CreateCharacterDto

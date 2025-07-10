@@ -19,7 +19,12 @@
             <span class="tag-unlocked">Lv 1+</span>
             <span class="desc">Face a list of random enemies.</span>
           </span>
-          <button class="btn-fight" (click)="fight('Kung Fu Grandma')">Fight!</button>
+          <button 
+            class="btn-fight" 
+            (click)="fight('Kung Fu Grandma')" 
+            [disabled]="!character || character.currentEnergy <= 0">
+            Fight!
+          </button>
         </li>
         <li>
           <span>

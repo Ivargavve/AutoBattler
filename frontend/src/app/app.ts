@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { RouterOutlet, RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
 import { User } from './services/user';
 import { Character } from './services/character';
-import { Observable, timer, of, firstValueFrom } from 'rxjs';
+import { Observable, timer, of, firstValueFrom, combineLatest } from 'rxjs';
 import { map, switchMap, startWith, tap } from 'rxjs/operators';
 import { LoadingSpinnerComponent } from './components/loading-component/loading-component';
 import { ICONS } from './icons'; 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FriendsListComponent } from './components/friends-list/friends-list';
+import { BattleService } from './services/battle.service';
 
 @Component({
   selector: 'app-root',
@@ -30,17 +31,26 @@ export class App implements OnInit {
   public user$: Observable<User | null>;
   public character$: Observable<Character | null>;
   public rechargeTimer$: Observable<string | null>;
-
+  showReturnToBattle$!: Observable<boolean>;
+  public currentRoute$!: Observable<string>;
   public loading = true;
-
   lastRechargeTime: Date | null = null;
   rechargeIntervalMinutes = 2;
   private rechargeCalled = false;
   icons = ICONS;
 
-  constructor(public auth: AuthService, private router: Router) {
+  constructor(public auth: AuthService, private router: Router, private battleService: BattleService) {
     this.user$ = this.auth.user$;
     this.character$ = this.auth.character$;
+
+    this.showReturnToBattle$ = combineLatest([
+      this.battleService.inBattle$,
+      this.router.events.pipe(
+        map(() => this.router.url)
+      )
+    ]).pipe(
+      map(([inBattle, url]) => inBattle && url !== '/battle')
+    );
 
     this.rechargeTimer$ = this.character$.pipe(
       switchMap(char => {
@@ -87,6 +97,11 @@ async ngOnInit(): Promise<void> {
 
   const currentUrl = this.router.url;
 
+  if (this.auth.isLoggedIn && currentUrl === '/login') {
+    this.router.navigate(['/home']);
+    this.loading = false;
+    return;
+  }
   if (!this.auth.isLoggedIn) {
     this.loading = false;
     return;
@@ -109,18 +124,8 @@ async ngOnInit(): Promise<void> {
       character = null;
       this.auth['characterSubject'].next(null);
     }
-    if (!character) {
-      if (currentUrl !== '/') {
-        this.router.navigate(['/']);
-      }
-      this.loading = false;
-      return;
-    }
     this.auth.rechargeCharacter();
     this.auth.loadUserWithCharacter();
-    if (currentUrl === '/login' || currentUrl === '/') {
-      this.router.navigate(['/home']);
-    }
   } catch (error) {
     this.auth.logout();
     this.router.navigate(['/login']);

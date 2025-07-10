@@ -103,4 +103,13 @@ export class AuthService {
       this.characterSubject.next(character);
     });
   }
+  useEnergy(amount = 1): Promise<number> {
+    return lastValueFrom(
+      this.http.post<{ currentEnergy: number }>(
+        `${environment.apiUrl}/characters/use-energy`, { amount }
+      )
+    ).then(res => {
+      return this.loadUserWithCharacter().then(() => res.currentEnergy);
+    });
+  }
 }
