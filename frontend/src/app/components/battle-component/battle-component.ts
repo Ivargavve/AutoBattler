@@ -5,12 +5,14 @@ import { Fighter, BattleLogEntry } from '../../services/battle-interfaces';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { Subscription, firstValueFrom } from 'rxjs';
-import {  ActivatedRoute, Router } from '@angular/router';
+import {  Router } from '@angular/router';
+import { BattleService } from '../../services/battle.service';
 
 @Component({
   selector: 'app-battle',
   standalone: true,
-  imports: [ CommonModule ],
+  imports: [ CommonModule
+  ],
   templateUrl: './battle-component.html',
   styleUrl: './battle-component.scss'
 })
@@ -26,13 +28,44 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
   playerEnergy: number = 0;
   enemyName: string | null = null;
 
+  attacks = [
+  { 
+    name: 'Standard Attack',
+    currentCharges: 18,
+    maxCharges: 20,
+    disabled: false,
+    action: () => this.attack()
+  },
+  { 
+    name: 'Special Attack',
+    currentCharges: 11,
+    maxCharges: 20,
+    disabled: true,
+    action: null
+  },
+  {
+    name: 'Defend',
+    currentCharges: 9,
+    maxCharges: 10,
+    disabled: true,
+    action: null
+  },
+  {
+    name: 'Fourth Move',
+    currentCharges: 2,
+    maxCharges: 5,
+    disabled: true,
+    action: null
+  }
+];
+
   private characterSub!: Subscription;
 
   @ViewChild('battleLogContainer') battleLogContainer!: ElementRef;
 
-  constructor(private http: HttpClient, private authService: AuthService, private router: Router) {}
+  constructor(private http: HttpClient, private authService: AuthService, private router: Router, private battleService : BattleService) {}
 
-  ngOnInit(): void {
+ngOnInit(): void {
     this.characterSub = this.authService.character$.subscribe(character => {
       if (character) {
         this.player = {
@@ -77,6 +110,7 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   startNewBattle(): void {
+    this.battleService.setInBattle(true);
     if (this.playerEnergy > 0) {
       this.isLoading = true;
       this.battleEnded = false;
@@ -109,6 +143,7 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.battleEnded = true;
       this.scrollToBottom();
     }
+    this.saveBattleState();
   }
 
   attack(): void {
@@ -161,10 +196,36 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
+  clearBattleState() {
+    localStorage.removeItem('battleState');
+  }
+
   onBattleEnd() {
+    this.battleService.setInBattle(false);
+    this.clearBattleState();
     setTimeout(() => {
       this.router.navigate(['/battle-planner']);
     }, 4000);
+  }
+
+  runFromBattle() {
+    this.battleService.setInBattle(false);
+    this.clearBattleState();
+    this.router.navigate(['/battle-planner']); 
+  }
+
+  saveBattleState() {
+    const state = {
+      player: this.player,
+      enemy: this.enemy,
+      battleLog: this.battleLog,
+      battleEnded: this.battleEnded,
+      enemyName: this.enemyName,
+      userLevel: this.userLevel,
+      userXp: this.userXp,
+      playerEnergy: this.playerEnergy
+    };
+    localStorage.setItem('battleState', JSON.stringify(state));
   }
 
   getLogClass(log: BattleLogEntry): string {

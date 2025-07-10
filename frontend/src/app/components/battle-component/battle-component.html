@@ -59,19 +59,20 @@
         </div>
         <!-- Attack Buttons -->
         <div class="battle-attack-buttons">
-          <button 
-            (click)="attack()"
-            [disabled]="isLoading || battleEnded"
-            class="attack-btn">
-            Standard Attack (18/20)
+          <button
+            *ngFor="let attack of attacks"
+            class="attack-btn"
+            [ngClass]="{ alt: attack.disabled }"
+            [disabled]="attack.disabled || isLoading || battleEnded"
+            (click)="attack.action ? attack.action() : null"
+          >
+            <span class="attack-label">{{ attack.name }}</span>
+            <span class="attack-charges">{{ attack.currentCharges }}/{{ attack.maxCharges }}</span>
           </button>
-          <button disabled class="attack-btn alt">Special Attack (11/20)</button>
-          <button disabled class="attack-btn alt">Defend (9/10)</button>
-          <button disabled class="attack-btn alt">Fourth Move (2/5)</button>
         </div>
         <!-- Run Button -->
         <div class="battle-run-btn-row">
-          <button class="attack-btn run-btn" style="color:#fff; background:#b33;">Run</button>
+          <button (click)="runFromBattle()" class="attack-btn run-btn" style="color:#fff; background:#b33;">Run</button>
         </div>
       </div>
     </div>

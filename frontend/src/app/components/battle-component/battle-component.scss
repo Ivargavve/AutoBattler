@@ -221,20 +221,36 @@
     margin-bottom: 0.3rem;
   }
   .attack-btn {
-    width: 100%;
-    min-width: unset;
-    padding: 0.38rem 0.5rem;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    border-width: 2px;
-    border-radius: 4px;
-    font-family: inherit;
-    font-weight: 700;
+    position: relative;
     background: var(--btn-bg, #18261c);
     color: var(--accent, #86f7b3);
-    letter-spacing: 1px;
-    box-shadow: 0 0 8px #44ffca19;
+    padding: 1rem;
+
+    .attack-label {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 1.07rem;
+      color: var(--accent, #86f7b3);
+      text-align: left;
+    }
+    .attack-charges {
+      position: absolute;
+      top: 0.32rem;
+      right: 0.59rem;
+      font-size: 0.7rem;
+      color: #a9b1aa;
+      opacity: 0.75;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    &.alt .attack-label {
+      color: #7cbfa5;
+    }
+
     &:hover:not(:disabled) {
       background: #212f25;
       color: #baffd8;

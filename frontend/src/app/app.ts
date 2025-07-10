@@ -125,12 +125,8 @@ async ngOnInit(): Promise<void> {
     this.auth.logout();
     this.router.navigate(['/login']);
   }
-
   this.loading = false;
 }
-
-
-
 
   get showPanels$(): Observable<boolean> {
     return this.auth.user$.pipe(
