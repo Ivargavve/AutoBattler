@@ -35,7 +35,7 @@ namespace backend.Controllers
             if (user == null)
                 return NotFound();
 
-            return Ok(new 
+            return Ok(new
             {
                 user.Id,
                 user.Username,
@@ -69,7 +69,7 @@ namespace backend.Controllers
             if (user == null)
                 return NotFound();
 
-            return Ok(new 
+            return Ok(new
             {
                 user.Id,
                 user.Username,
@@ -85,6 +85,36 @@ namespace backend.Controllers
                 user.CreatedAt,
                 user.LastLogin
             });
+        }
+
+        // GET: api/users
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _db.Users
+                .AsNoTracking()
+                .Select(user => new
+                {
+                    user.Id,
+                    user.Username,
+                    user.FullName,
+                    user.ProfilePictureUrl,
+                    user.Role,
+                    user.ExperiencePoints,
+                    user.Level,
+                    user.Credits,
+                    user.CosmeticItemsJson,
+                    user.SettingsJson,
+                    user.AchievementsJson,
+                    user.NeedsUsernameSetup,
+                    user.GoogleId,
+                    user.CreatedAt,
+                    user.LastLogin
+                })
+                .ToListAsync();
+
+            return Ok(users);
         }
     }
 }

@@ -63,5 +63,8 @@ export class FriendsService {
   rejectFriendRequest(requestId: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/friendships/${requestId}`);
   }
+  getAllUsers(): Observable<UserSearchResult[]> {
+    return this.http.get<UserSearchResult[]>('/api/users')
+  }
 
 }

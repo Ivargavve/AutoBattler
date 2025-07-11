@@ -238,7 +238,6 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-
   onBattleEnd() {
     setTimeout(() => {
       this.resetBattleAndNavigate();

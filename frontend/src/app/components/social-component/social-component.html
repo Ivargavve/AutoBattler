@@ -1,1 +1,54 @@
-<p>social-component works!</p>
+<div class="social-root">
+  <h1 class="social-title">Social</h1>
+  <div class="social-subtitle">
+    Connect with players, grow your friends list and join the world of AutoBattler together.
+  </div>
+  <div class="social-row">
+    <!-- Din vänlista till vänster -->
+    <div class="social-col social-main">
+      <section class="section-box">
+        <h2 class="section-title">Your Friends</h2>
+        <app-friends-list></app-friends-list>
+      </section>
+    </div>
+
+    <!-- Alla användare till höger -->
+    <div class="social-col social-side">
+      <section class="section-box">
+        <h2 class="section-title">All Users</h2>
+
+        <div *ngIf="loading" class="users-loading">
+          Loading users...
+        </div>
+        <div *ngIf="error" class="users-error">
+          {{ error }}
+        </div>
+
+        <ul class="user-list" *ngIf="!loading && users.length > 0">
+          <li *ngFor="let user of users" class="user-list-item">
+            <img
+              *ngIf="user.profilePictureUrl; else defaultUserIcon"
+              [src]="user.profilePictureUrl"
+              class="user-avatar"
+              alt="{{ user.username }}"
+            />
+            <ng-template #defaultUserIcon>
+              <span class="icon">👤</span>
+            </ng-template>
+            <div>
+              <div class="user-username">{{ user.username }}</div>
+              <div class="user-meta">
+                {{ user.fullName }}
+                <span class="user-level">Lvl {{ user.level }}</span>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <div *ngIf="!loading && users.length === 0" class="no-users">
+          <small>No users found.</small>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

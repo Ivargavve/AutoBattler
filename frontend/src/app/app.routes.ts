@@ -37,7 +37,6 @@ export const routes: Routes = [
   { 
     path: 'privacy', 
     loadComponent: () => import('./components/privacy-component/privacy-component').then(m => m.PrivacyComponent),
-    canActivate: [NoAuthGuard] 
   },
   { 
     path: 'home', 

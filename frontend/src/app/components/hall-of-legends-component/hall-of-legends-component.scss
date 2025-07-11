@@ -1,0 +1,179 @@
+.legends-root {
+  background: var(--grey-bg, #181818);
+  color: #f5f5f5;
+  max-width: 95%;
+  margin: 0rem auto;
+  padding: 2.3rem 2rem 1.6rem 2rem;
+  font-family: 'Georgia', 'JetBrains Mono', 'Menlo', monospace;
+  box-shadow: 0 4px 44px 0 #000b;
+}
+
+.legends-title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: 2px;
+  color: #fff;
+  margin-bottom: 0.18rem;
+  text-shadow: 0 2px 16px #fff4, 0 0 1px #000a;
+}
+
+.legends-subtitle {
+  text-align: center;
+  font-size: 1.06rem;
+  color: #e4e4e4;
+  margin-bottom: 2.3rem;
+  letter-spacing: 0.3px;
+  font-style: italic;
+}
+
+.section-title {
+  font-size: 1.12rem;
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 1.07rem;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px #fff6;
+  border-bottom: 1px solid #e1e1e1;
+  padding-bottom: 0.21rem;
+}
+
+.legends-section {
+  margin-bottom: 2.25rem;
+  padding-bottom: 1.15rem;
+  border-bottom: 1px solid #2c2c2c;
+}
+
+.legends-row {
+  display: flex;
+  gap: 2.9rem;
+  margin-bottom: 2.2rem;
+  align-items: flex-start;
+}
+
+.legends-col {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.legends-main {
+  flex: 2 1 0;
+  padding-right: 1.3rem;
+}
+
+.legends-side {
+  flex: 1.1 1 0;
+  border-left: 1px solid #3a3a3a;
+  padding-left: 1.35rem;
+  min-width: 210px;
+}
+
+.legend-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.legend-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 1em;
+  margin-bottom: 1.75em;
+  font-size: 1.09rem;
+  color: #fff;
+}
+.legend-rank {
+  min-width: 2.2em;
+  font-size: 1.11em;
+  font-weight: 700;
+  text-align: right;
+  padding-top: 2px;
+  color: #fff;
+  filter: brightness(1.2);
+  text-shadow: 0 0 5px #fff8;
+}
+.legend-rank:first-child,
+.legend-rank.neon {
+  color: #fff;
+  text-shadow: 0 0 13px #fff, 0 0 4px #fafafa;
+}
+.legend-name {
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
+  font-size: 1.07em;
+}
+.legend-desc {
+  font-size: 1.04em;
+  color: #ececec;
+  font-weight: 400;
+  margin-top: 0.09em;
+  padding-left: 0.1em;
+}
+
+.achievements-list {
+  list-style: none;
+  padding: 0 0 0 0.1em;
+  margin: 0;
+}
+.achievements-list li {
+  margin-bottom: 1.12em;
+  font-size: 1.01em;
+  display: flex;
+  flex-direction: column;
+  color: #fafafa;
+}
+.achieve-name {
+  font-weight: 700;
+  color: #fff;
+  margin-right: 0.18em;
+  letter-spacing: 0.2px;
+  font-size: 1.08em;
+  text-shadow: 0 0 7px #fff3;
+}
+.achieve-desc {
+  font-size: 0.99em;
+  color: #e4e4e4;
+  margin-left: 0.13em;
+  margin-top: 0.05em;
+}
+
+.moments-list {
+  list-style: disc inside;
+  padding-left: 1.2em;
+  color: #f7f7f7;
+  font-size: 1.06rem;
+  margin-top: 0.5rem;
+}
+.moments-list li {
+  margin-bottom: 0.91em;
+}
+.moment-date {
+  font-weight: 700;
+  color: #fff;
+  margin-right: 0.43em;
+  letter-spacing: 0.15px;
+}
+
+.legends-footer {
+  text-align: center;
+  color: #c3c3c3;
+  font-size: 0.97rem;
+  margin-top: 2.18rem;
+  opacity: 0.97;
+  letter-spacing: 0.2px;
+}
+
+@media (max-width: 950px) {
+  .legends-row { flex-direction: column; gap: 1.3rem; }
+  .legends-main, .legends-side { max-width: 100%; padding-right: 0; padding-left: 0; border-left: none; }
+}
+@media (max-width: 600px) {
+  .legends-root { padding: 0.8rem 0.18rem 1.2rem 0.18rem; }
+  .legends-title { font-size: 1.18rem; }
+  .section-title { font-size: 0.97rem; }
+  .legends-section { padding-bottom: 0.36rem; }
+  .legend-list li { font-size: 0.96rem; }
+  .achievements-list li { font-size: 0.97rem; }
+  .moments-list { font-size: 0.92rem; }
+}

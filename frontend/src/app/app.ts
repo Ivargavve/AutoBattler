@@ -53,25 +53,30 @@ export class App implements OnInit {
     ]).pipe(
       map(([inBattle, url]) => {
         const onBattlePage = /^\/battle($|\?)/.test(url);
-        return inBattle && !onBattlePage;
+        const onLoginPage = url === '/login';
+        return inBattle && !onBattlePage && !onLoginPage;
       }),
       delay(0)
     );
 
-    this.rechargeTimer$ = this.character$.pipe(
-      switchMap(char => {
+    this.rechargeTimer$ = combineLatest([
+      this.character$,
+      this.battleService.inBattle$
+    ]).pipe(
+      switchMap(([char, inBattle]) => {
         if (!char || typeof char.nextTickInSeconds !== 'number') return of('00:00');
-
-        if (
-          char.currentEnergy === char.maxEnergy &&
-          char.currentHealth === char.maxHealth
-        ) {
+        if (char.currentEnergy === char.maxEnergy && char.currentHealth === char.maxHealth) {
           return of('Full!');
         }
-
+        if (inBattle) return of('(Battle)'); 
+        let tickNum = 0;
         return timer(0, 1000).pipe(
-          map(tickNum => {
-            const tick = Math.max(0, (char.nextTickInSeconds ?? 0) - tickNum);
+          map(() => {
+            if (!inBattle) tickNum++;
+            return tickNum;
+          }),
+          map(tickNumValue => {
+            const tick = Math.max(0, (char.nextTickInSeconds ?? 0) - tickNumValue);
             const mins = Math.floor(tick / 60);
             const secs = tick % 60;
             return { mins, secs, tick };

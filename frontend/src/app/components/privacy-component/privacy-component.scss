@@ -1,11 +1,13 @@
 .privacy-container {
-  width: 100%;
+  width: 95%;
   margin: 0rem auto;
+  padding: 2.3rem 2rem 1.6rem 2rem;
   background: var(--grey-bg, #181818);
   padding: 2.5rem 2rem 1.5rem 2rem;
   color: var(--text);
   font-family: 'Share Tech Mono', monospace;
   line-height: 1.6;
+  box-shadow: 0 4px 44px 0 #000b;
 
   h1 {
     font-size: 2.3rem;

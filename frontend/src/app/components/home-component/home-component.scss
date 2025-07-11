@@ -3,7 +3,10 @@
   flex-direction: column;
   gap: 2rem;
   padding: 2rem;
-  width: 100%;
+  max-width: 95%;
+  margin: 0rem auto;
+  padding: 2.3rem 2rem 1.6rem 2rem;
+  box-shadow: 0 4px 44px 0 #000b;
 }
 
 .home-row {
