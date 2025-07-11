@@ -1,1 +1,75 @@
-<p>vault-component works!</p>
+<div class="vault-root">
+  <h1 class="vault-title">Vault</h1>
+  <div class="vault-subtitle">
+    View and manage your character, equipment, and inventory.<br>
+    All your hard-earned loot, stored in one place.
+  </div>
+
+  <div class="vault-row">
+    <!-- Vänster: Karaktärsinfo och Equipped Gear -->
+    <div class="vault-col vault-main">
+      <section class="section-box character-section">
+        <h2 class="section-title">Character</h2>
+        <div class="character-card">
+          <img [src]="character.avatarUrl || defaultAvatar" class="character-avatar" alt="Character" />
+          <div class="character-details">
+            <div class="character-name">{{ character.name }}</div>
+            <div class="character-class">Class: {{ character.class }}</div>
+            <div class="character-level">Level: {{ character.level }}</div>
+            <div class="character-xp">XP: {{ character.experiencePoints }}</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-box equipped-section">
+        <h2 class="section-title">Equipped Gear</h2>
+        <div class="equipped-grid">
+          <div class="gear-slot" *ngFor="let slot of equippedSlots">
+            <div class="slot-label">{{ slot.label }}</div>
+            <div class="gear-item" *ngIf="slot.item; else emptySlot">
+              <img [src]="slot.item.iconUrl || fallbackIcon" class="gear-icon" alt="{{ slot.item.name }}" />
+              <div class="gear-info">
+                <div class="gear-name">{{ slot.item.name }}</div>
+                <div class="gear-stats">{{ slot.item.stats }}</div>
+              </div>
+            </div>
+            <ng-template #emptySlot>
+              <div class="empty-slot">-</div>
+            </ng-template>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Höger: Inventory -->
+    <div class="vault-col vault-side">
+      <section class="section-box inventory-section">
+        <h2 class="section-title">Inventory</h2>
+        <div *ngIf="inventory.length === 0" class="inventory-empty">No items in your inventory.</div>
+        <ul class="inventory-list" *ngIf="inventory.length > 0">
+          <li class="inventory-item" *ngFor="let item of inventory">
+            <img [src]="item.iconUrl || fallbackIcon" class="inv-icon" alt="{{ item.name }}" />
+            <div class="inv-details">
+              <div class="inv-name">{{ item.name }}</div>
+              <div class="inv-type">{{ item.type }}</div>
+              <div class="inv-stats">{{ item.stats }}</div>
+            </div>
+            <div class="inv-qty" *ngIf="item.quantity > 1">x{{ item.quantity }}</div>
+          </li>
+        </ul>
+      </section>
+      <section class="section-box summary-section">
+        <h2 class="section-title">Summary</h2>
+        <div class="summary-row">
+          <span>Total Items:</span>
+          <span>{{ totalItems }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Unique Gear:</span>
+          <span>{{ uniqueGearCount }}</span>
+        </div>
+        <!-- Lägg till fler stats eller currencies här -->
+      </section>
+    </div>
+  </div>
+</div>

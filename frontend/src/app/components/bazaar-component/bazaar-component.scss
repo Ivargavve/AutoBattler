@@ -1,0 +1,197 @@
+.bazaar-root {
+  background: var(--grey-bg, #181818);
+  color: #f5f5f5;
+  max-width: 98%;
+  margin: 0 auto;
+  padding: 2.3rem 2rem 1.6rem 2rem;
+  font-family: 'JetBrains Mono', 'Menlo', 'monospace', 'Arial';
+  box-shadow: 0 4px 44px 0 #000b;
+}
+
+.bazaar-title {
+  font-size: 2.15rem;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: 2px;
+  color: #fff;
+  margin-bottom: 0.18rem;
+  text-shadow: 0 2px 16px #fff4, 0 0 1px #000a;
+}
+.bazaar-subtitle {
+  text-align: center;
+  font-size: 1.07rem;
+  color: #e4e4e4;
+  margin-bottom: 2.3rem;
+  font-style: italic;
+}
+
+.bazaar-row {
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+}
+.bazaar-col {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+}
+.bazaar-main { flex: 2 1 0; }
+.bazaar-side { flex: 1 1 0; }
+
+.section-box {
+  background: #232323;
+  border-radius: 1.4rem;
+  box-shadow: 0 2px 14px #000a;
+  margin-bottom: 2.15rem;
+  padding: 1.25rem 1.15rem 1.2rem 1.15rem;
+}
+
+.section-title {
+  font-size: 1.14rem;
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 1.1rem;
+  text-shadow: 0 0 7px #fff2;
+  border-bottom: 1px solid #e1e1e1;
+  padding-bottom: 0.15rem;
+  letter-spacing: 1px;
+}
+
+.vendor-list {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.vendor-btn {
+  background: #181818;
+  color: #fff;
+  border: 1.5px solid #464646;
+  border-radius: 0.9rem;
+  padding: 0.65rem 1rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  min-width: 120px;
+  transition: box-shadow .18s, border-color .16s;
+  box-shadow: 0 0 11px #18181855;
+  &.active, &:hover {
+    border-color: #e9e9e9;
+    box-shadow: 0 0 12px #00ffd888;
+    background: #232828;
+  }
+}
+.vendor-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  margin-right: 0.7em;
+  object-fit: cover;
+  border: 2px solid #333;
+}
+.vendor-info {
+  display: flex;
+  flex-direction: column;
+}
+.vendor-name {
+  font-weight: 700;
+  font-size: 1.04em;
+}
+.vendor-level {
+  color: #e4e4e4;
+  font-size: 0.93em;
+}
+
+.search-row {
+  display: flex;
+  gap: 0.5em;
+  margin-bottom: 0.8em;
+}
+.search-input {
+  flex: 1 1 0;
+  padding: 0.7em 1em;
+  border-radius: 0.8em;
+  border: 1.5px solid #3c3c3c;
+  background: #141414;
+  color: #fff;
+  font-size: 1em;
+  outline: none;
+}
+.search-btn {
+  background: #242;
+  color: #cfc;
+  border: none;
+  padding: 0.7em 1.35em;
+  border-radius: 0.8em;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1em;
+  transition: background .14s;
+  &:hover { background: #393; }
+}
+
+.item-list, .inventory-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.item-row, .inventory-item-row {
+  display: flex;
+  align-items: center;
+  padding: 0.68em 0;
+  border-bottom: 1px solid #292929;
+  gap: 1.1em;
+}
+.item-row:last-child, .inventory-item-row:last-child { border-bottom: none; }
+.item-icon, .inv-icon {
+  width: 34px; height: 34px;
+  object-fit: cover;
+  border-radius: 0.5em;
+  background: #222;
+  margin-right: 0.75em;
+}
+.item-details, .inv-details {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+}
+.item-name, .inv-name { font-weight: 700; }
+.item-type, .item-desc, .inv-qty { color: #e2e2e2; font-size: 0.98em; }
+.item-price, .inv-price {
+  color: #f7e687;
+  font-weight: 700;
+  min-width: 55px;
+  text-align: right;
+  font-size: 1.07em;
+}
+.buy-btn, .sell-btn {
+  background: #162; color: #ccffc9;
+  border: none;
+  border-radius: 0.7em;
+  padding: 0.45em 1.1em;
+  font-weight: 700;
+  margin-left: 0.7em;
+  cursor: pointer;
+  transition: background .14s, color .14s;
+  &:hover { background: #282; color: #f8fff5; }
+  &:disabled { background: #333; color: #aaa; cursor: not-allowed; }
+}
+.gold { color: #f7e687; font-weight: bold; }
+.empty-msg {
+  color: #aaa;
+  text-align: center;
+  margin-top: 0.9em;
+  font-size: 1em;
+}
+.player-gold {
+  font-size: 1.1em;
+  font-weight: 700;
+  display: flex;
+  gap: 1em;
+  margin-top: 0.6em;
+  color: #f7e687;
+  justify-content: flex-end;
+}
+
+@media (max-width: 900px) {
+  .bazaar-row { flex-direction: column; gap: 1.2em; }
+  .bazaar-main, .bazaar-side { max-width: 100%; }
+}

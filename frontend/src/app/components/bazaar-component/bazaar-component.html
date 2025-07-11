@@ -1,1 +1,85 @@
-<p>bazaar-component works!</p>
+<div class="bazaar-root">
+  <h1 class="bazaar-title">Bazaar</h1>
+  <div class="bazaar-subtitle">
+    Welcome to the Bazaar! Search, buy and sell items, potions and rare loot.<br>
+    Vendors offer different wares depending on your level.
+  </div>
+  <div class="bazaar-row">
+
+    <!-- Vänster: Vendor och shop-läge -->
+    <div class="bazaar-col bazaar-main">
+      <section class="section-box vendor-section">
+        <h2 class="section-title">Vendors</h2>
+        <div class="vendor-list">
+          <button 
+            *ngFor="let v of vendors" 
+            class="vendor-btn" 
+            [class.active]="v.id === selectedVendor.id"
+            (click)="selectVendor(v)">
+            <img [src]="v.avatarUrl || defaultVendor" class="vendor-avatar" alt="{{ v.name }}">
+            <div class="vendor-info">
+              <div class="vendor-name">{{ v.name }}</div>
+              <div class="vendor-level">Level: {{ v.minLevel }}+</div>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <section class="section-box search-section">
+        <h2 class="section-title">Search Items</h2>
+        <div class="search-row">
+          <input [(ngModel)]="searchQuery" placeholder="Search items..." class="search-input" />
+          <button (click)="searchItems()" class="search-btn">Search</button>
+        </div>
+      </section>
+
+      <section class="section-box itemlist-section">
+        <h2 class="section-title">Available Items</h2>
+        <ul class="item-list">
+          <li *ngFor="let item of filteredItems" class="item-row">
+            <img [src]="item.iconUrl || fallbackIcon" class="item-icon" alt="{{ item.name }}">
+            <div class="item-details">
+              <div class="item-name">{{ item.name }}</div>
+              <div class="item-type">{{ item.type }}</div>
+              <div class="item-desc">{{ item.description }}</div>
+            </div>
+            <div class="item-price">{{ item.price }} <span class="gold">G</span></div>
+            <button class="buy-btn" (click)="buyItem(item)">Buy</button>
+          </li>
+        </ul>
+        <div *ngIf="filteredItems.length === 0" class="empty-msg">
+          No items found.
+        </div>
+      </section>
+    </div>
+
+    <!-- Höger: Sälja items & ditt inventory -->
+    <div class="bazaar-col bazaar-side">
+      <section class="section-box sell-section">
+        <h2 class="section-title">Sell Items</h2>
+        <ul class="inventory-list">
+          <li *ngFor="let item of playerInventory" class="inventory-item-row">
+            <img [src]="item.iconUrl || fallbackIcon" class="inv-icon" alt="{{ item.name }}">
+            <div class="inv-details">
+              <div class="inv-name">{{ item.name }}</div>
+              <div class="inv-qty">x{{ item.quantity }}</div>
+            </div>
+            <div class="inv-price">{{ sellPrice(item) }} <span class="gold">G</span></div>
+            <button class="sell-btn" (click)="sellItem(item)" [disabled]="item.quantity === 0">Sell</button>
+          </li>
+        </ul>
+        <div *ngIf="playerInventory.length === 0" class="empty-msg">
+          Your inventory is empty.
+        </div>
+      </section>
+
+      <section class="section-box info-section">
+        <div class="player-gold">
+          <span class="gold-label">Gold:</span>
+          <span class="gold-amount">{{ playerGold }}</span>
+        </div>
+      </section>
+    </div>
+
+  </div>
+</div>
