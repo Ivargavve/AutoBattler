@@ -658,7 +658,8 @@ nav a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 1rem;
+  min-width: 0;
 }
 
 .level-xp-circle {

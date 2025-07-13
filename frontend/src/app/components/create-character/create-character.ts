@@ -41,7 +41,7 @@ export class CreateCharacterComponent implements OnInit {
     private authService: AuthService
   ) {
     this.characterForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(13)]],
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(13), Validators.pattern(/^[a-zA-Z0-9_]+$/)]],
       class: [this.characterClasses[0], Validators.required],
       profileIconUrl: [this.selectedIcon, Validators.required],
     });
