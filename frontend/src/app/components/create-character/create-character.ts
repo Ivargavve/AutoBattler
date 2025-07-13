@@ -19,7 +19,7 @@ export class CreateCharacterComponent implements OnInit {
   errorMessage = '';
   isSubmitting = false;
 
-  characterClasses = ['Warrior', 'Mage'];
+  characterClasses = ['Warrior', 'Mage', 'Ranger', 'Rogue', 'Paladin'];
   profileIcons = [
     'assets/char1.jpeg', 'assets/char2.jpeg', 'assets/char3.jpeg',
     'assets/char4.jpeg', 'assets/char5.jpeg', 'assets/char6.jpeg', 'assets/char7.jpeg',
