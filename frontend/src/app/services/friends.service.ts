@@ -10,6 +10,7 @@ export interface Friend {
   profilePictureUrl?: string;
   lastLogin?: string;
   online?: boolean;
+  friendshipId: number;
 }
 
 export interface UserSearchResult {
@@ -64,7 +65,10 @@ export class FriendsService {
     return this.http.delete(`${this.baseUrl}/friendships/${requestId}`);
   }
   getAllUsers(): Observable<UserSearchResult[]> {
-    return this.http.get<UserSearchResult[]>('/api/users')
+    return this.http.get<UserSearchResult[]>(`${this.baseUrl}/users`)
+  }
+  removeFriend(friendshipId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/friendships/${friendshipId}`);
   }
 
 }

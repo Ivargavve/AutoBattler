@@ -38,12 +38,13 @@ namespace backend.Controllers
                 var user = f.RequesterId == myId ? f.Addressee : f.Requester;
                 return new
                 {
+                    friendshipId = f.Id, // <-- Här skickas det med!
                     id = user.Id,
                     username = user.Username,
                     fullName = user.FullName,
                     profilePictureUrl = user.ProfilePictureUrl,
                     lastLogin = user.LastLogin,
-                    online = false // Placeholder, implement real online if needed
+                    online = false
                 };
             });
 

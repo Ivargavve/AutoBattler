@@ -7,7 +7,6 @@
     <span>{{ error }}</span>
   </div>
 
-  <!-- Vänlista-sök + Plus-knapp -->
   <div *ngIf="!loading">
     <div class="friend-controls search-users">
       <input
@@ -98,12 +97,38 @@
               </div>
               <div class="friend-info">
                 <span class="friend-fullname">{{ friend.fullName }}</span>
-                <span class="last-login" *ngIf="friend.lastLogin">- {{ friend.lastLogin | date:'shortTime' }}</span>
+                <span class="last-login" *ngIf="friend.lastLogin">- {{ getLastOnlineText(friend.lastLogin) }}</span>
               </div>
+            </div>
+            <div class="friend-menu-wrapper">
+              <button
+                class="friend-menu-btn"
+                (click)="openFriendMenu(friend, $event)"
+                tabindex="0"
+                aria-label="Show actions"
+              >
+                <i class="fas fa-ellipsis-v whiteIco"></i>
+              </button>
             </div>
           </div>
         </li>
       </ul>
+      <div 
+        *ngIf="menuOpen" 
+        class="friend-popup-menu"
+        [ngStyle]="{'top.px': menuPosition.top, 'left.px': menuPosition.left}"
+      >
+        <button class="menu-btn" *ngIf="selectedFriend" (click)="goToChallenge(selectedFriend)">
+          <i class="fas fa-crosshairs"></i> Challenge
+        </button>
+        <button class="menu-btn" *ngIf="selectedFriend" (click)="goToMakGora(selectedFriend)">
+          <i class="fas fa-skull"></i> Mak' Gora
+        </button>
+        <hr>
+        <button class="menu-btn danger" *ngIf="selectedFriend" (click)="menuOpen = false; onRemoveFriend(selectedFriend)">
+          <i class="fas fa-user-slash"></i> Remove friend
+        </button>
+      </div>
       <div *ngIf="filteredFriends.length === 0 && !loading" class="no-friends">
         <small *ngIf="(searchControl.value?.length ?? 0) > 0">
           No friends called "{{ searchControl.value }}"
@@ -132,7 +157,13 @@
         <app-loading-spinner></app-loading-spinner>
       </div>
       <ul class="friend-list">
-        <li *ngFor="let user of addFriendResults; trackBy: trackByUserId" class="user-search-result">
+        <li
+          *ngFor="let user of addFriendResults; trackBy: trackByUserId"
+          [routerLink]="user.username ? ['/profile', user.username] : ['/profile/id', user.id]"
+          style="cursor:pointer;"
+          (click)="$event.stopPropagation()"
+          class="user-search-result"
+        >
           <div class="friend-entry">
             <img
               *ngIf="user.profilePictureUrl; else defaultIcon"
@@ -169,6 +200,7 @@
           </div>
         </li>
       </ul>
+
       <div *ngIf="addFriendResults.length === 0 && (addFriendSearchControl.value?.length ?? 0) >= 2" class="no-friends">
         <small>No users found...</small>
       </div>

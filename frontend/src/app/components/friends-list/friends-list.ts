@@ -33,6 +33,10 @@ export class FriendsListComponent implements OnInit {
   acceptLoadingUserId: number | null = null;
   rejectLoadingUserId: number | null = null;
 
+  menuOpen = false;
+  menuPosition = { top: 0, left: 0 };
+  selectedFriend: Friend | null = null;
+
   @Output() friendClicked = new EventEmitter<Friend>();
 
   constructor(private friendsService: FriendsService, private router: Router, private elRef: ElementRef) {}
@@ -73,11 +77,67 @@ export class FriendsListComponent implements OnInit {
     });
   }
 
+  openFriendMenu(friend: Friend, event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.selectedFriend = friend;
+    const rect = (event.target as HTMLElement).getBoundingClientRect();
+    // Justera + scroll om nödvändigt!
+    this.menuPosition = {
+      top: rect.bottom + window.scrollY + 2,
+      left: rect.right + window.scrollX - 160 // justera detta vid behov
+    };
+    this.menuOpen = true;
+  }
+
+  // Nytt! Stänger popupen om man klickar utanför popup eller pluppar.
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    // Hitta popup och alla plupp-knappar
+    const menuElem = document.querySelector('.friend-popup-menu');
+    const btnElems = Array.from(document.querySelectorAll('.friend-menu-btn'));
+    const clickedMenu = menuElem && menuElem.contains(event.target as Node);
+    const clickedBtn = btnElems.some(btn => btn.contains(event.target as Node));
+    if (this.menuOpen && !clickedMenu && !clickedBtn) {
+      this.menuOpen = false;
+    }
+
+    // Hantera addFriend-overlay separat (stäng vid klick utanför overlay)
+    if (this.addFriendMode) {
+      const addOverlay = document.querySelector('.add-friend-overlay');
+      if (addOverlay && !addOverlay.contains(event.target as Node)) {
+        this.closeAddFriendPanel();
+      }
+    }
+  }
+
   toggleAddFriendMode() {
     this.addFriendMode = !this.addFriendMode;
     if (!this.addFriendMode) {
       this.addFriendResults = [];
       this.addFriendSearchControl.setValue('');
+    }
+  }
+
+  getLastOnlineText(dateString?: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMinutes < 1) {
+      return 'just now';
+    } else if (diffMinutes < 60) {
+      return `${diffMinutes} min ago`;
+    } else if (diffHours < 24) {
+      return `${diffHours} h ago`;
+    } else if (diffDays === 1) {
+      return '1 day ago';
+    } else {
+      return `${diffDays} days ago`;
     }
   }
 
@@ -192,24 +252,35 @@ export class FriendsListComponent implements OnInit {
     return user.id;
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    const clickedInside = this.elRef.nativeElement.contains(event.target);
-
-    if (!clickedInside) {
-      if (this.addFriendMode) {
-        this.closeAddFriendPanel();
-      }
-      if (this.searchControl.value) {
-        this.searchControl.setValue('');
-      }
-    }
-  }
-
   closeAddFriendPanel() {
     this.addFriendMode = false;
     this.addFriendSearchControl.setValue('');
     this.addFriendResults = [];
   }
+  onRemoveFriend(friend: Friend) {
+    if (!friend || !friend.friendshipId) return;
+    this.friendsService.removeFriend(friend.friendshipId).subscribe({
+      next: () => {
+        this.loadFriends();
+        this.menuOpen = false;
+      },
+      error: (err) => {
+        console.error('Error removing friend:', err);
+      }
+    });
+  }
+  goToChallenge(friend: Friend) {
+    // För "Challenge"
+    this.menuOpen = false;
+    this.router.navigate(['/battle-planner'], {
+      queryParams: { opponent: friend.username }
+    });
+  }
+  goToMakGora(friend: Friend) {
+    // För "Mak' Gora"
+    this.menuOpen = false;
+    this.router.navigate(['/battle-planner'], {
+      queryParams: { opponent: friend.username, makgora: true }
+    });
+  }
 }
-

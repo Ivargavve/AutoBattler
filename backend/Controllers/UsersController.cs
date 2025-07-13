@@ -93,7 +93,6 @@ namespace backend.Controllers
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _db.Users
-                .AsNoTracking()
                 .Select(user => new
                 {
                     user.Id,

@@ -41,7 +41,7 @@
 
 .friends-wrapper {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: visible;
   padding-right: 0.3rem;
   height: 100%;
 }
@@ -184,6 +184,7 @@
   cursor: pointer;
   box-shadow: 0 2px 7px 0 var(--accent-shadow, #86f7b366);
   letter-spacing: 0.8px;
+  margin-right: 0.2rem;
   transition: 
     background 0.18s, 
     color 0.18s, 
@@ -280,4 +281,94 @@
       border-color 0.18s, 
       box-shadow 0.18s;
     }
+}
+.friend-menu-wrapper {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 100%;
+  // NYTT: positionerar knappen *alltid* längst till höger
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+
+  .friend-menu-btn {
+    background: none;
+    border: none;
+    padding: 0 0.25em;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    outline: none;
+    transition: background 0.14s;
+
+    &:hover, &:focus {
+      background: #212c23;
+    }
+  }
+}
+
+.whiteIco {
+  color: #fff !important;
+  font-size: 0.9em;
+  transition: color 0.2s;
+}
+
+/* Popup-menyn (helt utan bootstrap) */
+.friend-popup-menu {
+  position: fixed;
+  min-width: 156px;
+  background: #181e1a;
+  border-radius: 4px;
+  box-shadow: 0 6px 30px #000a;
+  z-index: 4000;
+  padding: 0.5em 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1px;
+
+  .menu-btn {
+    background: none;
+    border: none;
+    text-align: left;
+    color: #baffd8;
+    font-family: inherit;
+    font-weight: 600;
+    padding: 0.5em 1.1em;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+    gap: 0.8em;
+
+    i {
+      font-size: 0.9em;
+      min-width: 1.2em;
+      text-align: center;
+    }
+
+    &:hover, &:focus {
+      background: #193a26;
+      color: #fff;
+    }
+
+    &.danger {
+      color: #fa6d7c;
+      font-weight: 700;
+      i {
+        color: #fa6d7c;
+      }
+    }
+  }
+  hr {
+    margin: 2px 0 2px 0;
+    border: none;
+    border-top: 1.5px solid #233d2d;
+    opacity: 0.7;
+  }
 }
