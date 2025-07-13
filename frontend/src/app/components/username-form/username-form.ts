@@ -27,7 +27,7 @@ export class UsernameSetupComponent {
     private http: HttpClient
   ) {
     this.usernameForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(13), Validators.pattern(/^[a-zA-Z0-9_]+$/)]],
+      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(14), Validators.pattern(/^[a-zA-Z0-9_]+$/)]],
     });
   }
 

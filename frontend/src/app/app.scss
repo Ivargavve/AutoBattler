@@ -349,6 +349,11 @@ nav a {
 .fullname {
   font-size: 0.85rem;
   color: var(--fullname, #888);
+  max-width: 7.5rem;        // Samma som username
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
 }
 
 .horizontal-info {
