@@ -331,7 +331,7 @@ nav a {
   }
 }
 .username {
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: bold;
   color: var(--accent, #86f7b3);
   text-shadow: 0 0 4px var(--username-shadow, rgba(134, 247, 179, 0.4));
@@ -347,9 +347,9 @@ nav a {
 }
 
 .fullname {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--fullname, #888);
-  max-width: 7.5rem;        // Samma som username
+  max-width: 7.5rem;        
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -663,7 +663,8 @@ nav a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  width: 100%;
+  gap: 0rem;
   min-width: 0;
 }
 
