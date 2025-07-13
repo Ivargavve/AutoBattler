@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Text.Json;
+using System.Linq;
 
 namespace backend.Controllers
 {
@@ -50,6 +52,16 @@ namespace backend.Controllers
 
                 chr.LastRechargeTime = chr.LastRechargeTime.AddSeconds(ticks * energyInterval);
 
+                if (!string.IsNullOrEmpty(chr.AttacksJson))
+                {
+                    var attacks = JsonSerializer.Deserialize<List<AttackData>>(chr.AttacksJson) ?? new List<AttackData>();
+                    foreach (var atk in attacks)
+                    {
+                        atk.CurrentCharges = atk.MaxCharges;
+                    }
+                    chr.AttacksJson = JsonSerializer.Serialize(attacks);
+                }
+
                 await _db.SaveChangesAsync();
             }
 
@@ -77,7 +89,8 @@ namespace backend.Controllers
                 chr.CreatedAt,
                 chr.UpdatedAt,
                 chr.LastRechargeTime,
-                nextTickInSeconds
+                nextTickInSeconds,
+                chr.AttacksJson
             });
         }
 
@@ -121,7 +134,8 @@ namespace backend.Controllers
                 chr.CreatedAt,
                 chr.UpdatedAt,
                 chr.LastRechargeTime,
-                nextTickInSeconds
+                nextTickInSeconds,
+                chr.AttacksJson
             });
         }
 
@@ -173,7 +187,8 @@ namespace backend.Controllers
                 chr.CreatedAt,
                 chr.UpdatedAt,
                 chr.LastRechargeTime,
-                nextTickInSeconds
+                nextTickInSeconds,
+                chr.AttacksJson
             });
         }
 
@@ -195,6 +210,28 @@ namespace backend.Controllers
                 ProfileIconUrl = dto.ProfileIconUrl,
                 LastRechargeTime = DateTime.UtcNow
             };
+
+            // --- NYTT: Tilldela attacker baserat på klass ---
+            var klass = dto.Class?.Trim().ToLower() ?? "";
+            var matchingAttacks = AttackTemplates.All
+                .Where(atk => atk.AllowedClasses.Any(ac => ac.ToLower() == klass))
+                .Select(atk => new
+                {
+                    atk.Id,
+                    atk.Name,
+                    atk.Type,
+                    atk.DamageType,
+                    atk.BaseDamage,
+                    atk.MaxCharges,
+                    CurrentCharges = atk.MaxCharges,
+                    atk.Scaling,
+                    atk.RequiredStats,
+                    atk.AllowedClasses,
+                    atk.Description
+                })
+                .ToList();
+
+            chr.AttacksJson = JsonSerializer.Serialize(matchingAttacks);
 
             _db.Characters.Add(chr);
             await _db.SaveChangesAsync();
@@ -223,7 +260,8 @@ namespace backend.Controllers
                     chr.EquipmentJson,
                     chr.CreatedAt,
                     chr.UpdatedAt,
-                    chr.LastRechargeTime
+                    chr.LastRechargeTime,
+                    chr.AttacksJson
                 }
             );
         }
@@ -309,4 +347,20 @@ namespace backend.Controllers
         public string Name { get; set; } = string.Empty;
         public string ProfileIconUrl { get; set; } = string.Empty;
     }
+    public class AttackData
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? Type { get; set; }
+        public string? DamageType { get; set; }
+        public int BaseDamage { get; set; }
+        public int MaxCharges { get; set; }
+        public int CurrentCharges { get; set; }
+        public Dictionary<string, double>? Scaling { get; set; }
+        public Dictionary<string, int>? RequiredStats { get; set; }
+        public List<string>? AllowedClasses { get; set; }
+        public string? Description { get; set; }
+    }
+
+
 }

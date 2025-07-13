@@ -226,6 +226,14 @@
     color: var(--accent, #86f7b3);
     padding: 1rem;
 
+    &:disabled {
+      background: #151517 !important; 
+      border-color: #000000 !important;
+      opacity: 0.73;
+      cursor: not-allowed;
+      box-shadow: 0 0 2px #000000;
+    }
+
     .attack-label {
       display: block;
       overflow: hidden;
@@ -274,22 +282,27 @@
   justify-content: flex-end;
   align-items: center;
   margin-top: 0.18rem;
+
   .run-btn {
     background: #be2c2c;
     color: #fff;
     border: 2px solid #8d2c2c;
     border-radius: 4px;
     font-weight: 800;
-    font-size: 1.04rem;
+    font-size: 0.9rem;   
     letter-spacing: 2px;
     text-shadow: 0 0 4px #a83d3d;
-    padding: 0.29rem 2.2rem;
+    padding: 0.33rem 0;   
+    min-width: 100px;      
     transition: background 0.16s, border-color 0.14s, color 0.14s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     &:hover:not(:disabled) {
-      background: #e74c3c;
-      border-color: #ff2e1c;
+      background: #ffb7af;
+      border-color: #ff695b;
       color: #fff5e6;
-      text-shadow: 0 0 6px #ff6767;
+      text-shadow: 0 0 6px #ff9797;
     }
     &:disabled {
       background: #493232;
@@ -357,3 +370,48 @@
     margin-top: 0.8rem;
   }
 }
+.battle-next-btn-row-centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1.1rem 0 0.5rem 0;
+  width: 100%;
+}
+
+.next-chevron-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  background: #00000000;
+  transition: 
+    border-color 0.13s, 
+    background 0.13s, 
+    color 0.13s, 
+    box-shadow 0.15s;
+  cursor: pointer;
+
+  &:hover, &:focus {
+    background: #222d23;
+    border-color: #70ffce;
+    color: #eafff0;
+    box-shadow: 0 0 20px #94ffd6, 0 0 2px #27efb7;
+    .chevron, .next-label {
+      color: #c6ffe7;
+      text-shadow: 0 0 12px #75ffc7cc;
+    }
+  }
+
+  .chevron {
+    font-size: 2.25em;
+    font-weight: 900;
+    color: #64ffb7;
+    text-shadow: 0 0 10px #4fff90, 0 0 3px #00ffba66;
+    margin: 0 0.3em;
+    pointer-events: none;
+    user-select: none;
+    transition: color 0.13s, text-shadow 0.13s;
+  }
+}
+
+

@@ -1,6 +1,7 @@
+import { PlayerAttack } from './battle-interfaces';
+
 export interface Character {
   id: number;
-  
   name: string;
   class: string;
   profileIconUrl: string;
@@ -25,5 +26,8 @@ export interface Character {
   createdAt: string;
   updatedAt: string;
   lastRechargeTime?: string | Date;
-  nextTickInSeconds?: number; 
+  nextTickInSeconds?: number;
+
+  attacksJson?: string;         
+  attacks?: PlayerAttack[];       
 }

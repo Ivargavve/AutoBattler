@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Fighter, BattleLogEntry } from '../../services/battle-interfaces';
+import { Fighter, BattleLogEntry, PlayerAttack } from '../../services/battle-interfaces';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { Subscription, firstValueFrom } from 'rxjs';
@@ -26,37 +26,8 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
   userXp: number | null = null;
   playerEnergy: number = 0;
   enemyName: string | null = null;
-
-  attacks = [
-    { 
-      name: 'Standard Attack',
-      currentCharges: 18,
-      maxCharges: 20,
-      disabled: false,
-      action: () => this.attack()
-    },
-    { 
-      name: 'Special Attack',
-      currentCharges: 11,
-      maxCharges: 20,
-      disabled: true,
-      action: null
-    },
-    {
-      name: 'Defend',
-      currentCharges: 9,
-      maxCharges: 10,
-      disabled: true,
-      action: null
-    },
-    {
-      name: 'Fourth Move',
-      currentCharges: 2,
-      maxCharges: 5,
-      disabled: true,
-      action: null
-    }
-  ];
+  attacks: PlayerAttack[] = [];
+  showNextButton = false;
 
   private characterSub!: Subscription;
 
@@ -73,6 +44,7 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
     this.characterSub = this.authService.character$.subscribe(character => {
       if (character) {
         this.player = {
+          id: character.id,
           name: character.name,
           hp: character.currentHealth,
           maxHp: character.maxHealth
@@ -80,13 +52,33 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
         this.playerEnergy = character.currentEnergy;
         this.userLevel = character.level;
         this.userXp = character.experiencePoints;
+
+        // Hantera attacker: från attacks eller attacksJson
+        this.attacks = (character.attacks ?? (
+          character.attacksJson ? JSON.parse(character.attacksJson) : []
+        )).map((atk: any) => ({
+          id: atk.Id,
+          name: atk.Name,
+          type: atk.Type,
+          damageType: atk.DamageType,
+          baseDamage: atk.BaseDamage,
+          maxCharges: atk.MaxCharges,
+          currentCharges: atk.CurrentCharges,
+          scaling: atk.Scaling,
+          requiredStats: atk.RequiredStats,
+          allowedClasses: atk.AllowedClasses,
+          description: atk.Description,
+        }));
+
       } else {
         this.player = null;
         this.playerEnergy = 0;
         this.userLevel = null;
         this.userXp = null;
+        this.attacks = [];
       }
     });
+
     // Ladda eventuell sparad battle-state via service
     const loadedState = this.battleService.loadBattleState();
     if (loadedState) {
@@ -98,7 +90,6 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.userLevel = loadedState.userLevel;
       this.userXp = loadedState.userXp;
       this.playerEnergy = loadedState.playerEnergy;
-      // Lägg till fler properties om du har!
     } else {
       this.battleLog = [];
       this.battleEnded = true;
@@ -141,6 +132,7 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
         next: (enemyData) => {
           this.enemyName = enemyData.enemyName;
           this.enemy = {
+            id: enemyData.enemyId ?? 0,
             name: enemyData.enemyName,
             hp: enemyData.enemyHp,
             maxHp: enemyData.enemyMaxHp
@@ -166,15 +158,17 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  attack(): void {
-    if (!this.player || !this.enemy || this.battleEnded || this.playerEnergy <= 0) return;
+  useAttack(attack: PlayerAttack): void {
+    if (!this.player || !this.enemy || this.battleEnded || this.playerEnergy <= 0 || attack.currentCharges <= 0) return;
 
     this.isLoading = true;
 
     const req = {
+      playerId: this.player.id,
       enemyHp: this.enemy.hp,
-      enemyName: this.enemy.name, 
-      action: 'attack'
+      enemyName: this.enemy.name,
+      action: 'attack',
+      attackId: attack.id
     };
 
     this.http.post<any>(`${environment.apiUrl}/battle/turn`, req)
@@ -184,7 +178,7 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
           this.player!.maxHp = res.playerMaxHp;
           this.enemy!.hp = res.enemyHp;
           this.enemy!.maxHp = res.enemyMaxHp;
-          this.enemy!.name = res.enemyName; 
+          this.enemy!.name = res.enemyName;
           this.enemyName = res.enemyName;
           this.battleLog.push(...res.battleLog);
           this.battleEnded = res.battleEnded;
@@ -200,10 +194,10 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
             this.isLoading = false;
             this.gainedXp = null;
             this.onBattleEnd();
-          } 
-          else {
+          } else {
             this.gainedXp = null;
           }
+          // Ladda om karaktär så attacker (och charges) är uppdaterade!
           this.authService.loadUserWithCharacter();
           this.isLoading = false;
           this.scrollToBottom();
@@ -232,16 +226,16 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.userLevel = null;
       this.userXp = null;
       this.playerEnergy = 0;
+      this.attacks = [];
     } catch (err) {} finally {
       this.isLoading = false;
+      this.showNextButton = false;
       this.router.navigate(['/battle-planner']);
     }
   }
 
   onBattleEnd() {
-    setTimeout(() => {
-      this.resetBattleAndNavigate();
-    }, 4000);
+    this.showNextButton = true;
   }
 
   runFromBattle() {
@@ -268,6 +262,26 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       userXp: this.userXp,
       playerEnergy: this.playerEnergy
     });
+  }
+
+  get displayAttacks(): PlayerAttack[] {
+    const filled = [...this.attacks];
+    while (filled.length < 4) {
+      filled.push({
+        id: -1,
+        name: 'Empty',
+        type: '',
+        damageType: '',
+        baseDamage: 0,
+        maxCharges: 0,
+        currentCharges: 0,
+        scaling: {},
+        requiredStats: {},
+        allowedClasses: [],
+        description: 'No attack equipped'
+      });
+    }
+    return filled.slice(0, 4);
   }
 
   getLogClass(log: BattleLogEntry): string {

@@ -35,13 +35,21 @@
             </div>
           </ng-container>
         </ng-container>
+
+        <!-- NEW NEXT BUTTON: Centrerad längst ned -->
+        <div *ngIf="battleEnded && showNextButton" class="battle-next-btn-row-centered">
+          <button (click)="runFromBattle()" class="next-chevron-btn">
+            <span class="chevron">&gt;&gt;</span>
+          </button>
+        </div>
+
       </div>
     </div>
 
     <div class="battle-main-row">
       <div class="battle-graphic-col">
         <img 
-          src="assets/battle/battle.jpg" 
+          src="" 
           alt="Battle Graphic" 
           class="battle-graphic-img">
       </div>
@@ -57,19 +65,22 @@
             <div class="hp">HP: {{ enemy?.hp }} / {{ enemy?.maxHp }}</div>
           </div>
         </div>
-        <!-- Attack Buttons -->
+
+        <!-- Attack Buttons: Alltid 4 knappar -->
         <div class="battle-attack-buttons">
           <button
-            *ngFor="let attack of attacks"
+            *ngFor="let attack of displayAttacks"
             class="attack-btn"
-            [ngClass]="{ alt: attack.disabled }"
-            [disabled]="attack.disabled || isLoading || battleEnded"
-            (click)="attack.action ? attack.action() : null"
+            [disabled]="attack.id === -1 || attack.currentCharges <= 0 || isLoading || battleEnded"
+            (click)="attack.id !== -1 ? useAttack(attack) : null"
+            [title]="attack.description"
           >
             <span class="attack-label">{{ attack.name }}</span>
-            <span class="attack-charges">{{ attack.currentCharges }}/{{ attack.maxCharges }}</span>
+            <span class="attack-charges" *ngIf="attack.id !== -1">{{ attack.currentCharges }}/{{ attack.maxCharges }}</span>
+            <span class="attack-charges" *ngIf="attack.id === -1">0/0</span>
           </button>
         </div>
+
         <!-- Run Button -->
         <div class="battle-run-btn-row">
           <button (click)="runFromBattle()" class="attack-btn run-btn" style="color:#fff; background:#b33;">Run</button>

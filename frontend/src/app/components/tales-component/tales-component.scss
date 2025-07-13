@@ -39,7 +39,7 @@ hr, .ab-section-divider {
 .ab-row {
   display: flex;
   width: 100%;
-  gap: 2.5rem;
+  gap: 0.5rem;
 }
 .ab-main-row {
   align-items: flex-start;
@@ -59,8 +59,7 @@ hr, .ab-section-divider {
 .ab-side-col {
   flex: 1.1 1 0;
   max-width: 340px;
-  padding-top: 0.4rem;
-  padding-left: 1.1rem;
+  padding: 0.5rem 0.6rem;
   border-left: 2px solid var(--divider, #444);
   color: var(--text, #e6e6e6);
   font-size: 0.97rem;
@@ -72,6 +71,7 @@ hr, .ab-section-divider {
 
 .ab-story {
   margin-bottom: 2.1rem;
+  padding: 0.8rem 1.2rem;
 }
 .ab-headline {
   font-size: 1.32rem;
