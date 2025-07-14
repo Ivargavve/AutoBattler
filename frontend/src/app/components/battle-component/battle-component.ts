@@ -251,6 +251,11 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  nextBattle() {
+    this.isLoading = true;
+    this.resetBattleAndNavigate();
+  }
+  
   saveBattleState() {
     this.battleService.saveBattleState({
       player: this.player,
