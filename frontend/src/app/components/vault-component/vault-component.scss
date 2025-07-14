@@ -29,7 +29,7 @@
 
 .vault-row {
   display: flex;
-  gap: 2.5rem;
+  gap: 0.5rem;
   align-items: flex-start;
 }
 
@@ -225,4 +225,123 @@
   .vault-title { font-size: 1.18rem; }
   .section-title { font-size: 0.98rem; }
   .character-avatar, .gear-icon, .inv-icon { width: 52px; height: 52px; }
+}
+
+/* --- Character Attacks --- */
+.character-attacks-box {
+  background: #18181d;
+  border: 1px solid #262631;
+  border-radius: 4px;
+  padding: 1.15rem 1.25rem 0.6rem 1.25rem;
+  box-shadow: 0 0 8px 0 #12122133;
+}
+
+.character-attacks-box h3 {
+  font-size: 1.04rem;
+  font-weight: 800;
+  color: #f3f3fa;
+  letter-spacing: 1.2px;
+  margin-bottom: 0.85rem;
+  text-shadow: 0 1px 8px #a0c4ff18;
+  border-bottom: 1px solid #2c2c33;
+  padding-bottom: 0.21em;
+}
+
+.attack-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.attack-item {
+  background: linear-gradient(90deg, #1b1b1f 70%, #222233 100%);
+  border: 1px solid #282838;
+  border-radius: 4px;
+  margin-bottom: 1.09em;
+  padding: 0.75em 1em 0.65em 1em;
+  box-shadow: 0 2px 12px #12121a1a;
+  font-size: 1.04em;
+  transition: box-shadow 0.2s;
+}
+
+.attack-item:last-child {
+  margin-bottom: 0;
+}
+
+.attack-item:hover {
+  box-shadow: 0 4px 22px #2986cc33;
+  border-color: #3d5a98;
+}
+
+.atk-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7em;
+  margin-bottom: 0.15em;
+}
+
+.atk-name {
+  color: #a6f2fb;
+  font-size: 1em;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 6px #2193b07e;
+  margin-right: 0.3em;
+}
+
+.atk-type {
+  font-size: 0.9em;
+  color: #aabbe7;
+  background: #1e263a;
+  border-radius: 3px;
+  padding: 1px 7px 1px 7px;
+  margin-left: 0.2em;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+.atk-meta {
+  color: #e0e9ff;
+  font-size: 0.8em;
+  margin-bottom: 0.05em;
+  margin-top: 0.12em;
+  font-family: inherit;
+  display: flex;
+  gap: 2.3em;
+  letter-spacing: 0.4px;
+}
+
+.attack-item span {
+  /* Inherit font for all stat labels inside attack-item */
+  font-family: inherit;
+}
+
+.attack-item [class*="atk-"] {
+  font-family: inherit;
+}
+
+.attack-item .atk-desc {
+  color: #8be9fd;
+  margin-top: 0.38em;
+  font-size: 0.8em;
+  font-style: italic;
+  padding-left: 0.08em;
+  letter-spacing: 0.2px;
+}
+
+.attack-item div:not(.atk-row):not(.atk-meta):not(.atk-desc) {
+  color: #bacaff;
+  font-size: 0.8em;
+  margin-top: 0.08em;
+}
+
+/* Responsive for attacks */
+@media (max-width: 700px) {
+  .character-attacks-box {
+    padding: 0.74rem 0.4rem 0.2rem 0.4rem;
+  }
+  .attack-item {
+    padding: 0.55em 0.55em 0.4em 0.55em;
+    font-size: 0.97em;
+  }
 }

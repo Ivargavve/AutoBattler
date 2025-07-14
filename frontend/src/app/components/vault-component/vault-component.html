@@ -6,43 +6,55 @@
   </div>
 
   <div class="vault-row">
-    <!-- Vänster: Karaktärsinfo och Equipped Gear -->
+    <!-- Vänster: Karaktär, Equipped Gear, Inventory, Summary -->
     <div class="vault-col vault-main">
       <section class="section-box character-section">
         <h2 class="section-title">Character</h2>
-        <div class="character-card">
-          <img [src]="character.avatarUrl || defaultAvatar" class="character-avatar" alt="Character" />
-          <div class="character-details">
-            <div class="character-name">{{ character.name }}</div>
-            <div class="character-class">Class: {{ character.class }}</div>
-            <div class="character-level">Level: {{ character.level }}</div>
-            <div class="character-xp">XP: {{ character.experiencePoints }}</div>
+        <ng-container *ngIf="character as c">
+          <div class="character-card">
+            <img [src]="c.profileIconUrl || defaultAvatar" class="character-avatar" alt="Character" />
+            <div class="character-details">
+              <div class="character-name">{{ c.name }}</div>
+              <div class="character-class">Class: {{ c.class }}</div>
+              <div class="character-level">Level: {{ c.level }}</div>
+              <div class="character-xp">XP: {{ c.experiencePoints }}</div>
+              <div class="character-hp">HP: {{ c.currentHealth }} / {{ c.maxHealth }}</div>
+              <div class="character-energy">Energy: {{ c.currentEnergy }} / {{ c.maxEnergy }}</div>
+              <div class="character-attack">Attack: {{ c.attack }}</div>
+              <div class="character-defense">Defense: {{ c.defense }}</div>
+              <div class="character-agility">Speed: {{ c.agility }}</div>
+              <div class="character-crit">Crit Chance: {{ c.criticalChance }}%</div>
+              <div class="character-credits">Credits: {{ c.credits }}</div>
+              <div class="character-date">Created: {{ c.createdAt | date:'short' }}</div>
+              <div class="character-date">Last updated: {{ c.updatedAt | date:'short' }}</div>
+              <div *ngIf="c.lastRechargeTime">Last Recharge: {{ c.lastRechargeTime | date:'short' }}</div>
+              <div *ngIf="c.nextTickInSeconds !== undefined">Next Tick: {{ c.nextTickInSeconds }}s</div>
+            </div>
           </div>
-        </div>
+        </ng-container>
       </section>
 
       <section class="section-box equipped-section">
         <h2 class="section-title">Equipped Gear</h2>
         <div class="equipped-grid">
-          <div class="gear-slot" *ngFor="let slot of equippedSlots">
-            <div class="slot-label">{{ slot.label }}</div>
-            <div class="gear-item" *ngIf="slot.item; else emptySlot">
-              <img [src]="slot.item.iconUrl || fallbackIcon" class="gear-icon" alt="{{ slot.item.name }}" />
-              <div class="gear-info">
-                <div class="gear-name">{{ slot.item.name }}</div>
-                <div class="gear-stats">{{ slot.item.stats }}</div>
+          <ng-container *ngFor="let slot of equippedSlots">
+            <div class="gear-slot">
+              <div class="slot-label">{{ slot.label }}</div>
+              <div class="gear-item" *ngIf="slot.item; else emptySlot">
+                <img [src]="slot.item.iconUrl || fallbackIcon" class="gear-icon" alt="{{ slot.item.name }}" />
+                <div class="gear-info">
+                  <div class="gear-name">{{ slot.item.name }}</div>
+                  <div class="gear-stats">{{ slot.item.stats }}</div>
+                </div>
               </div>
+              <ng-template #emptySlot>
+                <div class="empty-slot">-</div>
+              </ng-template>
             </div>
-            <ng-template #emptySlot>
-              <div class="empty-slot">-</div>
-            </ng-template>
-          </div>
+          </ng-container>
         </div>
       </section>
-    </div>
 
-    <!-- Höger: Inventory -->
-    <div class="vault-col vault-side">
       <section class="section-box inventory-section">
         <h2 class="section-title">Inventory</h2>
         <div *ngIf="inventory.length === 0" class="inventory-empty">No items in your inventory.</div>
@@ -58,6 +70,7 @@
           </li>
         </ul>
       </section>
+
       <section class="section-box summary-section">
         <h2 class="section-title">Summary</h2>
         <div class="summary-row">
@@ -68,7 +81,43 @@
           <span>Unique Gear:</span>
           <span>{{ uniqueGearCount }}</span>
         </div>
-        <!-- Lägg till fler stats eller currencies här -->
+      </section>
+    </div>
+
+    <!-- Höger: ENBART ATTACKER -->
+    <div class="vault-col vault-side">
+      <section *ngIf="attacks && attacks.length > 0" class="character-attacks-box section-box">
+        <h3>Attacks</h3>
+        <ul class="attack-list">
+          <li *ngFor="let atk of attacks" class="attack-item">
+            <div class="atk-row">
+              <span class="atk-name">{{ atk.name }}</span>
+              <span class="atk-type">({{ atk.type }}, {{ atk.damageType }})</span>
+            </div>
+            <div class="atk-meta">
+              <span>Base damage: {{ atk.baseDamage }}</span>
+              <span>Charges: {{ atk.currentCharges }}/{{ atk.maxCharges }}</span>
+            </div>
+            <div *ngIf="atk.scaling && (atk.scaling | keyvalue).length > 0">
+              <span>Scaling:
+                <span *ngFor="let stat of (atk.scaling | keyvalue); let last = last">
+                  {{ stat.key }}: x{{ stat.value }}<span *ngIf="!last">, </span>
+                </span>
+              </span>
+            </div>
+            <div *ngIf="atk.requiredStats && (atk.requiredStats | keyvalue).length > 0">
+              <span>Requires:
+                <span *ngFor="let req of (atk.requiredStats | keyvalue); let last = last">
+                  {{ req.key }}: {{ req.value }}<span *ngIf="!last">, </span>
+                </span>
+              </span>
+            </div>
+            <div *ngIf="atk.allowedClasses?.length">
+              <span>Allowed classes: {{ atk.allowedClasses.join(', ') }}</span>
+            </div>
+            <div class="atk-desc">{{ atk.description }}</div>
+          </li>
+        </ul>
       </section>
     </div>
   </div>

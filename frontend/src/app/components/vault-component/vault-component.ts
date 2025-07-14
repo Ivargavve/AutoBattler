@@ -1,60 +1,23 @@
 import { Component, OnInit } from '@angular/core';
-
-export interface Character {
-  name: string;
-  class: string;
-  level: number;
-  experiencePoints: number;
-  avatarUrl?: string;
-}
-
-export interface GearItem {
-  name: string;
-  iconUrl?: string;
-  stats: string;
-}
-
-export interface EquippedSlot {
-  label: string;
-  item: GearItem | null;
-}
-
-export interface InventoryItem {
-  name: string;
-  iconUrl?: string;
-  stats: string;
-  type: string;
-  quantity: number;
-}
+import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
+import { Character } from '../../services/character';
+import { PlayerAttack } from '../../services/battle-interfaces';
+import { Observable, Subscription, of } from 'rxjs';
 
 @Component({
   selector: 'app-vault-component',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './vault-component.html',
   styleUrls: ['./vault-component.scss'],
-  standalone: true,
-  imports: [],
 })
 export class VaultComponent implements OnInit {
-  character: Character = {
-    name: 'Wizz',
-    class: 'Warrior',
-    level: 17,
-    experiencePoints: 14950,
-    avatarUrl: '/assets/avatars/wizz.png',
-  };
-
-  equippedSlots: EquippedSlot[] = [
-    { label: 'Head', item: { name: 'Iron Helm', iconUrl: '/assets/items/iron-helm.png', stats: '+3 Armor' } },
-    { label: 'Chest', item: { name: 'Chainmail', iconUrl: '/assets/items/chainmail.png', stats: '+6 Armor' } },
-    { label: 'Weapon', item: { name: 'Longsword', iconUrl: '/assets/items/longsword.png', stats: '+10 Attack' } },
-    { label: 'Ring', item: null }
-  ];
-
-  inventory: InventoryItem[] = [
-    { name: 'Health Potion', iconUrl: '/assets/items/potion.png', stats: 'Restore 50 HP', type: 'Consumable', quantity: 2 },
-    { name: 'Mana Potion', iconUrl: '', stats: 'Restore 25 MP', type: 'Consumable', quantity: 1 },
-    { name: 'Wooden Shield', iconUrl: '/assets/items/shield.png', stats: '+2 Armor', type: 'Off-Hand', quantity: 1 }
-  ];
+  character: Character | null = null;
+  characterSub!: Subscription;
+  inventory: any[] = [];
+  equippedSlots: any[] = [];
+  attacks: PlayerAttack[] = [];
 
   defaultAvatar = '/assets/default-avatar.png';
   fallbackIcon = '/assets/fallback-item.png';
@@ -62,9 +25,68 @@ export class VaultComponent implements OnInit {
   totalItems = 0;
   uniqueGearCount = 0;
 
+  constructor(private authService: AuthService) {}
+
   ngOnInit() {
-    this.totalItems = this.inventory.length;
-    // Unique name count
-    this.uniqueGearCount = new Set(this.inventory.map(i => i.name)).size;
+    this.characterSub = this.authService.character$.subscribe(character => {
+      if (character) {
+        this.character = character;
+
+        // Inventory
+        try {
+          this.inventory = JSON.parse(character.inventoryJson || '[]');
+        } catch {
+          this.inventory = [];
+        }
+
+        // Equipment
+        try {
+          this.equippedSlots = JSON.parse(character.equipmentJson || '[]');
+        } catch {
+          this.equippedSlots = [];
+        }
+
+        // Attacks: Läs från attacks (direkt) eller attacksJson (backend), och mappa korrekt
+        if (character.attacks && character.attacks.length > 0) {
+          this.attacks = character.attacks;
+        } else if (character.attacksJson) {
+          // KAN komma in som PascalCase från backend → mappa!
+          try {
+            const rawAttacks = JSON.parse(character.attacksJson);
+            this.attacks = rawAttacks.map((atk: any) => ({
+              id: atk.Id ?? atk.id,
+              name: atk.Name ?? atk.name,
+              type: atk.Type ?? atk.type,
+              damageType: atk.DamageType ?? atk.damageType,
+              baseDamage: atk.BaseDamage ?? atk.baseDamage,
+              maxCharges: atk.MaxCharges ?? atk.maxCharges,
+              currentCharges: atk.CurrentCharges ?? atk.currentCharges,
+              scaling: atk.Scaling ?? atk.scaling ?? {},
+              requiredStats: atk.RequiredStats ?? atk.requiredStats ?? {},
+              allowedClasses: atk.AllowedClasses ?? atk.allowedClasses ?? [],
+              description: atk.Description ?? atk.description ?? '',
+            }));
+          } catch {
+            this.attacks = [];
+          }
+        } else {
+          this.attacks = [];
+        }
+
+        this.totalItems = this.inventory.reduce((sum, item) => sum + (item.quantity || 1), 0);
+        this.uniqueGearCount = new Set(this.inventory.map(i => i.name)).size;
+      } else {
+        this.character = null;
+        this.inventory = [];
+        this.equippedSlots = [];
+        this.attacks = [];
+        this.totalItems = 0;
+        this.uniqueGearCount = 0;
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.characterSub) this.characterSub.unsubscribe();
   }
 }
