@@ -1,53 +1,57 @@
 # AutoBattler
 
-**AutoBattler** is a hardcore, text-based autobattler RPG. Players control one character at a time — when they die, they're gone for good. The user's account persists across playthroughs and accumulates legacy progress like XP, cosmetics, and achievements.
+**AutoBattler** is a hardcore, text-based autobattler RPG built for web. You control a single character in turn based combat against bots and other players. When your character dies, they’re gone for good, but your account, achievements, and cosmetic progress remain!
 
-## Core Features
+## What is AutoBattler?
 
-- Text-based turn-based battles (PvE & PvP)
-- Hardcore permadeath system
-- Character creation & progression
-- Daily energy & health management
-- Gear & stat-based combat outcomes
-- Dungeons, raids, and limited-time events
-- In-game currency, shop, and cosmetics
-- Social features: friends, top players, graveyard history
+AutoBattler blends classic RPG elements with a modern, text based interface. The focus is on tactical battles, meaningful choices, and a sense of risk and progression. No flashy graphics, just tense, strategy driven gameplay anywhere, on any device.
+
+## Core Gameplay Features
+
+- **Hardcore Permadeath:**  
+  Each character can only die once. When you die, you start over with a new hero. Your account (user XP, cosmetics, and achievements) is always safe.
+
+- **Text-Based Battles:**  
+  Battles play out in stylized text. Each attack, defense, critical hit, and dodge is narrated in real time.
+
+- **Turn-Based PvE & PvP:**  
+  Fight AI enemies, raid dungeons, or challenge friends. Turns are resolved one action at a time, rewarding smart play.
+
+- **Character Creation & Progression:**  
+  Pick a class, choose your starting gear, and grow stronger by leveling up, unlocking new abilities, and finding loot.
+
+- **Energy & Health Management:**  
+  Daily limits on energy and health recovery force you to plan your battles and rest periods.
+
+- **Equipment & Stats:**  
+  Equip weapons, armor, and trinkets to boost your stats and unlock powerful synergies.
+
+- **Dungeons & Raids:**  
+  Tackle special encounters for rare rewards, some may be time limited or tied to in game events.
+
+- **In-Game Currency & Cosmetics:**  
+  Earn credits through play to buy gear, consumables, or customize your character with cosmetic items.
+
+- **Social & Legacy Progression:**  
+  Add friends, view top players, and browse the graveyard of fallen heroes. Earn account XP, titles, and badges that persist across all your characters.
 
 ## Tech Stack
 
-- **Frontend:** Angular 18 (Netlify)
-- **Backend:** .NET 8 API (Render)
-- **Database:** PostgreSQL (Render or Supabase)
-- **Authentication:** Google Sign-In (OAuth)
-- **Design:** Arcane-inspired, stylized cartoon aesthetic
+- **Frontend:** Angular 18 (deployed on Netlify)
+- **Backend:** .NET 8 Web API (deployed on Render)
+- **Database:** PostgreSQL (via Render or Supabase)
+- **Authentication:** Google Sign-In (OAuth2)
+- **Design:** Retro-futuristic style
 
-## Planned Pages
+## Project Credits
 
-- Home (patch notes, character summary)
-- Battle (bots, friends, dungeons, raids)
-- Armory (gear, stats, leveling)
-- Shop (gear, consumables, cosmetics)
-- Social (friends, leaderboards, profiles)
-- Graveyard (dead characters + stats)
-- Achievements
-- Character creation (on first login or after death)
-- Inbox / notifications
-- World lore (background story & dungeon info)
+Developed by [Ivar Gavelin](https://ivargavelin.com/).
 
-## Combat Example (Text-Based)
+---
 
-```
-The battle begins.
-Your character strikes Player 2 for 4 damage with Iron Dagger.
-Player 2 counterattacks and deals 2 damage.
-Victory! You win 5 silver coins and gain +17 XP (+2 User XP).
-```
+**Want to contribute, report bugs, or suggest features?**  
+Feel free to open an issue or pull request!
 
-## Future Plans
+---
 
-- Procedural daily events (moon cycles, special raids)
-- Cosmetic-only store linked to persistent User account
-- Deep social integration and achievements
-- Full legacy system and stat tracking
-
-###
+**(C) 2025 AutoBattler — All rights reserved**
