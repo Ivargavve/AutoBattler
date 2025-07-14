@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using backend.Data;
+using backend.Logic;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using backend.Utils;
@@ -55,6 +56,7 @@ namespace backend.Controllers
                 enemyHp = req.EnemyHp ?? selectedEnemy.MaxHp;
             }
 
+            // Gör om till klass om du vill kunna lagra tillstånd, annars kör anonymt:
             var enemy = new
             {
                 Name = selectedEnemy.Name,
@@ -63,24 +65,23 @@ namespace backend.Controllers
                 Attack = selectedEnemy.Attack,
                 Defense = selectedEnemy.Defense,
                 xp = selectedEnemy.XP,
-                CritChance = selectedEnemy.CritChance
+                CritChance = selectedEnemy.CritChance,
+                Type = selectedEnemy.Type ?? "normal"
             };
 
             var log = new List<BattleLogEntry>();
+            bool isPlayerBlocking = false;
+            bool isEnemyPoisoned = false;
 
-            // --- NY LOGIK FÖR ATTACK ---
             if (req.Action == "attack" && req.AttackId.HasValue)
             {
-                // Hämta spelarens attacker
                 var attacks = JsonSerializer.Deserialize<List<PlayerAttack>>(player.AttacksJson) ?? new List<PlayerAttack>();
-
                 var attack = attacks.FirstOrDefault(a => a.Id == req.AttackId.Value);
                 if (attack == null)
                     return BadRequest("You don't have that attack equipped.");
                 if (attack.CurrentCharges <= 0)
                     return BadRequest("No charges left on this attack.");
 
-                // Du kan lägga encounter-logik här om du vill
                 if ((enemy.Hp == enemy.MaxHp) && (player.CurrentHealth == player.MaxHealth))
                 {
                     var encounterLines = BattleDialogLines.EncounterOpeners(player.Name, player.Level, enemy.Name.ToLower());
@@ -89,51 +90,48 @@ namespace backend.Controllers
                 var playerOpeners = BattleDialogLines.PlayerOpeners(player.Name, enemy.Name.ToLower());
                 log.Add(new BattleLogEntry { Message = playerOpeners[rand.Next(playerOpeners.Length)], Type = "player-attack" });
 
-                // --- Damage calculation based on attack scaling ---
-                // Exempel: damage = baseDamage + scaling["attack"] * player.Attack + scaling["agility"] * player.Agility osv...
-                double totalDmg = attack.BaseDamage;
-                if (attack.Scaling != null)
-                {
-                    foreach (var pair in attack.Scaling)
-                    {
-                        var stat = pair.Key.ToLower();
-                        double scale = pair.Value;
-                        switch (stat)
-                        {
-                            case "attack": totalDmg += scale * player.Attack; break;
-                            case "defense": totalDmg += scale * player.Defense; break;
-                            case "agility": totalDmg += scale * player.Agility; break;
-                            // Lägg till fler statnamn om du vill ha mer scaling
-                        }
-                    }
-                }
-                double rngFactor = 0.8 + rand.NextDouble() * 0.4;
-                int rolledDamage = (int)Math.Round(totalDmg * rngFactor);
+                var attackTemplate = AttackTemplates.All.FirstOrDefault(t => t.Id == attack.Id);
+                if (attackTemplate == null)
+                    return BadRequest("Attack template not found.");
+
+                var result = AttackLogic.ApplyAttack(attackTemplate, player, enemy);
+
+                int damage = result.DamageToEnemy;
+                int heal = result.HealToPlayer;
+                isPlayerBlocking = result.BlockNextAttack;
+                isEnemyPoisoned = result.ApplyPoison;
 
                 double critRoll = rand.NextDouble();
-                bool isCrit = critRoll < player.CriticalChance;
-
-                int playerDamage = rolledDamage;
+                bool isCrit = critRoll < player.CriticalChance && damage > 0;
                 if (isCrit)
                 {
-                    playerDamage = (int)Math.Round((double)playerDamage * 2);
-                    var critLines = BattleDialogLines.CritLines(player.Name, playerDamage);
+                    damage = (int)Math.Round((double)damage * 2);
+                    var critLines = BattleDialogLines.CritLines(player.Name, damage);
                     log.Add(new BattleLogEntry { Message = critLines[rand.Next(critLines.Length)], Type = "player-crit" });
                 }
+
+                int enemyHpNew = enemy.Hp - damage;
+                player.CurrentHealth = Math.Min(player.MaxHealth, player.CurrentHealth + heal);
+
                 log.Add(new BattleLogEntry
                 {
-                    Message = $"{player.Name} uses {attack.Name} and deals {playerDamage} damage to the {enemy.Name.ToLower()}.",
-                    Type = isCrit ? "player-crit-damage" : "player-attack-damage"
+                    Message = result.Log,
+                    Type = "status"
                 });
 
-                int enemyHpNew = enemy.Hp - playerDamage;
+                if (damage > 0)
+                {
+                    log.Add(new BattleLogEntry
+                    {
+                        Message = $"{player.Name} deals {damage} damage to the {enemy.Name.ToLower()}.",
+                        Type = isCrit ? "player-crit-damage" : "player-attack-damage"
+                    });
+                }
+
                 var enemyHpLines = BattleDialogLines.EnemyHpLines(enemy.Name, Math.Max(enemyHpNew, 0), enemy.MaxHp);
                 log.Add(new BattleLogEntry { Message = enemyHpLines[rand.Next(enemyHpLines.Length)], Type = "enemy-hp" });
 
-                // --- Dra ner charges på attacken ---
                 attack.CurrentCharges -= 1;
-
-                // --- Spara tillbaka till spelarens attacker ---
                 player.AttacksJson = JsonSerializer.Serialize(attacks);
 
                 if (enemyHpNew <= 0)
@@ -197,11 +195,13 @@ namespace backend.Controllers
                         UserXp = player.User?.ExperiencePoints ?? 0,
                         UserLevel = player.User?.Level ?? 0,
                         PlayerEnergy = player.CurrentEnergy,
-                        PlayerAttacks = attacks // <-- Skicka tillbaka nya charges etc om du vill
+                        PlayerAttacks = attacks,
+                        isPlayerBlocking = isPlayerBlocking,
+                        isEnemyPoisoned = isEnemyPoisoned
                     });
                 }
 
-                // --- Enemy turn (samma som tidigare) ---
+                // --- ENEMY TURN ---
                 var enemyActions = BattleDialogLines.EnemyActions(enemy.Name.ToLower());
                 log.Add(new BattleLogEntry { Message = enemyActions[rand.Next(enemyActions.Length)], Type = "enemy-action" });
 
@@ -220,6 +220,18 @@ namespace backend.Controllers
                     enemyDamage = (int)Math.Round((double)enemyDamage * 2);
                     var enemyCritLines = BattleDialogLines.EnemyCritLines(enemy.Name.ToLower(), enemyDamage);
                     log.Add(new BattleLogEntry { Message = enemyCritLines[rand.Next(enemyCritLines.Length)], Type = "enemy-crit" });
+                }
+
+                // --- Här kan du använda isPlayerBlocking för att modifiera skada ---
+                // Exempel: Om block aktiv, reducera eller ignorera damage
+                if (isPlayerBlocking)
+                {
+                    enemyDamage = 0; // Eller t.ex. enemyDamage /= 2;
+                    log.Add(new BattleLogEntry
+                    {
+                        Message = $"{player.Name} blocks the enemy attack! 🛡️",
+                        Type = "status"
+                    });
                 }
 
                 log.Add(new BattleLogEntry
@@ -271,7 +283,9 @@ namespace backend.Controllers
                         UserXp = player.User?.ExperiencePoints ?? 0,
                         UserLevel = player.User?.Level ?? 0,
                         PlayerEnergy = player.CurrentEnergy,
-                        PlayerAttacks = attacks // <-- Skicka tillbaka nya charges etc om du vill
+                        PlayerAttacks = attacks,
+                        isPlayerBlocking = false, // Player är död -> ingen block
+                        isEnemyPoisoned = isEnemyPoisoned
                     });
                 }
 
@@ -290,7 +304,7 @@ namespace backend.Controllers
 
                 return Ok(new
                 {
-                    PlayerHp = playerHpNew,
+                    PlayerHp = player.CurrentHealth,
                     PlayerMaxHp = player.MaxHealth,
                     EnemyHp = enemyHpNew,
                     EnemyMaxHp = enemy.MaxHp,
@@ -303,7 +317,9 @@ namespace backend.Controllers
                     UserXp = player.User?.ExperiencePoints ?? 0,
                     UserLevel = player.User?.Level ?? 0,
                     PlayerEnergy = player.CurrentEnergy,
-                    PlayerAttacks = attacks // <-- Skicka tillbaka nya charges etc om du vill
+                    PlayerAttacks = attacks,
+                    isPlayerBlocking = false, // Block bara aktiv för en turn
+                    isEnemyPoisoned = isEnemyPoisoned
                 });
             }
             return BadRequest("Unknown action or missing attack id");
@@ -331,7 +347,6 @@ namespace backend.Controllers
         public string Type { get; set; } = "";
     }
 
-    // --- NYTT: Klass för spelarens attacker (används vid deserialisering) ---
     public class PlayerAttack
     {
         public int Id { get; set; }

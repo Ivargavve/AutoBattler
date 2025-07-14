@@ -14,37 +14,41 @@ namespace backend.Data
         public Dictionary<string, int> RequiredStats { get; set; } = new();
         public List<string> AllowedClasses { get; set; } = new();
         public string Description { get; set; } = "";
+        public int HealAmount { get; set; } = 0;         // Heal-effekt (om > 0)
+        public bool BlockNextAttack { get; set; } = false; // Om attacken blockar nästa attack
+        public bool Poison { get; set; } = false;        // Sätts true för poison-effekter
     }
 
     public static class AttackTemplates
     {
         public static List<AttackTemplate> All = new List<AttackTemplate>
         {
+            // === WARRIOR ATTACKS ===
             new AttackTemplate
             {
                 Id = 1,
                 Name = "Slash",
                 Type = "physical",
-                DamageType = "blunt",
+                DamageType = "slashing",
                 BaseDamage = 10,
                 MaxCharges = 8,
-                Scaling = new Dictionary<string, double> { { "attack", 1.0 }, { "agility", 0.2 } },
+                Scaling = new Dictionary<string, double> { { "attack", 1.1 }, { "agility", 0.2 } },
                 RequiredStats = new Dictionary<string, int> { { "attack", 5 } },
                 AllowedClasses = new List<string> { "warrior" },
-                Description = "A quick physical attack."
+                Description = "A quick slashing attack."
             },
             new AttackTemplate
             {
                 Id = 2,
-                Name = "Fireball",
-                Type = "magic",
-                DamageType = "fire",
-                BaseDamage = 12,
+                Name = "Cleave",
+                Type = "physical",
+                DamageType = "slashing",
+                BaseDamage = 14,
                 MaxCharges = 5,
-                Scaling = new Dictionary<string, double> { { "magic", 1.0 }, { "attack", 0.2 } },
-                RequiredStats = new Dictionary<string, int> { { "magic", 10 } },
-                AllowedClasses = new List<string> { "mage" },
-                Description = "A burning magical fireball."
+                Scaling = new Dictionary<string, double> { { "attack", 1.3 }, { "speed", 0.2 } },
+                RequiredStats = new Dictionary<string, int> { { "attack", 12 } },
+                AllowedClasses = new List<string> { "warrior" },
+                Description = "A heavy cleaving attack that can hit multiple foes."
             },
             new AttackTemplate
             {
@@ -52,16 +56,101 @@ namespace backend.Data
                 Name = "Shield Block",
                 Type = "defense",
                 DamageType = "none",
-                BaseDamage = 0,
+                BaseDamage = 2, // Liten motattack-skada
                 MaxCharges = 3,
-                Scaling = new Dictionary<string, double> { { "defense", 1.2 } },
+                Scaling = new Dictionary<string, double> { { "defense", 1.0 } },
                 RequiredStats = new Dictionary<string, int> { { "defense", 10 } },
-                AllowedClasses = new List<string> { "warrior", "paladin" },
-                Description = "Block the next incoming attack, reducing damage taken."
+                AllowedClasses = new List<string> { "warrior" },
+                BlockNextAttack = true,
+                Description = "Blocks the next incoming attack and deals minimal damage."
             },
             new AttackTemplate
             {
                 Id = 4,
+                Name = "Battle Shout",
+                Type = "buff",
+                DamageType = "none",
+                BaseDamage = 0,
+                MaxCharges = 2,
+                Scaling = new Dictionary<string, double> { },
+                RequiredStats = new Dictionary<string, int> { { "attack", 8 } },
+                AllowedClasses = new List<string> { "warrior" },
+                Description = "Increases your attack for the next two turns."
+            },
+
+            // === PALADIN ATTACKS ===
+            new AttackTemplate
+            {
+                Id = 5,
+                Name = "Smite",
+                Type = "magic",
+                DamageType = "holy",
+                BaseDamage = 12,
+                MaxCharges = 6,
+                Scaling = new Dictionary<string, double> { { "magic", 1.0 }, { "attack", 0.5 } },
+                RequiredStats = new Dictionary<string, int> { { "magic", 9 } },
+                AllowedClasses = new List<string> { "paladin" },
+                Description = "A holy strike against evil."
+            },
+            new AttackTemplate
+            {
+                Id = 6,
+                Name = "Holy Light",
+                Type = "magic",
+                DamageType = "holy",
+                BaseDamage = 0,
+                MaxCharges = 3,
+                Scaling = new Dictionary<string, double> { { "magic", 1.5 } },
+                RequiredStats = new Dictionary<string, int> { { "magic", 12 } },
+                AllowedClasses = new List<string> { "paladin" },
+                HealAmount = 18,
+                Description = "Heals the user for a large amount. Does extra damage to undead."
+            },
+            new AttackTemplate
+            {
+                Id = 7,
+                Name = "Sacred Shield",
+                Type = "defense",
+                DamageType = "none",
+                BaseDamage = 2, // Liten skada
+                MaxCharges = 2,
+                Scaling = new Dictionary<string, double> { { "defense", 1.2 } },
+                RequiredStats = new Dictionary<string, int> { { "defense", 11 } },
+                AllowedClasses = new List<string> { "paladin" },
+                BlockNextAttack = true,
+                Description = "Blocks the next incoming attack and grants a small heal."
+            },
+            new AttackTemplate
+            {
+                Id = 8,
+                Name = "Judgement",
+                Type = "magic",
+                DamageType = "holy",
+                BaseDamage = 16,
+                MaxCharges = 4,
+                Scaling = new Dictionary<string, double> { { "magic", 1.4 } },
+                RequiredStats = new Dictionary<string, int> { { "magic", 14 } },
+                AllowedClasses = new List<string> { "paladin" },
+                Description = "Delivers divine judgement on the enemy."
+            },
+
+            // === MAGE ATTACKS ===
+            new AttackTemplate
+            {
+                Id = 9,
+                Name = "Fireball",
+                Type = "magic",
+                DamageType = "fire",
+                BaseDamage = 13,
+                MaxCharges = 6,
+                Scaling = new Dictionary<string, double> { { "magic", 1.1 }, { "attack", 0.2 } },
+                RequiredStats = new Dictionary<string, int> { { "magic", 10 } },
+                AllowedClasses = new List<string> { "mage" },
+                Description = "A burning magical fireball."
+            },
+            new AttackTemplate
+            {
+                Id = 10,
                 Name = "Ice Shard",
                 Type = "magic",
                 DamageType = "ice",
@@ -74,55 +163,139 @@ namespace backend.Data
             },
             new AttackTemplate
             {
-                Id = 5,
-                Name = "Cleave",
-                Type = "physical",
-                DamageType = "slashing",
-                BaseDamage = 14,
-                MaxCharges = 6,
-                Scaling = new Dictionary<string, double> { { "attack", 1.2 }, { "speed", 0.2 } },
-                RequiredStats = new Dictionary<string, int> { { "attack", 12 } },
-                AllowedClasses = new List<string> { "warrior", "paladin" },
-                Description = "A heavy cleaving attack that hits hard."
+                Id = 11,
+                Name = "Arcane Blast",
+                Type = "magic",
+                DamageType = "arcane",
+                BaseDamage = 15,
+                MaxCharges = 4,
+                Scaling = new Dictionary<string, double> { { "magic", 1.4 } },
+                RequiredStats = new Dictionary<string, int> { { "magic", 15 } },
+                AllowedClasses = new List<string> { "mage" },
+                Description = "A powerful arcane blast."
             },
             new AttackTemplate
             {
-                Id = 6,
+                Id = 12,
+                Name = "Mana Shield",
+                Type = "defense",
+                DamageType = "none",
+                BaseDamage = 0,
+                MaxCharges = 3,
+                Scaling = new Dictionary<string, double> { { "magic", 0.7 } },
+                RequiredStats = new Dictionary<string, int> { { "magic", 10 } },
+                AllowedClasses = new List<string> { "mage" },
+                BlockNextAttack = true,
+                Description = "Creates a shield of mana to absorb the next attack."
+            },
+
+            // === ROGUE ATTACKS ===
+            new AttackTemplate
+            {
+                Id = 13,
                 Name = "Quick Shot",
                 Type = "physical",
                 DamageType = "piercing",
-                BaseDamage = 8,
-                MaxCharges = 6,
+                BaseDamage = 9,
+                MaxCharges = 8,
                 Scaling = new Dictionary<string, double> { { "attack", 0.7 }, { "agility", 0.8 } },
                 RequiredStats = new Dictionary<string, int> { { "agility", 9 } },
-                AllowedClasses = new List<string> { "ranger", "rogue" },
+                AllowedClasses = new List<string> { "rogue" },
                 Description = "A swift ranged attack."
             },
             new AttackTemplate
             {
-                Id = 7,
-                Name = "Holy Light",
-                Type = "magic",
-                DamageType = "holy",
-                BaseDamage = 15,
-                MaxCharges = 3,
-                Scaling = new Dictionary<string, double> { { "magic", 1.3 } },
-                RequiredStats = new Dictionary<string, int> { { "magic", 12 } },
-                AllowedClasses = new List<string> { "paladin" },
-                Description = "A holy spell that damages undead and heals the user."
-            },
-            new AttackTemplate
-            {
-                Id = 8,
+                Id = 14,
                 Name = "Poison Strike",
                 Type = "physical",
                 DamageType = "poison",
-                BaseDamage = 9,
+                BaseDamage = 7,
                 MaxCharges = 9,
                 Scaling = new Dictionary<string, double> { { "attack", 0.8 }, { "agility", 0.5 } },
                 RequiredStats = new Dictionary<string, int> { { "agility", 10 } },
                 AllowedClasses = new List<string> { "rogue" },
+                Poison = true,
                 Description = "A strike that poisons the enemy over time."
+            },
+            new AttackTemplate
+            {
+                Id = 15,
+                Name = "Shadowstep",
+                Type = "utility",
+                DamageType = "none",
+                BaseDamage = 0,
+                MaxCharges = 3,
+                Scaling = new Dictionary<string, double> { { "agility", 1.0 } },
+                RequiredStats = new Dictionary<string, int> { { "agility", 12 } },
+                AllowedClasses = new List<string> { "rogue" },
+                Description = "Evades the next attack and increases your critical chance for 1 turn."
+            },
+            new AttackTemplate
+            {
+                Id = 16,
+                Name = "Backstab",
+                Type = "physical",
+                DamageType = "piercing",
+                BaseDamage = 15,
+                MaxCharges = 3,
+                Scaling = new Dictionary<string, double> { { "attack", 1.3 } },
+                RequiredStats = new Dictionary<string, int> { { "agility", 11 } },
+                AllowedClasses = new List<string> { "rogue" },
+                Description = "Deals massive damage when striking from the shadows."
+            },
+
+            // === RANGER ATTACKS ===
+            new AttackTemplate
+            {
+                Id = 17,
+                Name = "Piercing Arrow",
+                Type = "physical",
+                DamageType = "piercing",
+                BaseDamage = 11,
+                MaxCharges = 7,
+                Scaling = new Dictionary<string, double> { { "attack", 0.9 }, { "agility", 0.7 } },
+                RequiredStats = new Dictionary<string, int> { { "agility", 10 } },
+                AllowedClasses = new List<string> { "ranger" },
+                Description = "An arrow shot that pierces armor."
+            },
+            new AttackTemplate
+            {
+                Id = 18,
+                Name = "Multi-Shot",
+                Type = "physical",
+                DamageType = "piercing",
+                BaseDamage = 7,
+                MaxCharges = 5,
+                Scaling = new Dictionary<string, double> { { "attack", 0.5 }, { "agility", 0.5 } },
+                RequiredStats = new Dictionary<string, int> { { "agility", 12 } },
+                AllowedClasses = new List<string> { "ranger" },
+                Description = "Fires multiple arrows at once for combined damage."
+            },
+            new AttackTemplate
+            {
+                Id = 19,
+                Name = "Nature's Grasp",
+                Type = "magic",
+                DamageType = "nature",
+                BaseDamage = 8,
+                MaxCharges = 4,
+                Scaling = new Dictionary<string, double> { { "magic", 0.9 } },
+                RequiredStats = new Dictionary<string, int> { { "magic", 8 } },
+                AllowedClasses = new List<string> { "ranger" },
+                Description = "Roots the enemy and deals nature damage."
+            },
+            new AttackTemplate
+            {
+                Id = 20,
+                Name = "Camouflage",
+                Type = "utility",
+                DamageType = "none",
+                BaseDamage = 0,
+                MaxCharges = 2,
+                Scaling = new Dictionary<string, double> { { "agility", 1.2 } },
+                RequiredStats = new Dictionary<string, int> { { "agility", 13 } },
+                AllowedClasses = new List<string> { "ranger" },
+                Description = "Evades the next attack and increases your chance to land a critical hit."
             }
         };
     }

@@ -3,22 +3,30 @@ export interface Fighter {
   name: string;
   hp: number;
   maxHp: number;
+  // Lägg till fler stats om du vill visa t.ex. attack, defense, etc.
 }
 
 export interface BattleResponse {
   playerHp: number;
   playerMaxHp: number;
+  playerEnergy: number;
+
   enemyHp: number;
   enemyMaxHp: number;
-  battleLog: string[];
+  enemyName: string;
+
+  battleLog: BattleLogEntry[];
   battleEnded: boolean;
   gainedXp?: number;
   newExperiencePoints?: number;
   playerLevel?: number;
   userXp?: number;
   userLevel?: number;
-  playerEnergy?: number;
-  enemyName: string; 
+
+  // Status flags från backend för effekter som visas i UI:
+  isPlayerBlocking?: boolean;
+  isEnemyPoisoned?: boolean;
+  // Du kan lägga till fler: t.ex. isPlayerPoisoned, isEnemyBlocking, etc.
 }
 
 export interface BattleLogEntry {

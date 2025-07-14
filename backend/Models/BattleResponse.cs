@@ -13,4 +13,10 @@ public class BattleResponse
     public int PlayerLevel { get; set; }
     public int UserXp { get; set; }
     public int UserLevel { get; set; }
+    
+    
+    public bool IsBlocking { get; set; }       // Om spelaren har block aktiv
+    public bool EnemyIsPoisoned { get; set; }  // Om fienden är poisoned
+    public int HealThisTurn { get; set; }      // Hur mycket healades denna runda
+    public int PoisonDamageThisTurn { get; set; } // Skada av poison denna runda
 }

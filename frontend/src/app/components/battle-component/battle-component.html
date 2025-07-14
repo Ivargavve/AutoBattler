@@ -12,10 +12,7 @@
     <div class="battle-log-wrapper">
       <div class="battle-log" #battleLogContainer>
         <ng-container *ngFor="let log of battleLog">
-          <!-- Divider för turn -->
           <div *ngIf="log.message.trim() === '--- End of turn ---'" class="battle-divider"></div>
-          
-          <!-- HP-row: två färger på samma rad -->
           <ng-container *ngIf="log.type === 'hp-row'">
             <div class="battle-hp-row">
               <span class="player-hp">
@@ -27,8 +24,6 @@
               </span>
             </div>
           </ng-container>
-
-          <!-- Alla andra loggar -->
           <ng-container *ngIf="log.type !== 'hp-row' && log.message.trim() !== '--- End of turn ---'">
             <div [ngClass]="getLogClass(log)">
               {{ log.message }}
@@ -36,13 +31,12 @@
           </ng-container>
         </ng-container>
 
-        <!-- NEW NEXT BUTTON: Centrerad längst ned -->
+        <!-- NEXT BUTTON -->
         <div *ngIf="battleEnded && showNextButton" class="battle-next-btn-row-centered">
           <button (click)="nextBattle()" class="next-chevron-btn">
             <span class="chevron">&gt;&gt;</span>
           </button>
         </div>
-
       </div>
     </div>
 
@@ -55,35 +49,56 @@
       </div>
       <div class="battle-controls-col">
         <div class="fighter-row">
+
+          <!-- PLAYER INFO -->
           <div class="player-info">
-            <div class="name">{{ player?.name }}</div>
+            <div class="name">
+              {{ player?.name }}
+              <!-- STATUS BADGES FÖR PLAYER -->
+              <span class="status-badge block" *ngIf="isPlayerBlocking">🛡️ Block</span>
+              <!-- Exempel: Visa heal, om du vill ha -->
+              <!-- <span class="status-badge heal" *ngIf="lastPlayerHeal > 0">💚 Heal</span> -->
+            </div>
             <div class="hp">HP: {{ player?.hp }} / {{ player?.maxHp }}</div>
           </div>
+
           <div class="vs">VS</div>
+
+          <!-- ENEMY INFO -->
           <div class="enemy-info">
-            <div class="name">{{ enemy?.name }}</div>
+            <div class="name">
+              {{ enemy?.name }}
+              <!-- STATUS BADGES FÖR ENEMY -->
+              <span class="status-badge poison" *ngIf="isEnemyPoisoned">☠️ Poison</span>
+            </div>
             <div class="hp">HP: {{ enemy?.hp }} / {{ enemy?.maxHp }}</div>
           </div>
+
         </div>
 
         <!-- Attack Buttons: Alltid 4 knappar -->
         <div class="battle-attack-buttons">
-          <button
-            *ngFor="let attack of displayAttacks"
-            class="attack-btn"
-            [disabled]="attack.id === -1 || attack.currentCharges <= 0 || isLoading || battleEnded"
-            (click)="attack.id !== -1 ? useAttack(attack) : null"
-            [title]="attack.description"
-          >
-            <span class="attack-label">{{ attack.name }}</span>
-            <span class="attack-charges" *ngIf="attack.id !== -1">{{ attack.currentCharges }}/{{ attack.maxCharges }}</span>
-            <span class="attack-charges" *ngIf="attack.id === -1">0/0</span>
-          </button>
-        </div>
+        <button
+          *ngFor="let attack of displayAttacks"
+          class="attack-btn"
+          [disabled]="attack.id === -1 || attack.currentCharges <= 0 || isLoading || battleEnded"
+          (click)="attack.id !== -1 ? selectAttack(attack) : null"
+          (mouseenter)="attack.id !== -1 ? setHoveredAttack(attack) : null"
+          (mouseleave)="clearHoveredAttack()"
+        >
+          <span class="attack-label">{{ attack.name }}</span>
+          <span class="attack-charges" *ngIf="attack.id !== -1">{{ attack.currentCharges }}/{{ attack.maxCharges }}</span>
+          <span class="attack-charges" *ngIf="attack.id === -1">0/0</span>
+        </button>
+      </div>
 
-        <!-- Run Button -->
-        <div class="battle-run-btn-row">
-          <button (click)="runFromBattle()" class="attack-btn run-btn" style="color:#fff; background:#b33;">Run</button>
+        <div class="attack-row-bottom">
+          <div class="attack-description-box">
+            {{ getAttackDescription() }}
+          </div>
+          <div class="battle-run-btn-row">
+            <button (click)="runFromBattle()" class="attack-btn run-btn">Run</button>
+          </div>
         </div>
       </div>
     </div>
