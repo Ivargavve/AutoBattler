@@ -10,7 +10,7 @@ namespace backend.Utils
         public int Defense { get; set; }
         public int XP { get; set; }
         public double CritChance { get; set; }
-        public string Type { get; set; } = "normal"; // undead, beast, human, dragon, demon, construct, elemental etc.
+        public string Type { get; set; } = "normal"; 
     }
 
     public static class EnemyTemplates
@@ -41,7 +41,7 @@ namespace backend.Utils
             new EnemyTemplate { Name = "Young Dragon", MaxHp = 50, Attack = 28, Defense = 7, XP = 140, CritChance = 0.17, Type = "dragon" },
             new EnemyTemplate { Name = "Ancient Dragon", MaxHp = 120, Attack = 42, Defense = 12, XP = 480, CritChance = 0.21, Type = "dragon" },
 
-            // Construct (magic robot/armor/golem)
+            // Construct 
             new EnemyTemplate { Name = "Stone Golem", MaxHp = 40, Attack = 17, Defense = 9, XP = 80, CritChance = 0.04, Type = "construct" },
             new EnemyTemplate { Name = "Animated Armor", MaxHp = 23, Attack = 14, Defense = 7, XP = 38, CritChance = 0.07, Type = "construct" },
 
@@ -49,7 +49,7 @@ namespace backend.Utils
             new EnemyTemplate { Name = "Fire Elemental", MaxHp = 25, Attack = 19, Defense = 2, XP = 55, CritChance = 0.13, Type = "elemental" },
             new EnemyTemplate { Name = "Ice Elemental", MaxHp = 23, Attack = 16, Defense = 3, XP = 51, CritChance = 0.11, Type = "elemental" },
 
-            // Fun extras
+            // Extras
             new EnemyTemplate { Name = "Haunted Toaster", MaxHp = 8, Attack = 6, Defense = 1, XP = 9, CritChance = 0.18, Type = "construct" },
             new EnemyTemplate { Name = "Buff Squirrel", MaxHp = 12, Attack = 14, Defense = 1, XP = 13, CritChance = 0.15, Type = "beast" },
             new EnemyTemplate { Name = "Social Media Troll", MaxHp = 16, Attack = 13, Defense = 1, XP = 19, CritChance = 0.15, Type = "human" }

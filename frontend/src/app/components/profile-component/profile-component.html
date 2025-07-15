@@ -1,13 +1,10 @@
 <div class="profile-bg">
   <div class="profile-page">
-
-    <!-- Profile data (user) and character both load after user$ resolves -->
     <ng-container *ngIf="user$ | async as user; else loading">
 
       <!-- User Profile Card -->
       <div class="profile-card">
         <div class="profile-header">
-          <!-- User profile picture -->
           <img [src]="user.profilePictureUrl" alt="Profile Picture" class="profile-pic" />
           <h2 class="username">{{ user.username }}</h2>
         </div>
@@ -24,11 +21,10 @@
         </div>
       </div>
 
-      <!-- Character Profile Card (same classes as user) -->
+      <!-- Character Profile Card -->
       <ng-container *ngIf="character$ | async as character; else noCharacter">
         <div class="profile-card character-profile-card">
           <div class="profile-header">
-            <!-- Character profile icon -->
             <img [src]="character.profileIconUrl" alt="Character Image" class="profile-pic" />
             <h2 class="username">{{ character.name || 'Character' }}</h2>
           </div>

@@ -1,6 +1,6 @@
 # AutoBattler
 
-**AutoBattler** is a hardcore, text-based autobattler RPG built for web. You control a single character in turn based combat against bots and other players. When your character dies, they’re gone for good, but your account, achievements, and cosmetic progress remain!
+**AutoBattler** is a hardcore, text based autobattler RPG built for web. You control a single character in turn based combat against bots and other players. When your character dies, they’re gone for good, but your account, achievements, and cosmetic progress remain!
 
 ## What is AutoBattler?
 

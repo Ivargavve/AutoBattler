@@ -56,8 +56,6 @@
               {{ player?.name }}
               <!-- STATUS BADGES FÖR PLAYER -->
               <span class="status-badge block" *ngIf="isPlayerBlocking">🛡️ Block</span>
-              <!-- Exempel: Visa heal, om du vill ha -->
-              <!-- <span class="status-badge heal" *ngIf="lastPlayerHeal > 0">💚 Heal</span> -->
             </div>
             <div class="hp">HP: {{ player?.hp }} / {{ player?.maxHp }}</div>
           </div>
@@ -76,7 +74,7 @@
 
         </div>
 
-        <!-- Attack Buttons: Alltid 4 knappar -->
+        <!-- Attack Buttons -->
         <div class="battle-attack-buttons">
         <button
           *ngFor="let attack of displayAttacks"

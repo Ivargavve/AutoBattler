@@ -17,8 +17,8 @@ namespace backend.Logic
     {
         public static AttackResult ApplyAttack(
             AttackTemplate template,
-            dynamic player,  // Du kan använda din Character här (har nu rätt stats!)
-            dynamic enemy    // Kan vara EnemyTemplate eller ett anonymt objekt
+            dynamic player,  
+            dynamic enemy  
         )
         {
             int damage = template.BaseDamage;
@@ -28,7 +28,6 @@ namespace backend.Logic
             string log = "";
             var effects = new List<string>();
 
-            // --- SCALING ---
             if (template.Scaling != null)
             {
                 foreach (var pair in template.Scaling)
@@ -42,12 +41,10 @@ namespace backend.Logic
                         case "defense": damage += (int)(scale * (player.Defense ?? 0)); break;
                         case "agility": damage += (int)(scale * (player.Agility ?? 0)); break;
                         case "speed": damage += (int)(scale * (player.Speed ?? 0)); break;
-                        // Lägg till fler stats här om du har fler i din modell!
                     }
                 }
             }
 
-            // --- SPECIALFALL FÖR NAMNGIVNA ATTACKER ---
             switch (template.Name)
             {
                 case "Holy Light":
@@ -61,7 +58,7 @@ namespace backend.Logic
                     }
                     else
                     {
-                        damage = 0; // Ingen skada mot icke-undead
+                        damage = 0;
                     }
                     break;
 
@@ -87,7 +84,6 @@ namespace backend.Logic
                     break;
 
                 case "Battle Shout":
-                    // Här kan du lägga till buff-return, just nu bara log
                     effects.Add($"{player.Name} uses Battle Shout and increases attack for 2 turns!");
                     damage = 0;
                     break;
@@ -104,7 +100,6 @@ namespace backend.Logic
                     break;
             }
 
-            // --- GENERELLA EFFEKTER OM INTE REDAN LOGGADE ---
             if (heal > 0 && template.Name != "Holy Light")
             {
                 effects.Add($"{player.Name} heals for {heal} HP!");

@@ -17,7 +17,6 @@ namespace backend.Controllers
             _db = db;
         }
 
-        // GET: api/users/me
         [HttpGet("me")]
         [Authorize]
         public async Task<IActionResult> GetMyProfile()
@@ -55,7 +54,6 @@ namespace backend.Controllers
             });
         }
 
-        // GET: api/users/{username}
         [HttpGet("{username}")]
         [Authorize]
         public async Task<IActionResult> GetUserByUsername(string username)
@@ -87,7 +85,6 @@ namespace backend.Controllers
             });
         }
 
-        // GET: api/users
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetAllUsers()

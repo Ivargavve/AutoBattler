@@ -191,7 +191,6 @@ body, html {
     border-color 0.18s, 
     background 0.19s;
 
-  // Hover-effekt som liknar karaktärskortet
   &:hover {
     cursor:pointer;
     border-color: var(--accent-hover, #baffd8);
@@ -735,7 +734,7 @@ nav a {
   height: 100%;
   flex: 1 1 0;
   min-height: 0;
-  display: flex;       // Gör så att barnen kan flexa ut hela ytan om du använder flex internt
+  display: flex;       
   flex-direction: column;
 }
 

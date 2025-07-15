@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service'; // Anpassa path om nödvändigt
+import { AuthService } from '../../services/auth.service'; 
 import { Character } from '../../services/character';
 
 @Component({

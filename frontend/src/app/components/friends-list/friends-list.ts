@@ -45,7 +45,6 @@ export class FriendsListComponent implements OnInit {
     this.loadFriends();
     this.loadPendingRequests();
 
-    // Vänlistans sökruta (filtrerar bara egna vänner)
     this.searchControl.valueChanges.pipe(
       startWith(''),
       debounceTime(250),
@@ -54,7 +53,6 @@ export class FriendsListComponent implements OnInit {
       this.filterFriends(search);
     });
 
-    // Sökfältet i modal för att lägga till nya vänner
     this.addFriendSearchControl.valueChanges.pipe(
       debounceTime(250),
       map(value => (value ?? '').trim())
@@ -82,18 +80,15 @@ export class FriendsListComponent implements OnInit {
     event.stopPropagation();
     this.selectedFriend = friend;
     const rect = (event.target as HTMLElement).getBoundingClientRect();
-    // Justera + scroll om nödvändigt!
     this.menuPosition = {
       top: rect.bottom + window.scrollY + 2,
-      left: rect.right + window.scrollX - 160 // justera detta vid behov
+      left: rect.right + window.scrollX - 160 
     };
     this.menuOpen = true;
   }
 
-  // Nytt! Stänger popupen om man klickar utanför popup eller pluppar.
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
-    // Hitta popup och alla plupp-knappar
     const menuElem = document.querySelector('.friend-popup-menu');
     const btnElems = Array.from(document.querySelectorAll('.friend-menu-btn'));
     const clickedMenu = menuElem && menuElem.contains(event.target as Node);
@@ -102,7 +97,6 @@ export class FriendsListComponent implements OnInit {
       this.menuOpen = false;
     }
 
-    // Hantera addFriend-overlay separat (stäng vid klick utanför overlay)
     if (this.addFriendMode) {
       const addOverlay = document.querySelector('.add-friend-overlay');
       if (addOverlay && !addOverlay.contains(event.target as Node)) {
@@ -179,7 +173,6 @@ export class FriendsListComponent implements OnInit {
     }
   }
 
-  // OBS! userSearchResults används bara om du har gamla sök på alla – annars kan du ta bort searchUsers helt.
   searchUsers(query: string) {
     this.searchingUsers = true;
     this.friendsService.searchUsers(query).subscribe({
@@ -201,7 +194,6 @@ export class FriendsListComponent implements OnInit {
       next: () => {
         this.loadFriends();
         this.loadPendingRequests();
-        // Nollställ även popup-resultat direkt efter add, för tydlig feedback
         this.addFriendResults = [];
         this.addFriendSearchControl.setValue('');
         this.addLoadingUserId = null;
@@ -270,14 +262,12 @@ export class FriendsListComponent implements OnInit {
     });
   }
   goToChallenge(friend: Friend) {
-    // För "Challenge"
     this.menuOpen = false;
     this.router.navigate(['/battle-planner'], {
       queryParams: { opponent: friend.username }
     });
   }
   goToMakGora(friend: Friend) {
-    // För "Mak' Gora"
     this.menuOpen = false;
     this.router.navigate(['/battle-planner'], {
       queryParams: { opponent: friend.username, makgora: true }

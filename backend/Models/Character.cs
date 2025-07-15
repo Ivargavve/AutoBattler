@@ -25,8 +25,8 @@ namespace backend.Models
         public int Magic { get; set; } = 0;      
         public int Speed { get; set; } = 0;      
         public int HealAmount { get; set; } = 0;
-        public int PoisonedTurns { get; set; } = 0; // Hur många rundor poisoned (för frontend/backend state)
-        public bool IsBlocking { get; set; } = false; // Block-status
+        public int PoisonedTurns { get; set; } = 0; 
+        public bool IsBlocking { get; set; } = false; 
         public double CriticalChance { get; set; } = 0.05;
 
         public int Credits { get; set; } = 0;

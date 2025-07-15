@@ -18,7 +18,6 @@ namespace backend.Controllers
             _db = db;
         }
 
-        // 1. Return all confirmed friends (for Friend interface)
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetMyFriends()
@@ -38,7 +37,7 @@ namespace backend.Controllers
                 var user = f.RequesterId == myId ? f.Addressee : f.Requester;
                 return new
                 {
-                    friendshipId = f.Id, // <-- Här skickas det med!
+                    friendshipId = f.Id, 
                     id = user.Id,
                     username = user.Username,
                     fullName = user.FullName,
@@ -51,7 +50,6 @@ namespace backend.Controllers
             return Ok(friendList);
         }
 
-        // 2. Search users (for UserSearchResult interface)
         [HttpGet("search-users")]
         [Authorize]
         public async Task<IActionResult> SearchUsers([FromQuery] string query)
@@ -110,7 +108,6 @@ namespace backend.Controllers
             return Ok(result);
         }
 
-        // 3. Friend requests (for PendingRequest interface)
         [HttpGet("requests")]
         [Authorize]
         public async Task<IActionResult> GetMyFriendRequests()
@@ -138,7 +135,6 @@ namespace backend.Controllers
             return Ok(pendingRequests);
         }
 
-        // 4. Accept a friend request
         [HttpPost("accept/{friendshipId}")]
         [Authorize]
         public async Task<IActionResult> AcceptFriendRequest(int friendshipId)
@@ -159,7 +155,6 @@ namespace backend.Controllers
             return Ok(new { message = "Friend request accepted." });
         }
 
-        // 5. Send friend request by user id
         [HttpPost("request/{addresseeId}")]
         [Authorize]
         public async Task<IActionResult> SendFriendRequest(int addresseeId)
@@ -192,7 +187,6 @@ namespace backend.Controllers
             return Ok(new { message = "Friend request sent." });
         }
 
-        // 6. Remove friendship or request
         [HttpDelete("{friendshipId}")]
         [Authorize]
         public async Task<IActionResult> DeleteFriendship(int friendshipId)

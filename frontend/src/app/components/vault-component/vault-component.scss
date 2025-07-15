@@ -227,7 +227,6 @@
   .character-avatar, .gear-icon, .inv-icon { width: 52px; height: 52px; }
 }
 
-/* --- Character Attacks --- */
 .character-attacks-box {
   background: #18181d;
   border: 1px solid #262631;
@@ -312,7 +311,6 @@
 }
 
 .attack-item span {
-  /* Inherit font for all stat labels inside attack-item */
   font-family: inherit;
 }
 
@@ -335,7 +333,6 @@
   margin-top: 0.08em;
 }
 
-/* Responsive for attacks */
 @media (max-width: 700px) {
   .character-attacks-box {
     padding: 0.74rem 0.4rem 0.2rem 0.4rem;

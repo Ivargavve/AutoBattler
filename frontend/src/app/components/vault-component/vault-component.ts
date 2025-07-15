@@ -31,26 +31,21 @@ export class VaultComponent implements OnInit {
     this.characterSub = this.authService.character$.subscribe(character => {
       if (character) {
         this.character = character;
-
-        // Inventory
         try {
           this.inventory = JSON.parse(character.inventoryJson || '[]');
         } catch {
           this.inventory = [];
         }
 
-        // Equipment
         try {
           this.equippedSlots = JSON.parse(character.equipmentJson || '[]');
         } catch {
           this.equippedSlots = [];
         }
 
-        // Attacks: Läs från attacks (direkt) eller attacksJson (backend), och mappa korrekt
         if (character.attacks && character.attacks.length > 0) {
           this.attacks = character.attacks;
         } else if (character.attacksJson) {
-          // KAN komma in som PascalCase från backend → mappa!
           try {
             const rawAttacks = JSON.parse(character.attacksJson);
             this.attacks = rawAttacks.map((atk: any) => ({

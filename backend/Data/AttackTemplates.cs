@@ -6,7 +6,7 @@ namespace backend.Data
     {
         public int Id { get; set; }
         public string Name { get; set; } = "";
-        public string Type { get; set; } = ""; // physical, magic, etc.
+        public string Type { get; set; } = ""; 
         public string DamageType { get; set; } = "";
         public int BaseDamage { get; set; }
         public int MaxCharges { get; set; }
@@ -14,16 +14,15 @@ namespace backend.Data
         public Dictionary<string, int> RequiredStats { get; set; } = new();
         public List<string> AllowedClasses { get; set; } = new();
         public string Description { get; set; } = "";
-        public int HealAmount { get; set; } = 0;         // Heal-effekt (om > 0)
-        public bool BlockNextAttack { get; set; } = false; // Om attacken blockar nästa attack
-        public bool Poison { get; set; } = false;        // Sätts true för poison-effekter
+        public int HealAmount { get; set; } = 0;         
+        public bool BlockNextAttack { get; set; } = false; 
+        public bool Poison { get; set; } = false;        
     }
 
     public static class AttackTemplates
     {
         public static List<AttackTemplate> All = new List<AttackTemplate>
         {
-            // === WARRIOR ATTACKS ===
             new AttackTemplate
             {
                 Id = 1,
@@ -78,7 +77,6 @@ namespace backend.Data
                 Description = "Increases your attack for the next two turns."
             },
 
-            // === PALADIN ATTACKS ===
             new AttackTemplate
             {
                 Id = 5,
@@ -134,7 +132,6 @@ namespace backend.Data
                 Description = "Delivers divine judgement on the enemy."
             },
 
-            // === MAGE ATTACKS ===
             new AttackTemplate
             {
                 Id = 9,
@@ -189,7 +186,6 @@ namespace backend.Data
                 Description = "Creates a shield of mana to absorb the next attack."
             },
 
-            // === ROGUE ATTACKS ===
             new AttackTemplate
             {
                 Id = 13,
@@ -244,7 +240,6 @@ namespace backend.Data
                 Description = "Deals massive damage when striking from the shadows."
             },
 
-            // === RANGER ATTACKS ===
             new AttackTemplate
             {
                 Id = 17,

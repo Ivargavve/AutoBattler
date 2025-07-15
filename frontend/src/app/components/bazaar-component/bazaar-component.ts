@@ -48,20 +48,15 @@ export class BazaarComponent {
   filteredItems: Item[] = [...this.allItems];
   searchQuery = '';
 
-  // Dummy inventory (for selling)
   playerInventory: Item[] = [
     { id: 1, name: 'Health Potion', type: 'Potion', price: 50, quantity: 3 },
     { id: 2, name: 'Iron Sword', type: 'Weapon', price: 200, quantity: 1 }
   ];
   playerGold = 1250;
 
-  // --- METHODS FOR HTML ---
-
   selectVendor(v: Vendor) {
     this.selectedVendor = v;
-    // Example: filter items by vendor level (simple demo)
     this.filteredItems = this.allItems.filter(item => v.minLevel <= this.selectedVendor.minLevel);
-    // You can customize: e.g., each vendor shows different item pool
   }
 
   searchItems() {
@@ -75,16 +70,14 @@ export class BazaarComponent {
   buyItem(item: Item) {
     if (this.playerGold >= item.price) {
       this.playerGold -= item.price;
-      // Find if item exists in inventory, else add new
       let inv = this.playerInventory.find(i => i.id === item.id);
       if (inv) inv.quantity! += 1;
       else this.playerInventory.push({ ...item, quantity: 1 });
-      // feedback/snackbar kan läggas till
     }
   }
 
   sellPrice(item: Item): number {
-    return Math.floor(item.price * 0.6); // 60% av priset som exempel
+    return Math.floor(item.price * 0.6); 
   }
 
   sellItem(item: Item) {
@@ -92,7 +85,6 @@ export class BazaarComponent {
       this.playerGold += this.sellPrice(item);
       item.quantity -= 1;
       if (item.quantity === 0) {
-        // Ta bort från inventory
         this.playerInventory = this.playerInventory.filter(i => i.id !== item.id);
       }
     }

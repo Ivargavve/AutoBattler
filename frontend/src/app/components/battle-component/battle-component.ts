@@ -58,7 +58,6 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
         this.userLevel = character.level;
         this.userXp = character.experiencePoints;
 
-        // Hantera attacker: från attacks eller attacksJson
         this.attacks = (character.attacks ?? (
           character.attacksJson ? JSON.parse(character.attacksJson) : []
         )).map((atk: any) => ({
@@ -84,7 +83,6 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
-    // Ladda eventuell sparad battle-state via service
     const loadedState = this.battleService.loadBattleState();
     if (loadedState) {
       this.player = loadedState.player;
@@ -96,7 +94,6 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.userXp = loadedState.userXp;
       this.playerEnergy = loadedState.playerEnergy;
       this.showNextButton = loadedState.showNextButton || false;
-      // --- LÄS STATUSVARIABLER ---
       this.isPlayerBlocking = loadedState.isPlayerBlocking || false;
       this.isEnemyPoisoned = loadedState.isEnemyPoisoned || false;
     } else {
@@ -134,7 +131,7 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.battleEnded = false;
       this.enemyName = null;
       this.enemy = null;
-      this.isPlayerBlocking = false; // --- RESET STATUSVARIABLER ---
+      this.isPlayerBlocking = false; 
       this.isEnemyPoisoned = false;
       this.battleLog = [{ message: "Starting new battle...", type: "start" }];
       this.scrollToBottom();
@@ -191,7 +188,6 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
           this.enemy!.maxHp = res.enemyMaxHp;
           this.enemy!.name = res.enemyName;
           this.enemyName = res.enemyName;
-          // --- NYTT: Lägg till stöd för status från backend ---
           this.isPlayerBlocking = res.isPlayerBlocking || false;
           this.isEnemyPoisoned = res.isEnemyPoisoned || false;
           this.battleLog.push(...res.battleLog);
@@ -211,7 +207,6 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
           } else {
             this.gainedXp = null;
           }
-          // Ladda om karaktär så attacker (och charges) är uppdaterade!
           this.authService.loadUserWithCharacter();
           this.isLoading = false;
           this.scrollToBottom();
@@ -241,7 +236,7 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.userXp = null;
       this.playerEnergy = 0;
       this.attacks = [];
-      this.isPlayerBlocking = false; // --- RESET STATUSVARIABLER ---
+      this.isPlayerBlocking = false; 
       this.isEnemyPoisoned = false;
     } catch (err) {} finally {
       this.isLoading = false;
@@ -280,7 +275,6 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clearHoveredAttack() {
     this.hoveredAttackDescription = '';
-    // lastShownDescription är kvar (senaste visade)
   }
 
   selectAttack(attack: PlayerAttack) {
@@ -292,54 +286,30 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getFullAttackDescription(attack: PlayerAttack): string {
     if (!attack || attack.id === -1) return '';
-
     let desc: string[] = [];
-
-
     desc.push(`**${attack.name}**`);
-
-    // Beskrivningstext
     if (attack.description) desc.push(attack.description);
-
-    // Skada
     if (attack.baseDamage && attack.baseDamage > 0)
       desc.push(`Damage: ${attack.baseDamage}`);
-
-    // Typ av skada
     if (attack.damageType) desc.push(`Type: ${attack.damageType}`);
-
-    // Attacktyp
     if (attack.type) desc.push(`Category: ${attack.type}`);
-
-    // Charges
     desc.push(`Charges: ${attack.currentCharges}/${attack.maxCharges}`);
-
-    // Scaling
     if (attack.scaling && Object.keys(attack.scaling).length > 0) {
       const scaleArr = Object.entries(attack.scaling)
         .map(([stat, val]) => `${stat.charAt(0).toUpperCase() + stat.slice(1)} ×${val}`);
       desc.push(`Scales with: ${scaleArr.join(', ')}`);
     }
-
-    // Effective against (om det finns)
-    // if (attack.effectiveAgainst) desc.push(`Effective against: ${attack.effectiveAgainst}`);
-
-    // Kräver stats (om du vill visa)
     if (attack.requiredStats && Object.keys(attack.requiredStats).length > 0) {
       const reqs = Object.entries(attack.requiredStats)
         .map(([stat, val]) => `${stat.charAt(0).toUpperCase() + stat.slice(1)} ${val}`);
       desc.push(`Requires: ${reqs.join(', ')}`);
     }
-
-    // Classes
     if (attack.allowedClasses && attack.allowedClasses.length > 0) {
       desc.push(`Usable by: ${attack.allowedClasses.join(', ')}`);
     }
-
     return desc.join(' · ');
   }
 
-  // Beskrivning som visas i rutan:
   getAttackDescription(): string {
     return this.hoveredAttackDescription || this.lastShownDescription || '';
   }
@@ -355,7 +325,7 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       userXp: this.userXp,
       playerEnergy: this.playerEnergy,
       showNextButton: this.showNextButton,
-      isPlayerBlocking: this.isPlayerBlocking, // --- SPARA STATUSVARIABLER
+      isPlayerBlocking: this.isPlayerBlocking, 
       isEnemyPoisoned: this.isEnemyPoisoned
     });
   }

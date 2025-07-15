@@ -9,7 +9,6 @@ export interface UserItem {
   fullName: string;
   profilePictureUrl?: string;
   level: number;
-  // Du kan lägga till fler fält om du vill visa t.ex. Credits, LastLogin etc
 }
 
 @Component({
@@ -29,7 +28,6 @@ export class SocialComponent implements OnInit {
   ngOnInit() {
     this.friendsService.getAllUsers().subscribe({
       next: (users: any[]) => {
-        // Returnerar hela objektet, plocka ut relevanta fält
         this.users = users.map(u => ({
           id: u.id,
           username: u.username,

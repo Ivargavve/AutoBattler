@@ -211,7 +211,6 @@ namespace backend.Controllers
                 LastRechargeTime = DateTime.UtcNow
             };
 
-            // --- NYTT: Tilldela attacker baserat på klass ---
             var klass = dto.Class?.Trim().ToLower() ?? "";
             var matchingAttacks = AttackTemplates.All
                 .Where(atk => atk.AllowedClasses.Any(ac => ac.ToLower() == klass))

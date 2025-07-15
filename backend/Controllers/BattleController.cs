@@ -56,7 +56,6 @@ namespace backend.Controllers
                 enemyHp = req.EnemyHp ?? selectedEnemy.MaxHp;
             }
 
-            // Gör om till klass om du vill kunna lagra tillstånd, annars kör anonymt:
             var enemy = new
             {
                 Name = selectedEnemy.Name,
@@ -222,11 +221,9 @@ namespace backend.Controllers
                     log.Add(new BattleLogEntry { Message = enemyCritLines[rand.Next(enemyCritLines.Length)], Type = "enemy-crit" });
                 }
 
-                // --- Här kan du använda isPlayerBlocking för att modifiera skada ---
-                // Exempel: Om block aktiv, reducera eller ignorera damage
                 if (isPlayerBlocking)
                 {
-                    enemyDamage = 0; // Eller t.ex. enemyDamage /= 2;
+                    enemyDamage = 0; 
                     log.Add(new BattleLogEntry
                     {
                         Message = $"{player.Name} blocks the enemy attack! 🛡️",
@@ -284,7 +281,7 @@ namespace backend.Controllers
                         UserLevel = player.User?.Level ?? 0,
                         PlayerEnergy = player.CurrentEnergy,
                         PlayerAttacks = attacks,
-                        isPlayerBlocking = false, // Player är död -> ingen block
+                        isPlayerBlocking = false, 
                         isEnemyPoisoned = isEnemyPoisoned
                     });
                 }
@@ -318,7 +315,7 @@ namespace backend.Controllers
                     UserLevel = player.User?.Level ?? 0,
                     PlayerEnergy = player.CurrentEnergy,
                     PlayerAttacks = attacks,
-                    isPlayerBlocking = false, // Block bara aktiv för en turn
+                    isPlayerBlocking = false, 
                     isEnemyPoisoned = isEnemyPoisoned
                 });
             }

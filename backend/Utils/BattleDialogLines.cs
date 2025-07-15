@@ -4,7 +4,6 @@ namespace backend.Utils
 {
     public static class BattleDialogLines
     {
-        // Openers för ny strid
         public static string[] EncounterOpeners(string playerName, int playerLevel, string enemyName) => new[]
         {
             $"A wild {enemyName} appears! It looks dangerous...",
@@ -41,7 +40,6 @@ namespace backend.Utils
             $"This encounter is so epic, it deserves its own Netflix series."
         };
 
-        // Spelarens attack-openers
         public static string[] PlayerOpeners(string playerName, string enemyName) => new[]
         {
             $"⚔️ {playerName} charges forward and swings at the {enemyName}!",
@@ -78,7 +76,6 @@ namespace backend.Utils
             $"{playerName} rolls for initiative, then attacks anyway."
         };
 
-        // Critical hit
         public static string[] CritLines(string playerName, int damage) => new[]
         {
             $"💥 **Critical hit!** {playerName} channels their inner anime protagonist and deals a jaw-dropping {damage} damage!",
@@ -115,7 +112,6 @@ namespace backend.Utils
         };
 
 
-        // Enemy HP minskning
         public static string[] EnemyHpLines(string enemyName, int hp, int maxHp) => new[]
         {
             $"The {enemyName} staggers! {enemyName.Capitalize()} HP now at {hp}/{maxHp}.",
@@ -150,7 +146,6 @@ namespace backend.Utils
             $"{enemyName.Capitalize()} tries to hit 'undo' on the fight ({hp}/{maxHp} HP left)."
         };
 
-        // Victory lines
        public static string[] VictoryLines(string playerName, string enemyName) => new[]
         {
             $"🏆 **Victory!** The {enemyName} explodes into confetti and is defeated!",
@@ -185,7 +180,6 @@ namespace backend.Utils
             $"🏆 {playerName} flexes. The {enemyName} can't even.",
         };
 
-        // Enemy actions
         public static string[] EnemyActions(string enemyName) => new[]
         {
             $"😡 The {enemyName} becomes enraged and counterattacks!",
@@ -220,7 +214,6 @@ namespace backend.Utils
             $"😬 The {enemyName} nervously attacks after telling a really bad joke."
         };
 
-        // Enemy attack lines
         public static string[] EnemyAttackLines(string enemyName) => new[]
         {
             $"The {enemyName} raises its rusty sword high and swings it furiously!",
@@ -255,7 +248,6 @@ namespace backend.Utils
             $"The {enemyName} snaps a towel at you, gym locker-room style!"
         };
 
-        // Enemy critical hit lines
         public static string[] EnemyCritLines(string enemyName, int damage) => new[]
         {
             $"💥 **Critical hit!** The {enemyName} spins like a fidget spinner and deals {damage} damage!",
@@ -290,7 +282,6 @@ namespace backend.Utils
             $"💥 **Critical hit!** The {enemyName} breaks the fourth wall for {damage} damage!"
         };
 
-        // Player tar skada
         public static string[] PlayerHpLines(string playerName, int hp, int maxHp) => new[]
         {
             $"{playerName} now has {hp}/{maxHp} HP remaining.",
@@ -325,7 +316,6 @@ namespace backend.Utils
             $"{playerName} says 'Ow.' {hp}/{maxHp} HP."
         };
 
-        // Defeat lines
         public static string[] DefeatLines(string playerName, string enemyName) => new[]
         {
             $"💀 {playerName} slips on a banana peel and is KO'd by the {enemyName}!",

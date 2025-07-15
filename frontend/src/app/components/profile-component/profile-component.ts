@@ -26,7 +26,6 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // User-data (för inloggad eller annan användare)
     this.user$ = this.route.paramMap.pipe(
       switchMap(params => {
         const username = params.get('username');
@@ -38,20 +37,13 @@ export class ProfileComponent implements OnInit {
       })
     );
 
-    // Character-data (separat anrop)
     this.character$ = this.route.paramMap.pipe(
       switchMap(params => {
         const username = params.get('username');
         if (username) {
-          // Annan användares karaktär
           return this.authService.getCharacterByUsername(username).pipe(
-            // Om character saknas (404) returnera null istället för error
-            map(char => char),
-            // fångar http error
-            // catchError(() => of(null))   // <-- lägg till import för catchError och avkommentera om du vill fånga 404-fel snyggt
-          );
+            map(char => char));
         } else {
-          // Egen karaktär
           return this.authService.character$;
         }
       })
