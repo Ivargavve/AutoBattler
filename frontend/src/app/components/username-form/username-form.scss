@@ -11,7 +11,8 @@
   max-width: 560px;
   background: var(--bg);
   color: var(--text);
-  border: 1px solid var(--sidebar-border);
+  border: 1.5px solid var(--accent);
+  box-shadow: inset 0 0 12px var(--accent-shadow);
   font-family: 'Courier New', monospace;
   text-shadow: 0 0 3px var(--card-border);
   transition: all 0.3s ease;

@@ -1,12 +1,11 @@
 <div class="battle-outer">
   <div class="battle-window">
 
-    <!-- VS Headline -->
-    <div class="battle-vs-headline">
-      <span class="vs-headline-text">
-        {{ player?.name }} <span class="vs-green">VS</span> {{ enemy?.name }}
-      </span>
-    </div>
+   <div class="battle-vs-headline">
+    <span class="vs-side left">{{ player?.name }}</span>
+    <span class="vs-center"><span class="vs-green">VS</span></span>
+    <span class="vs-side right">{{ enemy?.name }}</span>
+  </div>
 
     <!-- Battle Log -->
     <div class="battle-log-wrapper">
@@ -48,8 +47,8 @@
           class="battle-graphic-img">
       </div>
       <div class="battle-controls-col">
+        
         <div class="fighter-row">
-
           <!-- PLAYER INFO -->
           <div class="player-info">
             <div class="name">
@@ -71,11 +70,10 @@
             </div>
             <div class="hp">HP: {{ enemy?.hp }} / {{ enemy?.maxHp }}</div>
           </div>
-
         </div>
 
-        <!-- Attack Buttons -->
-        <div class="battle-attack-buttons">
+      <!-- Attack Buttons -->
+      <div class="battle-attack-buttons">
         <button
           *ngFor="let attack of displayAttacks"
           class="attack-btn"
@@ -90,14 +88,21 @@
         </button>
       </div>
 
-        <div class="attack-row-bottom">
-          <div class="attack-description-box">
-            {{ getAttackDescription() }}
-          </div>
-          <div class="battle-run-btn-row">
-            <button (click)="runFromBattle()" class="attack-btn run-btn">Run</button>
-          </div>
-        </div>
+      <div class="attack-description-box">
+        {{ getAttackDescription() }}
+      </div>
+      <!-- Bottom action navbar -->
+      <nav class="battle-bottom-nav">
+        <button class="battle-nav-btn info-btn" title="Info/Hjälp">
+          <i class="fa-solid fa-circle-info"></i>
+        </button>
+        <button class="battle-nav-btn bag-btn" title="Inventory">
+          <i class="fa-solid fa-bag-shopping"></i>
+        </button>
+        <button (click)="runFromBattle()" class="battle-nav-btn run-btn" title="Run">
+          Run
+        </button>
+      </nav>
       </div>
     </div>
   </div>

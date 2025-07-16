@@ -83,6 +83,12 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
+    if (this.attacks && this.attacks.length > 0) {
+      this.lastShownDescription = this.getFullAttackDescription(this.attacks[0]);
+    } else {
+      this.lastShownDescription = '';
+    }
+
     const loadedState = this.battleService.loadBattleState();
     if (loadedState) {
       this.player = loadedState.player;

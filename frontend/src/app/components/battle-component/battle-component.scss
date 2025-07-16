@@ -26,26 +26,42 @@
 
 // VS HEADLINE
 .battle-vs-headline {
-  width: 100%;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   margin-top: 1.2rem;
   margin-bottom: 0.6rem;
-  .vs-headline-text {
+
+  .vs-side {
+    width: 35%;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-family: inherit;
     font-size: 2.1rem;
     font-weight: 800;
     letter-spacing: 3.5px;
     color: #4fff90;
     text-shadow: 0 0 10px #31ffb96c;
-    .vs-green {
-      color: #46e880;
+    background: var(--btn-bg, #1b1d1b);
+    border-radius: 4px;;
+    border: 1px solid var(--sidebar-border, #2c2c2c);
+  }
+
+  .vs-center {
+    width: 15%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 2.2em;
+  }
+  .vs-green {
+      color: var(--accent, #86f7b3);
       margin: 0 18px;
       text-shadow: 0 0 7px #37ef8866;
     }
-  }
 }
+
 
 // BATTLE LOG
 .battle-log-wrapper {
@@ -174,9 +190,11 @@
   border-radius: 4px;
   background: var(--friend-li-bg, #111);
   padding: 0.5rem 1.2rem 0.5rem 1.2rem;
-  gap: 1.4rem;
+  gap: 1rem;
   margin: 0;
   .player-info, .enemy-info {
+    width: 38%;
+    text-align: center;
     display: flex;
     flex-direction: column;
     gap: 0.02rem;
@@ -195,10 +213,11 @@
     }
   }
   .vs {
+    width: 22%;
+    text-align: center;
     color: var(--accent, #86f7b3);
     font-size: 1.09rem;
     font-weight: bold;
-    letter-spacing: 2px;
     align-self: center;
     background: var(--btn-bg, #1b1d1b);
     border-radius: 4px;
@@ -277,8 +296,12 @@
 .battle-run-btn-row {
   display: flex;
   justify-content: flex-end;
-  align-items: center;
-  margin-top: 0.18rem;
+  align-items: flex-end;
+  position: absolute;
+  right: 0.4em;
+  bottom: 0.35em;
+  height: auto;
+  width: 30%;
 
   .run-btn {
     background: #be2c2c;
@@ -288,7 +311,7 @@
     font-weight: 800;
     font-size: 0.9rem;   
     letter-spacing: 2px;
-    text-shadow: 0 0 4px #a83d3d;
+    text-shadow: 0 0 4px #931818;
     padding: 0.33rem 0;   
     min-width: 100px;      
     transition: background 0.16s, border-color 0.14s, color 0.14s;
@@ -431,24 +454,102 @@
   flex-direction: row;
   align-items: center;
   gap: 1.2em;
-  width: 100%;
+  position: relative;
+  align-items: stretch;
 }
 
 .attack-description-box {
-  border: 1px solid #2c2c2c;
-  padding: 0.2rem 0.4rem;
-  min-width: 0;
-  flex: 1 1 0;
-  min-height: 2.3em;
-  max-width: 70%;
-  margin: 0;
-  color: #98b4bb;
+  margin-top: auto;
+  padding: 0.4rem 0.8rem;
+  min-height: 3.5rem;
+  width: 100%;
+  height: 2rem;
+  color: white;
   font-size: 0.7em;
   font-family: 'Fira Mono', monospace;
+  background: #101913;
   text-align: left;
   display: flex;
   align-items: center;
-  overflow: hidden;
-  white-space: pre-line;
-  user-select: text;
+}
+
+.battle-bottom-nav {
+  width: 100%;
+  height: 2.5rem;
+  background: rgba(18, 27, 24, 0.97);
+  border-top: 1px solid #3deeb4;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  z-index: 200;
+  padding: 0 1rem 0 1rem;
+
+  .info-btn {
+    margin-right: auto;
+    background: none;
+    border: none;
+    color: #5fffd0;
+    font-size: 1em;
+    padding: 0.2em 0.5em;
+    transition: background 0.15s, color 0.15s;
+    &:hover { background: #183a34; color: #fff; }
+  }
+  .bag-btn {
+    background: none;
+    border: none;
+    color: #89e7c1;
+    font-size: 1em;
+    padding: 0.2em 0.5em;
+    transition: background 0.15s, color 0.15s;
+    &:hover { background: #223634; color: #fff; }
+  }
+  .run-btn {
+    background: #be2c2c;
+    color: #fff;
+    border: 2px solid #8d2c2c;
+    font-weight: 800;
+    font-size: 1em;
+    padding: 0 1.2em;
+    margin-left: 0.3em;
+    box-shadow: 0 0 3px #7c3d3d;
+    transition: background 0.18s, border-color 0.15s, color 0.15s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &:hover:not(:disabled) {
+      background: #ffb7af;
+      border-color: #ff695b;
+      color: #fff5e6;
+      text-shadow: 0 0 6px #ff9797;
+    }
+    &:disabled {
+      background: #493232;
+      color: #a88787;
+      border-color: #493232;
+      opacity: 0.7;
+    }
+  }
+}
+
+// Gör så innehåll inte går bakom navbar på mobiler
+.battle-controls-col {
+  padding-bottom: 4.1rem;
+}
+
+@media (max-width: 700px) {
+  .battle-bottom-nav {
+    height: 3.5rem;
+    font-size: 0.97em;
+    gap: 0.75rem;
+    padding: 0 0.5rem;
+  }
+  .attack-description-box {
+    font-size: 0.97em;
+    min-height: 3.7em;
+    padding: 0.35rem 0.6rem;
+  }
+  .battle-controls-col {
+    padding-bottom: 3.4rem;
+  }
 }
