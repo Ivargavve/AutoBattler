@@ -8,6 +8,7 @@ export interface Character {
 
   level: number;
   experiencePoints: number;
+  maxExperiencePoints: number;
 
   currentHealth: number;
   maxHealth: number;

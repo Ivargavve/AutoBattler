@@ -12,6 +12,7 @@
 
         public bool NeedsUsernameSetup { get; set; } = true;
 
+        public int MaxExperiencePoints { get; set; } = 100;
         public int ExperiencePoints { get; set; } = 0;
         public int Level { get; set; } = 1;
         public int Credits { get; set; } = 0;

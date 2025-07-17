@@ -12,6 +12,7 @@ export interface User {
   needsUsernameSetup: boolean;
 
   experiencePoints: number;
+  maxExperiencePoints: number;
   level: number;
   credits: number;
 

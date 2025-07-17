@@ -13,6 +13,7 @@ namespace backend.Models
 
         public int Level { get; set; } = 1;
         public int ExperiencePoints { get; set; } = 0;
+        public int MaxExperiencePoints { get; set; } = 1000;
 
         public int MaxHealth { get; set; } = 100;
         public int CurrentHealth { get; set; } = 100;

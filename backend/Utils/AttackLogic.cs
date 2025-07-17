@@ -52,7 +52,7 @@ namespace backend.Logic
                     if ((enemy?.Type as string)?.ToLower() == "undead")
                     {
                         double magicScale = (template.Scaling != null) ? template.Scaling.GetValueOrDefault("magic", 0) : 0;
-                        damage = template.BaseDamage + (int)(magicScale * (player.Magic ?? 0));
+                        damage = template.BaseDamage + 10 + (int)(magicScale * (player.Magic ?? 0));
                         var enemyName = enemy?.Name ?? "the enemy";
                         effects.Add($"{player.Name} smites undead {enemyName} for {damage} holy damage!");
                     }

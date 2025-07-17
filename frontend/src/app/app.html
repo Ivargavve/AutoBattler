@@ -87,7 +87,7 @@
                       stroke-width="4"
                       stroke-linecap="round"
                       stroke-dasharray="138.2"
-                      [attr.stroke-dashoffset]="138.2 - 138.2 * getXpPercentage(user.experiencePoints) / 100"
+                      [attr.stroke-dashoffset]="138.2 - 138.2 * getXpPercentage(user.experiencePoints) / user.maxExperiencePoints"
                     />
                     <text
                       x="50%"
@@ -130,8 +130,8 @@
               <li>
                 <strong>Lvl: {{ character.level }}</strong>
                 <div class="bar-container grey">
-                  <div class="bar-fill" [style.width.%]="(character.experiencePoints / 100) * 100"></div>
-                  <span class="bar-text">{{ character.experiencePoints }} / {{ 100 }}</span>
+                  <div class="bar-fill" [style.width.%]="(character.experiencePoints / character.maxExperiencePoints) * 100"></div>
+                  <span class="bar-text">{{ character.experiencePoints }} / {{ character.maxExperiencePoints }}</span>
                 </div>
               </li>
               <li>

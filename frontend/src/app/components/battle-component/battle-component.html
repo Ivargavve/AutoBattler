@@ -53,8 +53,9 @@
           <div class="player-info">
             <div class="name">
               {{ player?.name }}
-              <!-- STATUS BADGES FÖR PLAYER -->
-              <span class="status-badge block" *ngIf="isPlayerBlocking">🛡️ Block</span>
+              <span class="status-badge-friendly block" *ngIf="isPlayerBlocking">🛡️ Block ({{ playerBlockTurnsLeft }})</span>
+              <span class="status-badge-friendly heal" *ngIf="isPlayerHealing">❤️ Heal ({{ playerHealTurnsLeft }})</span>
+              <span class="status-badge-friendly poison" *ngIf="isPlayerPoisoned">☠️ Poison ({{ playerPoisonTurnsLeft }})</span>
             </div>
             <div class="hp">HP: {{ player?.hp }} / {{ player?.maxHp }}</div>
           </div>
@@ -65,8 +66,9 @@
           <div class="enemy-info">
             <div class="name">
               {{ enemy?.name }}
-              <!-- STATUS BADGES FÖR ENEMY -->
-              <span class="status-badge poison" *ngIf="isEnemyPoisoned">☠️ Poison</span>
+              <span class="status-badge-enemy heal" *ngIf="isEnemyHealing">❤️ Heal ({{ enemyHealTurnsLeft }})</span>
+              <span class="status-badge-enemy block" *ngIf="isEnemyBlocking">🛡️ Block ({{ enemyBlockTurnsLeft }})</span>
+               <span class="status-badge-enemy poison" *ngIf="isEnemyPoisoned">☠️ Poison ({{ enemyPoisonTurnsLeft }})</span>
             </div>
             <div class="hp">HP: {{ enemy?.hp }} / {{ enemy?.maxHp }}</div>
           </div>
@@ -77,19 +79,29 @@
         <button
           *ngFor="let attack of displayAttacks"
           class="attack-btn"
+          [ngClass]="[attack.type]"
           [disabled]="attack.id === -1 || attack.currentCharges <= 0 || isLoading || battleEnded"
           (click)="attack.id !== -1 ? selectAttack(attack) : null"
           (mouseenter)="attack.id !== -1 ? setHoveredAttack(attack) : null"
           (mouseleave)="clearHoveredAttack()"
         >
           <span class="attack-label">{{ attack.name }}</span>
-          <span class="attack-charges" *ngIf="attack.id !== -1">{{ attack.currentCharges }}/{{ attack.maxCharges }}</span>
-          <span class="attack-charges" *ngIf="attack.id === -1">0/0</span>
+          <span class="attack-charges" 
+                [ngClass]="getChargeClass(attack)"
+                *ngIf="attack.id !== -1">{{ attack.currentCharges }}/{{ attack.maxCharges }}</span>
+          <span class="attack-charges charge-empty" *ngIf="attack.id === -1">0/0</span>
+
+          <span class="attack-type">{{ getAttackTypeLabel(attack.type) }}</span>
         </button>
       </div>
 
-      <div class="attack-description-box">
-        {{ getAttackDescription() }}
+      <div class="attack-description-box" *ngIf="getAttackDescription()">
+        <span class="attack-name" *ngIf="getAttackDescription().split(':::')[0] as attackName">
+          {{ attackName }}
+        </span>
+        <span class="attack-description" *ngIf="getAttackDescription().split(':::')[1] as attackDesc">
+          {{ attackDesc }}
+        </span>
       </div>
       <!-- Bottom action navbar -->
       <nav class="battle-bottom-nav">

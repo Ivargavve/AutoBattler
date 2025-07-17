@@ -55,7 +55,7 @@ namespace backend.Data
                 Name = "Shield Block",
                 Type = "defense",
                 DamageType = "none",
-                BaseDamage = 2, // Liten motattack-skada
+                BaseDamage = 2, 
                 MaxCharges = 3,
                 Scaling = new Dictionary<string, double> { { "defense", 1.0 } },
                 RequiredStats = new Dictionary<string, int> { { "defense", 10 } },
@@ -101,7 +101,7 @@ namespace backend.Data
                 Scaling = new Dictionary<string, double> { { "magic", 1.5 } },
                 RequiredStats = new Dictionary<string, int> { { "magic", 12 } },
                 AllowedClasses = new List<string> { "paladin" },
-                HealAmount = 18,
+                HealAmount = 22,
                 Description = "Heals the user for a large amount. Does extra damage to undead."
             },
             new AttackTemplate

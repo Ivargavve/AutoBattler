@@ -1,0 +1,60 @@
+<div class="battle-hub-wrapper">
+
+  <!-- NAVBAR -->
+  <nav class="battle-hub-navbar">
+    <button 
+      *ngFor="let tab of ['welcome', 'monsters', 'challenges', 'makgora', 'dungeons', 'raids']"
+      [class.active]="activeTab === tab"
+      (click)="activeTab = tab">
+      {{ tab | titlecase }}
+    </button>
+  </nav>
+
+  <!-- FLIKINNEHÅLL -->
+  <div class="battle-hub-main">
+
+    <!-- Welcome -->
+    <ng-container *ngIf="activeTab === 'welcome'">
+      <section class="hub-block welcome-block">
+        <h1>Welcome to the Battle Hub</h1>
+        <p>
+          Plan your next fight, join challenges, or jump into epic raids!  
+        </p>
+        <ul class="hub-tips">
+          <li *ngFor="let tip of tips">{{ tip }}</li>
+        </ul>
+      </section>
+    </ng-container>
+
+    <!-- Monsters -->
+    <ng-container *ngIf="activeTab === 'monsters'">
+      <section class="hub-block monsters-block">
+        <h2>Monsters</h2>
+        <div class="monsters-list">
+          <button 
+            *ngFor="let monster of monsters"
+            class="monster-btn"
+            [disabled]="playerLevel < monster.level"
+          >
+            <div class="monster-name">{{ monster.name }}</div>
+            <div class="monster-level" [ngClass]="{'locked': playerLevel < monster.level}">
+              Lv {{ monster.level }}
+            </div>
+            <div class="monster-desc">{{ monster.desc }}</div>
+          </button>
+        </div>
+        <div class="info-note">Unlock higher level monsters by leveling up!</div>
+      </section>
+    </ng-container>
+
+    <!-- Placeholder: Kommande flikar -->
+    <ng-container *ngIf="['challenges', 'makgora', 'dungeons', 'raids'].includes(activeTab)">
+      <section class="hub-block coming-block">
+        <h2>{{ activeTab | titlecase }}</h2>
+        <p>More content coming soon!</p>
+      </section>
+    </ng-container>
+
+  </div>
+
+</div>

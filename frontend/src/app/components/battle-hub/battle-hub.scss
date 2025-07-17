@@ -1,0 +1,189 @@
+.battle-hub-wrapper {
+  width: 96%;
+  max-width: 950px;
+  margin: 2.5rem auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: #101814;
+  border-radius: 6px;
+  box-shadow: 0 6px 32px #000b;
+  padding: 1.6rem 1.2rem 2rem 1.2rem;
+}
+
+.battle-hub-navbar {
+  display: flex;
+  gap: 1.2rem;
+  border-bottom: 1.5px solid #183628;
+  margin-bottom: 1.3rem;
+  padding-bottom: 0.3rem;
+
+  button {
+    background: none;
+    border: none;
+    color: #88ffd7;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.14rem;
+    padding: 0.46rem 1.18rem 0.45rem 1.18rem;
+    border-bottom: 2.5px solid transparent;
+    border-radius: 8px 8px 0 0;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: color 0.16s, border-bottom 0.2s;
+
+    &.active, &:hover {
+      color: #4fff90;
+      border-bottom: 2.5px solid #4fff90;
+      background: #151d15;
+    }
+  }
+}
+
+.battle-hub-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.7rem;
+}
+
+.hub-block {
+  background: #181818;
+  border-radius: 4px;
+  padding: 1.6rem 2rem;
+  box-shadow: 0 0 14px #44ffca13;
+}
+
+.welcome-block {
+  text-align: center;
+  h1 {
+    font-size: 2rem;
+    color: #80ffd1;
+    text-shadow: 0 0 12px #3bffb77c;
+    margin-bottom: 0.7em;
+    letter-spacing: 1px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  p {
+    color: #baffde;
+    font-size: 1.08rem;
+    margin-bottom: 1.3em;
+  }
+}
+
+.hub-tips {
+  list-style: none;
+  color: #c7ffe5;
+  font-size: 1.08em;
+  margin: 0;
+  padding: 0;
+
+  li {
+    margin-bottom: 0.38em;
+    font-weight: 400;
+    line-height: 1.34;
+    letter-spacing: 0.2px;
+  }
+}
+
+.monsters-block {
+  h2 {
+    color: #5bffc7;
+    font-family: 'Share Tech Mono', monospace;
+    margin-bottom: 1.2em;
+    font-size: 1.45rem;
+  }
+  .monsters-list {
+    display: flex;
+    gap: 1.1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.7em;
+  }
+  .monster-btn {
+    background: #101f15;
+    border: 2px solid #173e2d;
+    border-radius: 8px;
+    min-width: 150px;
+    min-height: 108px;
+    padding: 0.8em 1.1em;
+    color: #a0ffd9;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.01em;
+    box-shadow: 0 0 12px #31ffb922;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2em;
+    position: relative;
+    cursor: pointer;
+    transition: box-shadow 0.15s, border-color 0.15s, background 0.18s;
+    outline: none;
+
+    &:hover:not(:disabled) {
+      border-color: #36ffb7;
+      box-shadow: 0 0 18px #4fff9090;
+      background: #122b1b;
+      color: #eafffc;
+    }
+    &:disabled {
+      border-color: #313b36;
+      color: #667c7e;
+      opacity: 0.68;
+      background: #192319;
+      cursor: not-allowed;
+    }
+    .monster-name {
+      font-size: 1.09em;
+      color: #70ffc2;
+      margin-bottom: 0.11em;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+    }
+    .monster-level {
+      font-size: 0.99em;
+      color: #81bfc5;
+      margin-bottom: 0.22em;
+      &.locked {
+        color: #ffa27a;
+        text-shadow: 0 0 4px #fa0a;
+      }
+    }
+    .monster-desc {
+      font-size: 0.97em;
+      color: #a8d1c4;
+      opacity: 0.8;
+      font-weight: 400;
+      margin-top: 0.13em;
+    }
+  }
+  .info-note {
+    color: #b9ffc2;
+    font-size: 0.98em;
+    margin-top: 1em;
+    text-align: left;
+    opacity: 0.77;
+    letter-spacing: 0.1px;
+  }
+}
+
+.coming-block {
+  text-align: center;
+  h2 {
+    font-size: 1.3rem;
+    color: #90ffd0;
+    margin-bottom: 0.9em;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  p {
+    color: #c5ffed;
+    font-size: 1.1em;
+    letter-spacing: 0.1px;
+    opacity: 0.8;
+  }
+}
+
+@media (max-width: 700px) {
+  .battle-hub-wrapper { padding: 0.6rem; }
+  .battle-hub-navbar { gap: 0.55rem; font-size: 0.95rem; }
+  .hub-block { padding: 1rem 0.6rem; }
+  .monsters-block .monsters-list { gap: 0.4rem; }
+  .monster-btn { min-width: 110px; min-height: 84px; padding: 0.5em 0.5em; }
+}

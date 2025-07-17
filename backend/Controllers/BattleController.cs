@@ -143,25 +143,23 @@ namespace backend.Controllers
                     int gainedXp = enemy.xp;
                     player.ExperiencePoints += gainedXp;
 
-                    if (player.ExperiencePoints >= 100)
+                    if (player.ExperiencePoints >= player.MaxExperiencePoints)
                     {
                         player.ExperiencePoints = 0;
                         player.Level += 1;
-                        player.MaxHealth += 5;
+                        player.MaxExperiencePoints = (int)(player.MaxExperiencePoints * 1.2);
                         player.CurrentHealth = player.MaxHealth;
-                        player.Attack += 2;
-                        player.Defense += 1;
-                        player.CriticalChance += 0.01;
                         log.Add(new BattleLogEntry { Message = $"🎉 {player.Name} has reached level {player.Level}!", Type = "levelup" });
 
                         if (player.User != null)
                         {
-                            player.User.ExperiencePoints += 10;
-                            if (player.User.ExperiencePoints >= 100)
+                            player.User.ExperiencePoints += 100;
+                            if (player.User.ExperiencePoints >= player.User.MaxExperiencePoints)
                             {
                                 player.User.ExperiencePoints = 0;
                                 player.User.Level += 1;
-                                player.User.Credits += 100;
+                                player.User.MaxExperiencePoints = (int)(player.User.MaxExperiencePoints * 1.2);
+                                player.User.Credits += player.User.Level * 100; 
                                 log.Add(new BattleLogEntry { Message = $"🎉 Your account has reached user level {player.User.Level}!", Type = "user-levelup" });
                             }
                         }

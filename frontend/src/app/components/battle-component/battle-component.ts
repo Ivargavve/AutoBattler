@@ -31,8 +31,25 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
   hoveredAttackDescription: string = '';
   selectedAttackDescription: string = '';
   lastShownDescription: string = '';
+
+  // Status flags
+  // Player status effects
   isPlayerBlocking: boolean = false;
+  isPlayerHealing: boolean = false;
+  isPlayerPoisoned: boolean = false;
+  // Enemy status effects
+  isEnemyBlocking: boolean = false;
+  isEnemyHealing: boolean = false;
   isEnemyPoisoned: boolean = false;
+  // Turn counters for status effects
+  // Player turn counters
+  playerBlockTurnsLeft: number = 0;
+  playerHealTurnsLeft: number = 0;
+  playerPoisonTurnsLeft: number = 0;
+  // Enemy turn counters
+  enemyBlockTurnsLeft: number = 0;
+  enemyHealTurnsLeft: number = 0;
+  enemyPoisonTurnsLeft: number = 0;
 
   private characterSub!: Subscription;
 
@@ -101,6 +118,8 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.playerEnergy = loadedState.playerEnergy;
       this.showNextButton = loadedState.showNextButton || false;
       this.isPlayerBlocking = loadedState.isPlayerBlocking || false;
+      this.isPlayerHealing = loadedState.isPlayerHealing || false;
+      this.isPlayerPoisoned = loadedState.isPlayerPoisoned || false;
       this.isEnemyPoisoned = loadedState.isEnemyPoisoned || false;
     } else {
       this.battleLog = [];
@@ -195,6 +214,8 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
           this.enemy!.name = res.enemyName;
           this.enemyName = res.enemyName;
           this.isPlayerBlocking = res.isPlayerBlocking || false;
+          this.isPlayerHealing = res.isPlayerHealing || false;
+          this.isPlayerPoisoned = res.isPlayerPoisoned || false;
           this.isEnemyPoisoned = res.isEnemyPoisoned || false;
           this.battleLog.push(...res.battleLog);
           this.battleEnded = res.battleEnded;
@@ -243,6 +264,8 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.playerEnergy = 0;
       this.attacks = [];
       this.isPlayerBlocking = false; 
+      this.isPlayerHealing = false;
+      this.isPlayerPoisoned = false;
       this.isEnemyPoisoned = false;
     } catch (err) {} finally {
       this.isLoading = false;
@@ -292,32 +315,32 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getFullAttackDescription(attack: PlayerAttack): string {
     if (!attack || attack.id === -1) return '';
-    let desc: string[] = [];
-    desc.push(`**${attack.name}**`);
-    if (attack.description) desc.push(attack.description);
-    if (attack.baseDamage && attack.baseDamage > 0)
-      desc.push(`Damage: ${attack.baseDamage}`);
-    if (attack.damageType) desc.push(`Type: ${attack.damageType}`);
-    if (attack.type) desc.push(`Category: ${attack.type}`);
-    desc.push(`Charges: ${attack.currentCharges}/${attack.maxCharges}`);
-    if (attack.scaling && Object.keys(attack.scaling).length > 0) {
-      const scaleArr = Object.entries(attack.scaling)
-        .map(([stat, val]) => `${stat.charAt(0).toUpperCase() + stat.slice(1)} ×${val}`);
-      desc.push(`Scales with: ${scaleArr.join(', ')}`);
-    }
-    if (attack.requiredStats && Object.keys(attack.requiredStats).length > 0) {
-      const reqs = Object.entries(attack.requiredStats)
-        .map(([stat, val]) => `${stat.charAt(0).toUpperCase() + stat.slice(1)} ${val}`);
-      desc.push(`Requires: ${reqs.join(', ')}`);
-    }
-    if (attack.allowedClasses && attack.allowedClasses.length > 0) {
-      desc.push(`Usable by: ${attack.allowedClasses.join(', ')}`);
-    }
-    return desc.join(' · ');
+    let name = attack.name;
+    let desc = attack.description ? attack.description : '';
+    return name + ':::' + desc; 
   }
 
   getAttackDescription(): string {
     return this.hoveredAttackDescription || this.lastShownDescription || '';
+  }
+
+  getAttackTypeLabel(type: string): string {
+    switch (type) {
+      case 'physical': return 'Physical';
+      case 'magic': return 'Magic';
+      case 'heal': return 'Heal';
+      case 'buff': return 'Buff';
+      case 'block': return 'Block';
+      default: return type ? type.charAt(0).toUpperCase() + type.slice(1) : '';
+    }
+  }
+
+  getChargeClass(attack: PlayerAttack): string {
+    if (attack.id === -1) return 'charge-empty';
+    if (attack.currentCharges === 0) return 'charge-empty';
+    if (attack.currentCharges / attack.maxCharges > 0.5) return 'charge-high';
+    if (attack.currentCharges / attack.maxCharges > 0.25) return 'charge-mid';
+    return 'charge-low';
   }
   
   saveBattleState() {
@@ -332,6 +355,8 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       playerEnergy: this.playerEnergy,
       showNextButton: this.showNextButton,
       isPlayerBlocking: this.isPlayerBlocking, 
+      isPlayerHealing: this.isPlayerHealing,
+      isPlayerPoisoned: this.isPlayerPoisoned,
       isEnemyPoisoned: this.isEnemyPoisoned
     });
   }
