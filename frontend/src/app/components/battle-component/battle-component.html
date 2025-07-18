@@ -97,7 +97,7 @@
 
       <div class="attack-description-box" *ngIf="getAttackDescription()">
         <span class="attack-name" *ngIf="getAttackDescription().split(':::')[0] as attackName">
-          {{ attackName }}
+          {{ attackName }}:
         </span>
         <span class="attack-description" *ngIf="getAttackDescription().split(':::')[1] as attackDesc">
           {{ attackDesc }}

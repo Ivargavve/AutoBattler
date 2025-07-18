@@ -27,17 +27,19 @@ export class BattleHubComponent {
     });
 
     this.http.get<any[]>(`${environment.apiUrl}/enemies`).subscribe(enemies => {
-      this.monsters = enemies.map(e => ({
-        name: e.name,
-        level: e.level ?? 1,
-        desc: e.description || e.desc || "",
-        type: e.type || "unknown",
-        maxHp: e.maxHp,
-        attack: e.attack,
-        defense: e.defense,
-        xp: e.xp,
-        critChance: e.critChance
-      }));
+      this.monsters = enemies
+        .map(e => ({
+          name: e.name,
+          level: e.level ?? 1,
+          desc: e.description || e.desc || "",
+          type: e.type || "unknown",
+          maxHp: e.maxHp,
+          attack: e.attack,
+          defense: e.defense,
+          xp: e.xp,
+          critChance: e.critChance
+        }))
+        .sort((a, b) => a.level - b.level);
     });
   }
 
