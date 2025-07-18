@@ -5,12 +5,14 @@ namespace backend.Utils
     public class EnemyTemplate
     {
         public string Name { get; set; } = "";
+        public int Level { get; set; } = 1;
         public int MaxHp { get; set; }
         public int Attack { get; set; }
         public int Defense { get; set; }
         public int XP { get; set; }
         public double CritChance { get; set; }
-        public string Type { get; set; } = "normal"; 
+        public string Type { get; set; } = "normal";
+        public string Description { get; set; } = "";
     }
 
     public static class EnemyTemplates
@@ -18,41 +20,41 @@ namespace backend.Utils
         public static List<EnemyTemplate> All = new List<EnemyTemplate>
         {
             // Undead
-            new EnemyTemplate { Name = "Skeleton", MaxHp = 15, Attack = 9, Defense = 2, XP = 18, CritChance = 0.06, Type = "undead" },
-            new EnemyTemplate { Name = "Zombie", MaxHp = 22, Attack = 10, Defense = 1, XP = 25, CritChance = 0.04, Type = "undead" },
-            new EnemyTemplate { Name = "Vampire", MaxHp = 27, Attack = 16, Defense = 3, XP = 58, CritChance = 0.15, Type = "undead" },
-            new EnemyTemplate { Name = "Lich King", MaxHp = 45, Attack = 28, Defense = 6, XP = 120, CritChance = 0.12, Type = "undead" },
+            new EnemyTemplate { Name = "Skeleton", Level = 1, MaxHp = 18, Attack = 11, Defense = 2, XP = 20, CritChance = 0.06, Type = "undead", Description = "Clattering bones held together by dark magic." },
+            new EnemyTemplate { Name = "Zombie", Level = 2, MaxHp = 28, Attack = 14, Defense = 3, XP = 34, CritChance = 0.06, Type = "undead", Description = "Slow but relentless. Smells terrible." },
+            new EnemyTemplate { Name = "Vampire", Level = 5, MaxHp = 55, Attack = 26, Defense = 8, XP = 90, CritChance = 0.13, Type = "undead", Description = "Elegant and deadly. Thirsts for your blood." },
+            new EnemyTemplate { Name = "Lich King", Level = 11, MaxHp = 160, Attack = 46, Defense = 16, XP = 350, CritChance = 0.15, Type = "undead", Description = "Master of forbidden magic. Rules the undead." },
 
             // Beast
-            new EnemyTemplate { Name = "Wolf", MaxHp = 13, Attack = 11, Defense = 1, XP = 16, CritChance = 0.10, Type = "beast" },
-            new EnemyTemplate { Name = "Dire Bear", MaxHp = 30, Attack = 21, Defense = 4, XP = 68, CritChance = 0.13, Type = "beast" },
-            new EnemyTemplate { Name = "Giant Spider", MaxHp = 18, Attack = 13, Defense = 2, XP = 30, CritChance = 0.12, Type = "beast" },
+            new EnemyTemplate { Name = "Wolf", Level = 1, MaxHp = 15, Attack = 12, Defense = 2, XP = 16, CritChance = 0.08, Type = "beast", Description = "Quick and cunning hunter of the night." },
+            new EnemyTemplate { Name = "Dire Bear", Level = 8, MaxHp = 110, Attack = 32, Defense = 10, XP = 170, CritChance = 0.15, Type = "beast", Description = "Massive and unstoppable in a rampage." },
+            new EnemyTemplate { Name = "Giant Spider", Level = 4, MaxHp = 38, Attack = 19, Defense = 5, XP = 55, CritChance = 0.13, Type = "beast", Description = "Venomous and loves dark corners." },
 
             // Human
-            new EnemyTemplate { Name = "Bandit", MaxHp = 16, Attack = 12, Defense = 2, XP = 17, CritChance = 0.09, Type = "human" },
-            new EnemyTemplate { Name = "Cultist", MaxHp = 20, Attack = 14, Defense = 3, XP = 31, CritChance = 0.13, Type = "human" },
-            new EnemyTemplate { Name = "Dark Knight", MaxHp = 35, Attack = 22, Defense = 6, XP = 75, CritChance = 0.12, Type = "human" },
+            new EnemyTemplate { Name = "Bandit", Level = 2, MaxHp = 24, Attack = 14, Defense = 3, XP = 23, CritChance = 0.07, Type = "human", Description = "Out for your gold, and maybe your life." },
+            new EnemyTemplate { Name = "Cultist", Level = 4, MaxHp = 40, Attack = 19, Defense = 5, XP = 60, CritChance = 0.12, Type = "human", Description = "Worships dark gods. Creepy vibes." },
+            new EnemyTemplate { Name = "Dark Knight", Level = 10, MaxHp = 140, Attack = 39, Defense = 14, XP = 270, CritChance = 0.14, Type = "human", Description = "Sworn to evil. Armor darker than his soul." },
 
             // Demon/Devil
-            new EnemyTemplate { Name = "Imp", MaxHp = 11, Attack = 13, Defense = 0, XP = 13, CritChance = 0.15, Type = "demon" },
-            new EnemyTemplate { Name = "Demon Brute", MaxHp = 41, Attack = 26, Defense = 5, XP = 110, CritChance = 0.16, Type = "demon" },
+            new EnemyTemplate { Name = "Imp", Level = 3, MaxHp = 22, Attack = 18, Defense = 2, XP = 27, CritChance = 0.18, Type = "demon", Description = "Annoying, mischievous, always grinning." },
+            new EnemyTemplate { Name = "Demon Brute", Level = 12, MaxHp = 190, Attack = 52, Defense = 18, XP = 400, CritChance = 0.19, Type = "demon", Description = "Huge horns, huge muscles, zero patience." },
 
             // Dragon
-            new EnemyTemplate { Name = "Young Dragon", MaxHp = 50, Attack = 28, Defense = 7, XP = 140, CritChance = 0.17, Type = "dragon" },
-            new EnemyTemplate { Name = "Ancient Dragon", MaxHp = 120, Attack = 42, Defense = 12, XP = 480, CritChance = 0.21, Type = "dragon" },
+            new EnemyTemplate { Name = "Young Dragon", Level = 15, MaxHp = 270, Attack = 74, Defense = 22, XP = 650, CritChance = 0.20, Type = "dragon", Description = "Fiery breath and an attitude problem." },
+            new EnemyTemplate { Name = "Ancient Dragon", Level = 25, MaxHp = 690, Attack = 136, Defense = 36, XP = 1500, CritChance = 0.25, Type = "dragon", Description = "Wiser and deadlier than you can imagine." },
 
             // Construct 
-            new EnemyTemplate { Name = "Stone Golem", MaxHp = 40, Attack = 17, Defense = 9, XP = 80, CritChance = 0.04, Type = "construct" },
-            new EnemyTemplate { Name = "Animated Armor", MaxHp = 23, Attack = 14, Defense = 7, XP = 38, CritChance = 0.07, Type = "construct" },
+            new EnemyTemplate { Name = "Stone Golem", Level = 9, MaxHp = 120, Attack = 28, Defense = 20, XP = 190, CritChance = 0.07, Type = "construct", Description = "Solid rock. Not much for conversation." },
+            new EnemyTemplate { Name = "Animated Armor", Level = 5, MaxHp = 52, Attack = 22, Defense = 13, XP = 80, CritChance = 0.08, Type = "construct", Description = "Empty armor, full of rage." },
 
             // Elemental
-            new EnemyTemplate { Name = "Fire Elemental", MaxHp = 25, Attack = 19, Defense = 2, XP = 55, CritChance = 0.13, Type = "elemental" },
-            new EnemyTemplate { Name = "Ice Elemental", MaxHp = 23, Attack = 16, Defense = 3, XP = 51, CritChance = 0.11, Type = "elemental" },
+            new EnemyTemplate { Name = "Fire Elemental", Level = 6, MaxHp = 58, Attack = 27, Defense = 6, XP = 110, CritChance = 0.15, Type = "elemental", Description = "Made of living flame. Toasty!" },
+            new EnemyTemplate { Name = "Ice Elemental", Level = 7, MaxHp = 62, Attack = 24, Defense = 10, XP = 115, CritChance = 0.13, Type = "elemental", Description = "Cold, calculating, a bit frosty." },
 
             // Extras
-            new EnemyTemplate { Name = "Haunted Toaster", MaxHp = 8, Attack = 6, Defense = 1, XP = 9, CritChance = 0.18, Type = "construct" },
-            new EnemyTemplate { Name = "Buff Squirrel", MaxHp = 12, Attack = 14, Defense = 1, XP = 13, CritChance = 0.15, Type = "beast" },
-            new EnemyTemplate { Name = "Social Media Troll", MaxHp = 16, Attack = 13, Defense = 1, XP = 19, CritChance = 0.15, Type = "human" }
+            new EnemyTemplate { Name = "Haunted Toaster", Level = 1, MaxHp = 10, Attack = 8, Defense = 2, XP = 11, CritChance = 0.22, Type = "construct", Description = "Makes burnt toast... and your life miserable." },
+            new EnemyTemplate { Name = "Buff Squirrel", Level = 2, MaxHp = 22, Attack = 19, Defense = 3, XP = 21, CritChance = 0.16, Type = "beast", Description = "Small body, huge biceps." },
+            new EnemyTemplate { Name = "Social Media Troll", Level = 3, MaxHp = 29, Attack = 17, Defense = 3, XP = 33, CritChance = 0.15, Type = "human", Description = "Feeds on your rage and typos." }
         };
 
         public static EnemyTemplate? GetByName(string name)

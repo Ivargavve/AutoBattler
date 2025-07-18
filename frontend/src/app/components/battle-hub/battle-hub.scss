@@ -1,14 +1,13 @@
 .battle-hub-wrapper {
   width: 96%;
-  max-width: 950px;
-  margin: 2.5rem auto 0 auto;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  background: #101814;
-  border-radius: 6px;
+  background: var(--bg-grey);
   box-shadow: 0 6px 32px #000b;
   padding: 1.6rem 1.2rem 2rem 1.2rem;
+  min-height: 100vh;
 }
 
 .battle-hub-navbar {
@@ -52,23 +51,6 @@
   box-shadow: 0 0 14px #44ffca13;
 }
 
-.welcome-block {
-  text-align: center;
-  h1 {
-    font-size: 2rem;
-    color: #80ffd1;
-    text-shadow: 0 0 12px #3bffb77c;
-    margin-bottom: 0.7em;
-    letter-spacing: 1px;
-    font-family: 'Share Tech Mono', monospace;
-  }
-  p {
-    color: #baffde;
-    font-size: 1.08rem;
-    margin-bottom: 1.3em;
-  }
-}
-
 .hub-tips {
   list-style: none;
   color: #c7ffe5;
@@ -81,86 +63,6 @@
     font-weight: 400;
     line-height: 1.34;
     letter-spacing: 0.2px;
-  }
-}
-
-.monsters-block {
-  h2 {
-    color: #5bffc7;
-    font-family: 'Share Tech Mono', monospace;
-    margin-bottom: 1.2em;
-    font-size: 1.45rem;
-  }
-  .monsters-list {
-    display: flex;
-    gap: 1.1rem;
-    flex-wrap: wrap;
-    margin-bottom: 0.7em;
-  }
-  .monster-btn {
-    background: #101f15;
-    border: 2px solid #173e2d;
-    border-radius: 8px;
-    min-width: 150px;
-    min-height: 108px;
-    padding: 0.8em 1.1em;
-    color: #a0ffd9;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1.01em;
-    box-shadow: 0 0 12px #31ffb922;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.2em;
-    position: relative;
-    cursor: pointer;
-    transition: box-shadow 0.15s, border-color 0.15s, background 0.18s;
-    outline: none;
-
-    &:hover:not(:disabled) {
-      border-color: #36ffb7;
-      box-shadow: 0 0 18px #4fff9090;
-      background: #122b1b;
-      color: #eafffc;
-    }
-    &:disabled {
-      border-color: #313b36;
-      color: #667c7e;
-      opacity: 0.68;
-      background: #192319;
-      cursor: not-allowed;
-    }
-    .monster-name {
-      font-size: 1.09em;
-      color: #70ffc2;
-      margin-bottom: 0.11em;
-      font-weight: 700;
-      letter-spacing: 0.8px;
-    }
-    .monster-level {
-      font-size: 0.99em;
-      color: #81bfc5;
-      margin-bottom: 0.22em;
-      &.locked {
-        color: #ffa27a;
-        text-shadow: 0 0 4px #fa0a;
-      }
-    }
-    .monster-desc {
-      font-size: 0.97em;
-      color: #a8d1c4;
-      opacity: 0.8;
-      font-weight: 400;
-      margin-top: 0.13em;
-    }
-  }
-  .info-note {
-    color: #b9ffc2;
-    font-size: 0.98em;
-    margin-top: 1em;
-    text-align: left;
-    opacity: 0.77;
-    letter-spacing: 0.1px;
   }
 }
 
@@ -180,10 +82,154 @@
   }
 }
 
+.monsters-block {
+  background: var(--grey-bg);
+  border-radius: 4px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h2 {
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 2rem;
+    letter-spacing: 1.2px;
+    text-shadow: 0 0 7px var(--accent-logo-shadow);
+    margin-bottom: 1.4rem;
+    margin-left: 0.04em;
+    font-weight: 500;
+  }
+}
+
+.monsters-list {
+  width: 100%;
+  margin: 0 auto 1.1rem auto;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.monsters-list li {
+  width: 100%;
+}
+
+.monster-btn {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  border-radius: 4px;
+  box-shadow: inset 0 3px 18px 0 var(--accent-shadow), 0 1px 2px 0 #0005;
+  padding: 1.08em 1.25em 1.07em 1.18em;
+  gap: 0.15em;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8em;
+  color: var(--section-title);
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: 
+    background 0.15s,
+    border-color 0.16s,
+    box-shadow 0.19s,
+    filter 0.11s,
+    color 0.14s;
+  outline: none;
+
+  &:hover:not(:disabled):not(.locked) {
+    background: var(--btn-hover-bg);
+    border-color: var(--accent-hover);
+    box-shadow: inset 0 4px 24px 0 var(--accent-hover-shadow), 0 2px 6px 0 #0009;
+    color: var(--accent-hover);
+    filter: brightness(1.11);
+  }
+  &:active:not(:disabled):not(.locked) {
+    filter: brightness(0.95);
+    background: var(--btn-bg);
+    border-color: var(--accent);
+  }
+  &:disabled,
+  &.locked {
+    background: #202522;
+    border-color: #37443a;
+    color: #788e7d;
+    filter: grayscale(0.5) brightness(0.88);
+    cursor: not-allowed;
+    box-shadow: 0 1px 7px 0 #0007;
+    .monster-name,
+    .monster-desc {
+      color: #919c95;
+      opacity: 0.62;
+      text-shadow: none;
+    }
+    .monster-level {
+      color: #657b67;
+      opacity: 0.8;
+    }
+  }
+
+  .monster-name {
+    font-size: 1.19em;
+    font-family: inherit;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    margin-bottom: 0.12em;
+    color: var(--section-title);
+    text-shadow: 0 1px 9px var(--accent-logo-shadow);
+  }
+  .monster-level {
+    font-size: 1.03em;
+    color: var(--meta-text);
+    margin-bottom: 0.08em;
+    &.locked {
+      color: #657b67;
+      opacity: 0.8;
+      font-style: italic;
+    }
+  }
+  .monster-desc {
+    font-size: 0.97em;
+    color: var(--accent);
+    opacity: 0.93;
+    margin-bottom: 0.02em;
+    margin-top: 0.06em;
+    font-family: inherit;
+    text-shadow: 0 1px 7px var(--accent-logo-shadow);
+  }
+}
+
+// Infotexten under monsterlistan
+.info-note {
+  color: var(--accent);
+  font-size: 1.06em;
+  margin-top: 1.1em;
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.2px;
+  text-align: left;
+  width: 100%;
+  max-width: 460px;
+  min-width: 220px;
+  text-shadow: 0 0 10px var(--accent-shadow);
+}
+
+/* RESPONSIVE */
 @media (max-width: 700px) {
-  .battle-hub-wrapper { padding: 0.6rem; }
-  .battle-hub-navbar { gap: 0.55rem; font-size: 0.95rem; }
-  .hub-block { padding: 1rem 0.6rem; }
-  .monsters-block .monsters-list { gap: 0.4rem; }
-  .monster-btn { min-width: 110px; min-height: 84px; padding: 0.5em 0.5em; }
+  .monsters-block {
+    padding: 1.1rem 0.2rem 1.2rem 0.2rem;
+  }
+  .monsters-list, .info-note {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .monster-btn {
+    font-size: 0.99em;
+    min-width: 110px;
+    min-height: 90px;
+    padding: 0.72em 0.7em 0.7em 0.7em;
+  }
 }

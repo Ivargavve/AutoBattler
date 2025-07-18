@@ -7,6 +7,7 @@ import { environment } from '../../../environments/environment';
 import { Subscription, firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { BattleService } from '../../services/battle.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-battle',
@@ -59,7 +60,8 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
     private http: HttpClient,
     private authService: AuthService,
     private router: Router,
-    private battleService: BattleService
+    private battleService: BattleService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -105,6 +107,10 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.lastShownDescription = '';
     }
+
+    this.route.queryParams.subscribe(params => {
+      this.enemyName = params['enemy'] || null;
+    });
 
     const loadedState = this.battleService.loadBattleState();
     if (loadedState) {
@@ -154,14 +160,14 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.playerEnergy > 0) {
       this.isLoading = true;
       this.battleEnded = false;
-      this.enemyName = null;
       this.enemy = null;
       this.isPlayerBlocking = false; 
       this.isEnemyPoisoned = false;
       this.battleLog = [{ message: "Starting new battle...", type: "start" }];
       this.scrollToBottom();
 
-      this.http.get<any>(`${environment.apiUrl}/battle/encounter`).subscribe({
+      const enemyQuery = this.enemyName ? `?enemyName=${encodeURIComponent(this.enemyName)}` : '';
+      this.http.get<any>(`${environment.apiUrl}/battle/encounter${enemyQuery}`).subscribe({
         next: (enemyData) => {
           this.enemyName = enemyData.enemyName;
           this.enemy = {
@@ -270,7 +276,7 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
     } catch (err) {} finally {
       this.isLoading = false;
       this.showNextButton = false;
-      this.router.navigate(['/battle-planner']);
+      this.router.navigate(['/battle-hub']);
     }
   }
 

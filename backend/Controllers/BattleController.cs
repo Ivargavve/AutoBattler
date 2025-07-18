@@ -321,11 +321,19 @@ namespace backend.Controllers
         }
 
         [HttpGet("encounter")]
-        public IActionResult EncounterEnemy()
+        public IActionResult EncounterEnemy([FromQuery] string? enemyName)
         {
-            var rand = new System.Random();
             var enemyTemplates = EnemyTemplates.All;
-            var selectedEnemy = enemyTemplates[rand.Next(enemyTemplates.Count)];
+
+            var selectedEnemy = !string.IsNullOrEmpty(enemyName)
+                ? EnemyTemplates.GetByName(enemyName)
+                : null;
+
+            if (selectedEnemy == null)
+            {
+                var rand = new System.Random();
+                selectedEnemy = enemyTemplates[rand.Next(enemyTemplates.Count)];
+            }
 
             return Ok(new
             {
@@ -333,6 +341,11 @@ namespace backend.Controllers
                 enemyHp = selectedEnemy.MaxHp,
                 enemyMaxHp = selectedEnemy.MaxHp,
             });
+        }
+        [HttpGet("/api/enemies")]
+        public IActionResult GetEnemies()
+        {
+            return Ok(EnemyTemplates.All);
         }
     }
 
