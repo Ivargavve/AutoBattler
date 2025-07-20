@@ -2,6 +2,8 @@
 
 **AutoBattler** is a hardcore, text based autobattler RPG built for web. You control a single character in turn based combat against bots and other players. When your character dies, they’re gone for good, but your account, achievements, and cosmetic progress remain!
 
+![Battle Example](frontend/src/assets/readme/btl2.png)
+
 ## What is AutoBattler?
 
 AutoBattler blends classic RPG elements with a modern, text based interface. The focus is on tactical battles, meaningful choices, and a sense of risk and progression. No flashy graphics, just tense, strategy driven gameplay anywhere, on any device.
@@ -34,6 +36,8 @@ AutoBattler blends classic RPG elements with a modern, text based interface. The
 
 - **Social & Legacy Progression:**  
   Add friends, view top players, and browse the graveyard of fallen heroes. Earn account XP, titles, and badges that persist across all your characters.
+
+![Battle Example](frontend/src/assets/readme/btl5.png)
 
 ## Tech Stack
 
