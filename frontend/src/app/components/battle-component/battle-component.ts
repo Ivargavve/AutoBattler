@@ -45,6 +45,11 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
   isEnemyBlocking: boolean = false;
   isEnemyHealing: boolean = false;
   isEnemyPoisoned: boolean = false;
+
+  // Enemy poison DoT state
+  enemyPoisonDamagePerTurn: number = 0;
+  enemyPoisonTurnsLeft: number = 0;
+
   // Turn counters for status effects
   // Player turn counters
   playerBlockTurnsLeft: number = 0;
@@ -53,7 +58,6 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
   // Enemy turn counters
   enemyBlockTurnsLeft: number = 0;
   enemyHealTurnsLeft: number = 0;
-  enemyPoisonTurnsLeft: number = 0;
 
   private characterSub!: Subscription;
 
@@ -126,11 +130,16 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.userXp = loadedState.userXp;
       this.playerEnergy = loadedState.playerEnergy;
       this.showNextButton = loadedState.showNextButton || false;
+
       this.isPlayerBlocking = loadedState.isPlayerBlocking || false;
       this.isPlayerEvading = loadedState.isPlayerEvading || false;
       this.isPlayerHealing = loadedState.isPlayerHealing || false;
       this.isPlayerPoisoned = loadedState.isPlayerPoisoned || false;
+
       this.isEnemyPoisoned = loadedState.isEnemyPoisoned || false;
+      this.enemyPoisonDamagePerTurn = loadedState.enemyPoisonDamagePerTurn || 0;
+      this.enemyPoisonTurnsLeft = loadedState.enemyPoisonTurnsLeft || 0;
+
       this.playerCritBonus = loadedState.playerCritBonus || 0;
       this.playerCritBonusTurns = loadedState.playerCritBonusTurns || 0;
     } else {
@@ -167,11 +176,16 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isLoading = true;
       this.battleEnded = false;
       this.enemy = null;
+
+      // reset statuses
       this.isPlayerBlocking = false; 
       this.isPlayerEvading = false;
       this.isEnemyPoisoned = false;
       this.playerCritBonus = 0;
       this.playerCritBonusTurns = 0;
+      this.enemyPoisonDamagePerTurn = 0;
+      this.enemyPoisonTurnsLeft = 0;
+
       this.battleLog = [{ message: "Starting new battle...", type: "start" }];
       this.scrollToBottom();
 
@@ -217,8 +231,14 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       enemyName: this.enemy.name,
       action: 'attack',
       attackId: attack.id,
+
+      // crit buff state
       playerCritBonus: this.playerCritBonus,
-      playerCritBonusTurns: this.playerCritBonusTurns
+      playerCritBonusTurns: this.playerCritBonusTurns,
+
+      // poison DoT state på fienden
+      enemyPoisonDamagePerTurn: this.enemyPoisonDamagePerTurn,
+      enemyPoisonTurnsLeft: this.enemyPoisonTurnsLeft
     };
 
     this.http.post<any>(`${environment.apiUrl}/battle/turn`, req)
@@ -230,13 +250,21 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
           this.enemy!.maxHp = res.enemyMaxHp;
           this.enemy!.name = res.enemyName;
           this.enemyName = res.enemyName;
+
           this.isPlayerBlocking = res.isPlayerBlocking || false;
           this.isPlayerEvading = res.isPlayerEvading || false; 
           this.isPlayerHealing = res.isPlayerHealing || false;
           this.isPlayerPoisoned = res.isPlayerPoisoned || false;
+
+          // poison DoT state från backend
           this.isEnemyPoisoned = res.isEnemyPoisoned || false;
+          this.enemyPoisonDamagePerTurn = res.enemyPoisonDamagePerTurn ?? this.enemyPoisonDamagePerTurn ?? 0;
+          this.enemyPoisonTurnsLeft = res.enemyPoisonTurnsLeft ?? this.enemyPoisonTurnsLeft ?? 0;
+
+          // crit-buff state från backend
           this.playerCritBonus = res.playerCritBonus ?? 0;
           this.playerCritBonusTurns = res.playerCritBonusTurns ?? 0;
+
           this.battleLog.push(...res.battleLog);
           this.battleEnded = res.battleEnded;
 
@@ -283,6 +311,8 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.userXp = null;
       this.playerEnergy = 0;
       this.attacks = [];
+
+      // reset statuses
       this.isPlayerBlocking = false;
       this.isPlayerEvading = false;
       this.isPlayerHealing = false;
@@ -290,6 +320,9 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isEnemyPoisoned = false;
       this.playerCritBonus = 0;
       this.playerCritBonusTurns = 0;
+      this.enemyPoisonDamagePerTurn = 0;
+      this.enemyPoisonTurnsLeft = 0;
+
     } catch (err) {} finally {
       this.isLoading = false;
       this.showNextButton = false;
@@ -365,6 +398,11 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
     if (attack.currentCharges / attack.maxCharges > 0.25) return 'charge-mid';
     return 'charge-low';
   }
+
+  // crit-buff-badge
+  get isPlayerCritBuffed(): boolean {
+    return (this.playerCritBonus ?? 0) > 0 && (this.playerCritBonusTurns ?? 0) > 0;
+  }
   
   saveBattleState() {
     this.battleService.saveBattleState({
@@ -377,11 +415,16 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       userXp: this.userXp,
       playerEnergy: this.playerEnergy,
       showNextButton: this.showNextButton,
+
       isPlayerBlocking: this.isPlayerBlocking,
       isPlayerEvading: this.isPlayerEvading,
       isPlayerHealing: this.isPlayerHealing,
       isPlayerPoisoned: this.isPlayerPoisoned,
+
       isEnemyPoisoned: this.isEnemyPoisoned,
+      enemyPoisonDamagePerTurn: this.enemyPoisonDamagePerTurn,
+      enemyPoisonTurnsLeft: this.enemyPoisonTurnsLeft,
+
       playerCritBonus: this.playerCritBonus,
       playerCritBonusTurns: this.playerCritBonusTurns
     });

@@ -16,10 +16,13 @@ namespace backend.Data
         public string Description { get; set; } = "";
         public int HealAmount { get; set; } = 0;
         public bool BlockNextAttack { get; set; } = false;
-        public bool Poison { get; set; } = false;       
-        public bool EvadeNextAttack { get; set; } = false; 
-        public int CritChanceBonus { get; set; } = 0;        
+        public bool Poison { get; set; } = false;
+        public bool EvadeNextAttack { get; set; } = false;
+        public int CritChanceBonus { get; set; } = 0;
         public int CritBonusTurns { get; set; } = 0;
+        public int PoisonDamagePerTurn { get; set; } = 0;
+        public int PoisonDuration { get; set; } = 0;
+
     }
 
     public static class AttackTemplates
@@ -50,7 +53,7 @@ namespace backend.Data
                 Scaling = new Dictionary<string, double> { { "attack", 1.3 }, { "speed", 0.2 } },
                 RequiredStats = new Dictionary<string, int> { { "attack", 12 } },
                 AllowedClasses = new List<string> { "warrior" },
-                Description = "A heavy cleaving attack that can hit multiple foes."
+                Description = "A heavy slashing attack with high base damage."
             },
             new AttackTemplate
             {
@@ -77,9 +80,10 @@ namespace backend.Data
                 Scaling = new Dictionary<string, double> { },
                 RequiredStats = new Dictionary<string, int> { { "attack", 8 } },
                 AllowedClasses = new List<string> { "warrior" },
-                Description = "Increases your attack for the next two turns."
+                CritChanceBonus = 100,
+                CritBonusTurns = 2,
+                Description = "Increases your attack and critical chance for a short time."
             },
-
             new AttackTemplate
             {
                 Id = 5,
@@ -214,8 +218,11 @@ namespace backend.Data
                 RequiredStats = new Dictionary<string, int> { { "agility", 10 } },
                 AllowedClasses = new List<string> { "rogue" },
                 Poison = true,
+                PoisonDamagePerTurn = 3,
+                PoisonDuration = 3,
                 Description = "A strike that poisons the enemy over time."
             },
+
             new AttackTemplate
             {
                 Id = 15,
@@ -277,13 +284,16 @@ namespace backend.Data
                 Id = 19,
                 Name = "Nature's Grasp",
                 Type = "magic",
-                DamageType = "nature",
+                DamageType = "poison",
                 BaseDamage = 8,
                 MaxCharges = 4,
                 Scaling = new Dictionary<string, double> { { "magic", 0.9 } },
                 RequiredStats = new Dictionary<string, int> { { "magic", 8 } },
                 AllowedClasses = new List<string> { "ranger" },
-                Description = "Roots the enemy and deals nature damage."
+                Poison = true,
+                PoisonDamagePerTurn = 4,
+                PoisonDuration = 2,
+                Description = "Roots the enemy and deals poison damage over time."
             },
             new AttackTemplate
             {

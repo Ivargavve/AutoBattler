@@ -26,8 +26,13 @@ export interface BattleResponse {
   isPlayerEvading?: boolean;
   isEnemyPoisoned?: boolean;
 
+  // crit-buff state
   playerCritBonus?: number;
   playerCritBonusTurns?: number;
+
+  // poison DoT state på fienden
+  enemyPoisonDamagePerTurn?: number;
+  enemyPoisonTurnsLeft?: number;
 }
 
 export interface BattleLogEntry {

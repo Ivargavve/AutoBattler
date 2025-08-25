@@ -14,14 +14,18 @@ namespace backend.Logic
         public string Log { get; set; } = "";
         public int CritChanceBonus { get; set; }
         public int CritBonusTurns { get; set; }
+
+        // Poison DoT
+        public int PoisonDamagePerTurn { get; set; }
+        public int PoisonTurns { get; set; }
     }
 
     public static class AttackLogic
     {
         public static AttackResult ApplyAttack(
             AttackTemplate template,
-            dynamic player,   // förväntas ha Name, Attack, Magic, Defense, Agility, Speed
-            dynamic enemy     // förväntas ha Name, Type
+            dynamic player,   // Name, Attack, Magic, Defense, Agility, Speed
+            dynamic enemy     // Name, Type
         )
         {
             int damage = template.BaseDamage;
@@ -32,6 +36,9 @@ namespace backend.Logic
 
             int critBonus = 0;
             int critTurns = 0;
+
+            int pDmg = 0;
+            int pTurns = 0;
 
             var effects = new List<string>();
 
@@ -59,7 +66,9 @@ namespace backend.Logic
                     effects.Add($"{player.Name} is healed for {heal} HP!");
                     if ((enemy?.Type as string)?.ToLower() == "undead")
                     {
-                        double magicScale = (template.Scaling != null) ? template.Scaling.GetValueOrDefault("magic", 0) : 0;
+                        double magicScale = (template.Scaling != null)
+                            ? template.Scaling.GetValueOrDefault("magic", 0)
+                            : 0;
                         damage = template.BaseDamage + 10 + (int)(magicScale * (player.Magic ?? 0));
                         var enemyName = enemy?.Name ?? "the enemy";
                         effects.Add($"{player.Name} smites undead {enemyName}!");
@@ -78,8 +87,11 @@ namespace backend.Logic
                     break;
 
                 case "Poison Strike":
+                case "Nature's Grasp":
                     poison = true;
-                    effects.Add($"{player.Name} uses {template.Name} and poisons {enemy.Name}!");
+                    pDmg = template.PoisonDamagePerTurn > 0 ? template.PoisonDamagePerTurn : 2;
+                    pTurns = template.PoisonDuration > 0 ? template.PoisonDuration : 2;
+                    effects.Add($"{player.Name} uses {template.Name} and applies poison!");
                     break;
 
                 case "Shadowstep":
@@ -92,12 +104,10 @@ namespace backend.Logic
                     break;
 
                 case "Battle Shout":
-                    effects.Add($"{player.Name} uses Battle Shout and increases attack for 2 turns!");
+                    critBonus = template.CritChanceBonus > 0 ? template.CritChanceBonus : 20;
+                    critTurns = template.CritBonusTurns  > 0 ? template.CritBonusTurns  : 1;
+                    effects.Add($"{player.Name} uses Battle Shout and rallies for the next fights!");
                     damage = 0;
-                    break;
-
-                case "Nature's Grasp":
-                    effects.Add($"{player.Name} roots the enemy with nature's grasp!");
                     break;
 
                 default:
@@ -105,7 +115,6 @@ namespace backend.Logic
                     break;
             }
 
-            // Generell följdlogik
             if (heal > 0 && template.Name != "Holy Light")
             {
                 effects.Add($"{player.Name} heals for {heal} HP!");
@@ -135,6 +144,9 @@ namespace backend.Logic
                 BlockNextAttack = block,
                 EvadeNextAttack = evade,
                 ApplyPoison = poison,
+                PoisonDamagePerTurn = poison ? pDmg : 0,
+                PoisonTurns = poison ? pTurns : 0,
+
                 CritChanceBonus = critBonus,
                 CritBonusTurns = critTurns,
                 Log = string.Join(" ", effects)

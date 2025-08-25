@@ -56,6 +56,9 @@
               <span class="status-badge-friendly block" *ngIf="isPlayerBlocking">🛡️ Block ({{ playerBlockTurnsLeft }})</span>
               <span class="status-badge-friendly heal" *ngIf="isPlayerHealing">❤️ Heal ({{ playerHealTurnsLeft }})</span>
               <span class="status-badge-friendly poison" *ngIf="isPlayerPoisoned">☠️ Poison ({{ playerPoisonTurnsLeft }})</span>
+              <span class="status-badge-friendly crit" *ngIf="isPlayerCritBuffed">
+                🎯 Crit +{{ playerCritBonus }}% ({{ playerCritBonusTurns }})
+              </span>
             </div>
             <div class="hp">HP: {{ player?.hp }} / {{ player?.maxHp }}</div>
           </div>

@@ -74,10 +74,19 @@ namespace backend.Controllers
             bool isPlayerEvading = false;
             bool isEnemyPoisoned = false;
 
+            // incoming buffs from previous turn (frontend → backend)
             int incomingCritBonus = req.PlayerCritBonus ?? 0;
             int incomingCritTurns = req.PlayerCritBonusTurns ?? 0;
+
+            // incoming enemy poison DoT state
+            int inEnemyPoisonDmg = req.EnemyPoisonDamagePerTurn ?? 0;
+            int inEnemyPoisonTurns = req.EnemyPoisonTurnsLeft ?? 0;
+
+            // state to send back to next turn
             int outCritBonus = 0;
             int outCritTurns = 0;
+            int outEnemyPoisonDmg = 0;
+            int outEnemyPoisonTurns = 0;
 
             if (req.Action == "attack" && req.AttackId.HasValue)
             {
@@ -106,39 +115,76 @@ namespace backend.Controllers
                 int heal = result.HealToPlayer;
                 isPlayerBlocking = result.BlockNextAttack;
                 isPlayerEvading = result.EvadeNextAttack;
-                isEnemyPoisoned = result.ApplyPoison;
 
-                log.Add(new BattleLogEntry
+                // apply new poison if attack set it
+                if (result.ApplyPoison && result.PoisonDamagePerTurn > 0 && result.PoisonTurns > 0)
                 {
-                    Message = result.Log,
-                    Type = "status"
-                });
+                    inEnemyPoisonDmg = result.PoisonDamagePerTurn;
+                    inEnemyPoisonTurns = result.PoisonTurns;
+                }
 
+                // if this attack grants crit buff (e.g., Camouflage, Battle Shout), it starts next turn
                 if (result.CritChanceBonus > 0 && result.CritBonusTurns > 0)
                 {
                     outCritBonus = result.CritChanceBonus;
                     outCritTurns = result.CritBonusTurns;
                 }
 
-                double effectiveCrit = player.CriticalChance; 
+                // effective crit chance with any incoming buff
+                double effectiveCrit = player.CriticalChance; // 0..1
                 if (incomingCritTurns > 0 && damage > 0)
                 {
                     effectiveCrit = Math.Min(1.0, effectiveCrit + (incomingCritBonus / 100.0));
                 }
 
+                // roll crit
                 double critRoll = rand.NextDouble();
                 bool isCrit = (damage > 0) && (critRoll < effectiveCrit);
                 if (isCrit)
                 {
                     damage = (int)Math.Round(damage * 2.0);
+
+                    // ability line first
+                    log.Add(new BattleLogEntry
+                    {
+                        Message = $"{player.Name} uses {attackTemplate.Name}!",
+                        Type = "status"
+                    });
+
+                    // single crit damage line
                     var critLines = BattleDialogLines.CritLines(player.Name, damage);
                     log.Add(new BattleLogEntry { Message = critLines[rand.Next(critLines.Length)], Type = "player-crit" });
+
+                    // any auxiliary statuses that shouldn't be lost on crit
+                    if (isPlayerBlocking)
+                        log.Add(new BattleLogEntry { Message = $"{player.Name} prepares to block the next attack!", Type = "status" });
+                    if (isPlayerEvading)
+                        log.Add(new BattleLogEntry { Message = $"{player.Name} will evade the next attack!", Type = "status" });
+                    if (heal > 0)
+                        log.Add(new BattleLogEntry { Message = $"{player.Name} heals for {heal} HP!", Type = "status" });
+                }
+                else
+                {
+                    // normal status block from AttackLogic
+                    log.Add(new BattleLogEntry { Message = result.Log, Type = "status" });
+
+                    // explicit damage line for non-crit damaging skills
+                    if (damage > 0)
+                    {
+                        log.Add(new BattleLogEntry
+                        {
+                            Message = $"{player.Name} deals {damage} damage to the {enemy.Name.ToLower()}.",
+                            Type = "player-attack-damage"
+                        });
+                    }
                 }
 
+                // consume one turn of incoming crit buff if we actually swung
                 if (incomingCritTurns > 0 && damage > 0)
                 {
                     incomingCritTurns -= 1;
                 }
+                // forward remaining incoming crit buff if still active
                 if (incomingCritTurns > 0)
                 {
                     outCritBonus = incomingCritBonus;
@@ -148,21 +194,13 @@ namespace backend.Controllers
                 int enemyHpNew = enemy.Hp - damage;
                 player.CurrentHealth = Math.Min(player.MaxHealth, player.CurrentHealth + heal);
 
-                if (!isCrit && damage > 0)
-                {
-                    log.Add(new BattleLogEntry
-                    {
-                        Message = $"{player.Name} deals {damage} damage to the {enemy.Name.ToLower()}.",
-                        Type = "player-attack-damage"
-                    });
-                }
-
                 var enemyHpLines = BattleDialogLines.EnemyHpLines(enemy.Name, Math.Max(enemyHpNew, 0), enemy.MaxHp);
                 log.Add(new BattleLogEntry { Message = enemyHpLines[rand.Next(enemyHpLines.Length)], Type = "enemy-hp" });
 
                 attack.CurrentCharges -= 1;
                 player.AttacksJson = JsonSerializer.Serialize(attacks);
 
+                // if enemy died from the hit, end battle
                 if (enemyHpNew <= 0)
                 {
                     var victoryLines = BattleDialogLines.VictoryLines(player.Name, enemy.Name.ToLower());
@@ -223,18 +261,114 @@ namespace backend.Controllers
                         UserLevel = player.User?.Level ?? 0,
                         PlayerEnergy = player.CurrentEnergy,
                         PlayerAttacks = attacks,
+
                         isPlayerBlocking = isPlayerBlocking,
                         isPlayerEvading = isPlayerEvading,
-                        isEnemyPoisoned = isEnemyPoisoned,
-                        PlayerCritBonus = outCritBonus,
-                        PlayerCritBonusTurns = outCritTurns
+
+                        isEnemyPoisoned = false,
+                        enemyPoisonDamagePerTurn = 0,
+                        enemyPoisonTurnsLeft = 0,
+
+                        playerCritBonus = outCritBonus,
+                        playerCritBonusTurns = outCritTurns
                     });
                 }
 
                 // --- ENEMY TURN ---
+
                 var enemyActions = BattleDialogLines.EnemyActions(enemy.Name.ToLower());
                 log.Add(new BattleLogEntry { Message = enemyActions[rand.Next(enemyActions.Length)], Type = "enemy-action" });
 
+                // poison tick at the start of enemy turn
+                if (inEnemyPoisonTurns > 0 && inEnemyPoisonDmg > 0)
+                {
+                    enemyHpNew -= inEnemyPoisonDmg;
+                    log.Add(new BattleLogEntry
+                    {
+                        Message = $"Poison deals {inEnemyPoisonDmg} damage to the {enemy.Name.ToLower()}.",
+                        Type = "status"
+                    });
+                    inEnemyPoisonTurns -= 1;
+
+                    // if poison killed the enemy, end here before it attacks
+                    if (enemyHpNew <= 0)
+                    {
+                        var victoryLines2 = BattleDialogLines.VictoryLines(player.Name, enemy.Name.ToLower());
+                        log.Add(new BattleLogEntry { Message = victoryLines2[rand.Next(victoryLines2.Length)], Type = "victory" });
+                        log.Add(new BattleLogEntry { Message = $"{player.Name} gains {enemy.xp} XP from the battle.", Type = "xp" });
+                        player.CurrentEnergy -= 1;
+
+                        int gainedXp = enemy.xp;
+                        player.ExperiencePoints += gainedXp;
+
+                        if (player.ExperiencePoints >= player.MaxExperiencePoints)
+                        {
+                            player.ExperiencePoints = 0;
+                            player.Level += 1;
+                            player.MaxExperiencePoints = (int)(player.MaxExperiencePoints * 1.2);
+                            player.CurrentHealth = player.MaxHealth;
+                            log.Add(new BattleLogEntry { Message = $"🎉 {player.Name} has reached level {player.Level}!", Type = "levelup" });
+
+                            if (player.User != null)
+                            {
+                                player.User.ExperiencePoints += 100;
+                                if (player.User.ExperiencePoints >= player.User.MaxExperiencePoints)
+                                {
+                                    player.User.ExperiencePoints = 0;
+                                    player.User.Level += 1;
+                                    player.User.MaxExperiencePoints = (int)(player.User.MaxExperiencePoints * 1.2);
+                                    player.User.Credits += player.User.Level * 100;
+                                    log.Add(new BattleLogEntry { Message = $"🎉 Your account has reached user level {player.User.Level}!", Type = "user-levelup" });
+                                }
+                            }
+                        }
+                        await _db.SaveChangesAsync();
+
+                        log.Add(new BattleLogEntry
+                        {
+                            Message = $"{player.Name}: {player.CurrentHealth}/{player.MaxHealth} HP | {enemy.Name}: 0/{enemy.MaxHp} HP",
+                            Type = "hp-row"
+                        });
+
+                        return Ok(new
+                        {
+                            PlayerHp = player.CurrentHealth,
+                            PlayerMaxHp = player.MaxHealth,
+                            EnemyHp = 0,
+                            EnemyMaxHp = enemy.MaxHp,
+                            EnemyName = enemy.Name,
+                            BattleLog = log,
+                            BattleEnded = true,
+                            GainedXp = gainedXp,
+                            NewExperiencePoints = player.ExperiencePoints,
+                            PlayerLevel = player.Level,
+                            UserXp = player.User?.ExperiencePoints ?? 0,
+                            UserLevel = player.User?.Level ?? 0,
+                            PlayerEnergy = player.CurrentEnergy,
+                            PlayerAttacks = attacks,
+
+                            isPlayerBlocking = isPlayerBlocking,
+                            isPlayerEvading = isPlayerEvading,
+
+                            isEnemyPoisoned = false,
+                            enemyPoisonDamagePerTurn = 0,
+                            enemyPoisonTurnsLeft = 0,
+
+                            playerCritBonus = outCritBonus,
+                            playerCritBonusTurns = outCritTurns
+                        });
+                    }
+                }
+
+                // forward remaining poison state
+                if (inEnemyPoisonTurns > 0)
+                {
+                    outEnemyPoisonDmg = inEnemyPoisonDmg;
+                    outEnemyPoisonTurns = inEnemyPoisonTurns;
+                }
+                isEnemyPoisoned = outEnemyPoisonTurns > 0;
+
+                // enemy attack flavor
                 var enemyAttackLines = BattleDialogLines.EnemyAttackLines(enemy.Name.ToLower());
                 log.Add(new BattleLogEntry { Message = enemyAttackLines[rand.Next(enemyAttackLines.Length)], Type = "enemy-attack" });
 
@@ -321,11 +455,16 @@ namespace backend.Controllers
                         UserLevel = player.User?.Level ?? 0,
                         PlayerEnergy = player.CurrentEnergy,
                         PlayerAttacks = attacks,
+
                         isPlayerBlocking = false, 
                         isPlayerEvading = false,
+
                         isEnemyPoisoned = isEnemyPoisoned,
-                        PlayerCritBonus = outCritBonus,
-                        PlayerCritBonusTurns = outCritTurns
+                        enemyPoisonDamagePerTurn = outEnemyPoisonDmg,
+                        enemyPoisonTurnsLeft = outEnemyPoisonTurns,
+
+                        playerCritBonus = outCritBonus,
+                        playerCritBonusTurns = outCritTurns
                     });
                 }
 
@@ -358,13 +497,19 @@ namespace backend.Controllers
                     UserLevel = player.User?.Level ?? 0,
                     PlayerEnergy = player.CurrentEnergy,
                     PlayerAttacks = attacks,
+
                     isPlayerBlocking = false, 
                     isPlayerEvading = false,
+
                     isEnemyPoisoned = isEnemyPoisoned,
-                    PlayerCritBonus = outCritBonus,
-                    PlayerCritBonusTurns = outCritTurns
+                    enemyPoisonDamagePerTurn = outEnemyPoisonDmg,
+                    enemyPoisonTurnsLeft = outEnemyPoisonTurns,
+
+                    playerCritBonus = outCritBonus,
+                    playerCritBonusTurns = outCritTurns
                 });
             }
+
             return BadRequest("Unknown action or missing attack id");
         }
 
@@ -426,8 +571,12 @@ namespace backend.Controllers
         public int? EnemyHp { get; set; }
         public string? EnemyName { get; set; }
 
-        // Crit-buff från frontend
-        public int? PlayerCritBonus { get; set; }       // procentenheter
-        public int? PlayerCritBonusTurns { get; set; }  // kvarvarande turer
+        // crit buff from frontend
+        public int? PlayerCritBonus { get; set; }
+        public int? PlayerCritBonusTurns { get; set; }
+
+        // enemy poison DoT state from frontend
+        public int? EnemyPoisonDamagePerTurn { get; set; }
+        public int? EnemyPoisonTurnsLeft { get; set; }
     }
 }
