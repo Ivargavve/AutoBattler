@@ -23,7 +23,11 @@ export interface BattleResponse {
   userLevel?: number;
 
   isPlayerBlocking?: boolean;
+  isPlayerEvading?: boolean;
   isEnemyPoisoned?: boolean;
+
+  playerCritBonus?: number;
+  playerCritBonusTurns?: number;
 }
 
 export interface BattleLogEntry {

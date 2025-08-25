@@ -9,25 +9,33 @@ namespace backend.Logic
         public int DamageToEnemy { get; set; }
         public int HealToPlayer { get; set; }
         public bool BlockNextAttack { get; set; }
+        public bool EvadeNextAttack { get; set; }
         public bool ApplyPoison { get; set; }
         public string Log { get; set; } = "";
+        public int CritChanceBonus { get; set; }
+        public int CritBonusTurns { get; set; }
     }
 
     public static class AttackLogic
     {
         public static AttackResult ApplyAttack(
             AttackTemplate template,
-            dynamic player,  
-            dynamic enemy  
+            dynamic player,   // förväntas ha Name, Attack, Magic, Defense, Agility, Speed
+            dynamic enemy     // förväntas ha Name, Type
         )
         {
             int damage = template.BaseDamage;
             int heal = template.HealAmount;
             bool block = template.BlockNextAttack;
+            bool evade = template.EvadeNextAttack;
             bool poison = template.Poison;
-            string log = "";
+
+            int critBonus = 0;
+            int critTurns = 0;
+
             var effects = new List<string>();
 
+            // Scaling
             if (template.Scaling != null)
             {
                 foreach (var pair in template.Scaling)
@@ -36,11 +44,11 @@ namespace backend.Logic
                     double scale = pair.Value;
                     switch (stat)
                     {
-                        case "attack": damage += (int)(scale * (player.Attack ?? 0)); break;
-                        case "magic": damage += (int)(scale * (player.Magic ?? 0)); break;
+                        case "attack":  damage += (int)(scale * (player.Attack  ?? 0)); break;
+                        case "magic":   damage += (int)(scale * (player.Magic   ?? 0)); break;
                         case "defense": damage += (int)(scale * (player.Defense ?? 0)); break;
                         case "agility": damage += (int)(scale * (player.Agility ?? 0)); break;
-                        case "speed": damage += (int)(scale * (player.Speed ?? 0)); break;
+                        case "speed":   damage += (int)(scale * (player.Speed   ?? 0)); break;
                     }
                 }
             }
@@ -54,7 +62,7 @@ namespace backend.Logic
                         double magicScale = (template.Scaling != null) ? template.Scaling.GetValueOrDefault("magic", 0) : 0;
                         damage = template.BaseDamage + 10 + (int)(magicScale * (player.Magic ?? 0));
                         var enemyName = enemy?.Name ?? "the enemy";
-                        effects.Add($"{player.Name} smites undead {enemyName} for {damage} holy damage!");
+                        effects.Add($"{player.Name} smites undead {enemyName}!");
                     }
                     else
                     {
@@ -66,19 +74,19 @@ namespace backend.Logic
                 case "Shield Block":
                 case "Mana Shield":
                     block = true;
-                    if (damage > 0)
-                        effects.Add($"{player.Name} blocks the next attack and hits for {damage} damage!");
-                    else
-                        effects.Add($"{player.Name} prepares to block the next attack!");
+                    effects.Add($"{player.Name} prepares to block the next attack!");
                     break;
 
                 case "Poison Strike":
                     poison = true;
-                    effects.Add($"{player.Name} uses {template.Name} and poisons {enemy.Name} for {damage} damage!");
+                    effects.Add($"{player.Name} uses {template.Name} and poisons {enemy.Name}!");
                     break;
 
                 case "Shadowstep":
                 case "Camouflage":
+                    evade = true;
+                    critBonus = template.CritChanceBonus > 0 ? template.CritChanceBonus : 20;
+                    critTurns = template.CritBonusTurns  > 0 ? template.CritBonusTurns  : 1;
                     effects.Add($"{player.Name} uses {template.Name} and becomes harder to hit!");
                     damage = 0;
                     break;
@@ -89,17 +97,15 @@ namespace backend.Logic
                     break;
 
                 case "Nature's Grasp":
-                    effects.Add($"{player.Name} roots the enemy with nature's grasp and deals {damage} nature damage!");
+                    effects.Add($"{player.Name} roots the enemy with nature's grasp!");
                     break;
 
                 default:
-                    if (damage > 0)
-                        effects.Add($"{player.Name} uses {template.Name} and deals {damage} damage.");
-                    else
-                        effects.Add($"{player.Name} uses {template.Name}!");
+                    effects.Add($"{player.Name} uses {template.Name}!");
                     break;
             }
 
+            // Generell följdlogik
             if (heal > 0 && template.Name != "Holy Light")
             {
                 effects.Add($"{player.Name} heals for {heal} HP!");
@@ -108,21 +114,30 @@ namespace backend.Logic
             {
                 effects.Add($"{player.Name} prepares to block the next attack!");
             }
+            if (evade)
+            {
+                effects.Add($"{player.Name} will evade the next attack!");
+            }
             if (poison && template.Name != "Poison Strike")
             {
                 var enemyName = enemy?.Name ?? "the enemy";
                 effects.Add($"{player.Name} poisons {enemyName}!");
             }
-
-            log = string.Join(" ", effects);
+            if (critBonus > 0 && critTurns > 0)
+            {
+                effects.Add($"{player.Name} gains +{critBonus}% crit chance for {critTurns} turn(s)!");
+            }
 
             return new AttackResult
             {
                 DamageToEnemy = Math.Max(0, damage),
                 HealToPlayer = Math.Max(0, heal),
                 BlockNextAttack = block,
+                EvadeNextAttack = evade,
                 ApplyPoison = poison,
-                Log = log
+                CritChanceBonus = critBonus,
+                CritBonusTurns = critTurns,
+                Log = string.Join(" ", effects)
             };
         }
     }

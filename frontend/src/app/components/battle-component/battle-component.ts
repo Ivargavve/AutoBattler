@@ -33,11 +33,14 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedAttackDescription: string = '';
   lastShownDescription: string = '';
 
-  // Status flags
   // Player status effects
   isPlayerBlocking: boolean = false;
+  isPlayerEvading: boolean = false; 
   isPlayerHealing: boolean = false;
   isPlayerPoisoned: boolean = false;
+  playerCritBonus: number = 0;
+  playerCritBonusTurns: number = 0;
+
   // Enemy status effects
   isEnemyBlocking: boolean = false;
   isEnemyHealing: boolean = false;
@@ -124,9 +127,12 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.playerEnergy = loadedState.playerEnergy;
       this.showNextButton = loadedState.showNextButton || false;
       this.isPlayerBlocking = loadedState.isPlayerBlocking || false;
+      this.isPlayerEvading = loadedState.isPlayerEvading || false;
       this.isPlayerHealing = loadedState.isPlayerHealing || false;
       this.isPlayerPoisoned = loadedState.isPlayerPoisoned || false;
       this.isEnemyPoisoned = loadedState.isEnemyPoisoned || false;
+      this.playerCritBonus = loadedState.playerCritBonus || 0;
+      this.playerCritBonusTurns = loadedState.playerCritBonusTurns || 0;
     } else {
       this.battleLog = [];
       this.battleEnded = true;
@@ -162,7 +168,10 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.battleEnded = false;
       this.enemy = null;
       this.isPlayerBlocking = false; 
+      this.isPlayerEvading = false;
       this.isEnemyPoisoned = false;
+      this.playerCritBonus = 0;
+      this.playerCritBonusTurns = 0;
       this.battleLog = [{ message: "Starting new battle...", type: "start" }];
       this.scrollToBottom();
 
@@ -207,7 +216,9 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       enemyHp: this.enemy.hp,
       enemyName: this.enemy.name,
       action: 'attack',
-      attackId: attack.id
+      attackId: attack.id,
+      playerCritBonus: this.playerCritBonus,
+      playerCritBonusTurns: this.playerCritBonusTurns
     };
 
     this.http.post<any>(`${environment.apiUrl}/battle/turn`, req)
@@ -220,9 +231,12 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
           this.enemy!.name = res.enemyName;
           this.enemyName = res.enemyName;
           this.isPlayerBlocking = res.isPlayerBlocking || false;
+          this.isPlayerEvading = res.isPlayerEvading || false; 
           this.isPlayerHealing = res.isPlayerHealing || false;
           this.isPlayerPoisoned = res.isPlayerPoisoned || false;
           this.isEnemyPoisoned = res.isEnemyPoisoned || false;
+          this.playerCritBonus = res.playerCritBonus ?? 0;
+          this.playerCritBonusTurns = res.playerCritBonusTurns ?? 0;
           this.battleLog.push(...res.battleLog);
           this.battleEnded = res.battleEnded;
 
@@ -269,10 +283,13 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.userXp = null;
       this.playerEnergy = 0;
       this.attacks = [];
-      this.isPlayerBlocking = false; 
+      this.isPlayerBlocking = false;
+      this.isPlayerEvading = false;
       this.isPlayerHealing = false;
       this.isPlayerPoisoned = false;
       this.isEnemyPoisoned = false;
+      this.playerCritBonus = 0;
+      this.playerCritBonusTurns = 0;
     } catch (err) {} finally {
       this.isLoading = false;
       this.showNextButton = false;
@@ -360,10 +377,13 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       userXp: this.userXp,
       playerEnergy: this.playerEnergy,
       showNextButton: this.showNextButton,
-      isPlayerBlocking: this.isPlayerBlocking, 
+      isPlayerBlocking: this.isPlayerBlocking,
+      isPlayerEvading: this.isPlayerEvading,
       isPlayerHealing: this.isPlayerHealing,
       isPlayerPoisoned: this.isPlayerPoisoned,
-      isEnemyPoisoned: this.isEnemyPoisoned
+      isEnemyPoisoned: this.isEnemyPoisoned,
+      playerCritBonus: this.playerCritBonus,
+      playerCritBonusTurns: this.playerCritBonusTurns
     });
   }
 

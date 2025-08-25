@@ -6,7 +6,7 @@ namespace backend.Data
     {
         public int Id { get; set; }
         public string Name { get; set; } = "";
-        public string Type { get; set; } = ""; 
+        public string Type { get; set; } = "";
         public string DamageType { get; set; } = "";
         public int BaseDamage { get; set; }
         public int MaxCharges { get; set; }
@@ -14,9 +14,12 @@ namespace backend.Data
         public Dictionary<string, int> RequiredStats { get; set; } = new();
         public List<string> AllowedClasses { get; set; } = new();
         public string Description { get; set; } = "";
-        public int HealAmount { get; set; } = 0;         
-        public bool BlockNextAttack { get; set; } = false; 
-        public bool Poison { get; set; } = false;        
+        public int HealAmount { get; set; } = 0;
+        public bool BlockNextAttack { get; set; } = false;
+        public bool Poison { get; set; } = false;       
+        public bool EvadeNextAttack { get; set; } = false; 
+        public int CritChanceBonus { get; set; } = 0;        
+        public int CritBonusTurns { get; set; } = 0;
     }
 
     public static class AttackTemplates
@@ -224,6 +227,9 @@ namespace backend.Data
                 Scaling = new Dictionary<string, double> { { "agility", 1.0 } },
                 RequiredStats = new Dictionary<string, int> { { "agility", 12 } },
                 AllowedClasses = new List<string> { "rogue" },
+                EvadeNextAttack = true,
+                CritChanceBonus = 85,
+                CritBonusTurns = 1,
                 Description = "Evades the next attack and increases your critical chance for 1 turn."
             },
             new AttackTemplate
@@ -290,6 +296,9 @@ namespace backend.Data
                 Scaling = new Dictionary<string, double> { { "agility", 1.2 } },
                 RequiredStats = new Dictionary<string, int> { { "agility", 13 } },
                 AllowedClasses = new List<string> { "ranger" },
+                EvadeNextAttack = true,
+                CritChanceBonus = 55,
+                CritBonusTurns = 1,
                 Description = "Evades the next attack and increases your chance to land a critical hit."
             }
         };

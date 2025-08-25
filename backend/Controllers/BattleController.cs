@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using backend.Utils;
 using System.Text.Json;
+using System.Linq; // FirstOrDefault
 
 namespace backend.Controllers
 {
@@ -64,13 +65,19 @@ namespace backend.Controllers
                 Attack = selectedEnemy.Attack,
                 Defense = selectedEnemy.Defense,
                 xp = selectedEnemy.XP,
-                CritChance = selectedEnemy.CritChance,
+                CritChance = selectedEnemy.CritChance, // 0..1
                 Type = selectedEnemy.Type ?? "normal"
             };
 
             var log = new List<BattleLogEntry>();
             bool isPlayerBlocking = false;
+            bool isPlayerEvading = false;
             bool isEnemyPoisoned = false;
+
+            int incomingCritBonus = req.PlayerCritBonus ?? 0;
+            int incomingCritTurns = req.PlayerCritBonusTurns ?? 0;
+            int outCritBonus = 0;
+            int outCritTurns = 0;
 
             if (req.Action == "attack" && req.AttackId.HasValue)
             {
@@ -98,19 +105,8 @@ namespace backend.Controllers
                 int damage = result.DamageToEnemy;
                 int heal = result.HealToPlayer;
                 isPlayerBlocking = result.BlockNextAttack;
+                isPlayerEvading = result.EvadeNextAttack;
                 isEnemyPoisoned = result.ApplyPoison;
-
-                double critRoll = rand.NextDouble();
-                bool isCrit = critRoll < player.CriticalChance && damage > 0;
-                if (isCrit)
-                {
-                    damage = (int)Math.Round((double)damage * 2);
-                    var critLines = BattleDialogLines.CritLines(player.Name, damage);
-                    log.Add(new BattleLogEntry { Message = critLines[rand.Next(critLines.Length)], Type = "player-crit" });
-                }
-
-                int enemyHpNew = enemy.Hp - damage;
-                player.CurrentHealth = Math.Min(player.MaxHealth, player.CurrentHealth + heal);
 
                 log.Add(new BattleLogEntry
                 {
@@ -118,12 +114,46 @@ namespace backend.Controllers
                     Type = "status"
                 });
 
-                if (damage > 0)
+                if (result.CritChanceBonus > 0 && result.CritBonusTurns > 0)
+                {
+                    outCritBonus = result.CritChanceBonus;
+                    outCritTurns = result.CritBonusTurns;
+                }
+
+                double effectiveCrit = player.CriticalChance; 
+                if (incomingCritTurns > 0 && damage > 0)
+                {
+                    effectiveCrit = Math.Min(1.0, effectiveCrit + (incomingCritBonus / 100.0));
+                }
+
+                double critRoll = rand.NextDouble();
+                bool isCrit = (damage > 0) && (critRoll < effectiveCrit);
+                if (isCrit)
+                {
+                    damage = (int)Math.Round(damage * 2.0);
+                    var critLines = BattleDialogLines.CritLines(player.Name, damage);
+                    log.Add(new BattleLogEntry { Message = critLines[rand.Next(critLines.Length)], Type = "player-crit" });
+                }
+
+                if (incomingCritTurns > 0 && damage > 0)
+                {
+                    incomingCritTurns -= 1;
+                }
+                if (incomingCritTurns > 0)
+                {
+                    outCritBonus = incomingCritBonus;
+                    outCritTurns = incomingCritTurns;
+                }
+
+                int enemyHpNew = enemy.Hp - damage;
+                player.CurrentHealth = Math.Min(player.MaxHealth, player.CurrentHealth + heal);
+
+                if (!isCrit && damage > 0)
                 {
                     log.Add(new BattleLogEntry
                     {
                         Message = $"{player.Name} deals {damage} damage to the {enemy.Name.ToLower()}.",
-                        Type = isCrit ? "player-crit-damage" : "player-attack-damage"
+                        Type = "player-attack-damage"
                     });
                 }
 
@@ -194,7 +224,10 @@ namespace backend.Controllers
                         PlayerEnergy = player.CurrentEnergy,
                         PlayerAttacks = attacks,
                         isPlayerBlocking = isPlayerBlocking,
-                        isEnemyPoisoned = isEnemyPoisoned
+                        isPlayerEvading = isPlayerEvading,
+                        isEnemyPoisoned = isEnemyPoisoned,
+                        PlayerCritBonus = outCritBonus,
+                        PlayerCritBonusTurns = outCritTurns
                     });
                 }
 
@@ -214,7 +247,7 @@ namespace backend.Controllers
                 int enemyDamage = enemyRolledDamage;
                 if (enemyCrit)
                 {
-                    enemyDamage = (int)Math.Round((double)enemyDamage * 2);
+                    enemyDamage = (int)Math.Round(enemyDamage * 2.0);
                     var enemyCritLines = BattleDialogLines.EnemyCritLines(enemy.Name.ToLower(), enemyDamage);
                     log.Add(new BattleLogEntry { Message = enemyCritLines[rand.Next(enemyCritLines.Length)], Type = "enemy-crit" });
                 }
@@ -225,6 +258,15 @@ namespace backend.Controllers
                     log.Add(new BattleLogEntry
                     {
                         Message = $"{player.Name} blocks the enemy attack! 🛡️",
+                        Type = "status"
+                    });
+                }
+                else if (isPlayerEvading)
+                {
+                    enemyDamage = 0;
+                    log.Add(new BattleLogEntry
+                    {
+                        Message = $"{player.Name} evades the attack! 🌀",
                         Type = "status"
                     });
                 }
@@ -280,7 +322,10 @@ namespace backend.Controllers
                         PlayerEnergy = player.CurrentEnergy,
                         PlayerAttacks = attacks,
                         isPlayerBlocking = false, 
-                        isEnemyPoisoned = isEnemyPoisoned
+                        isPlayerEvading = false,
+                        isEnemyPoisoned = isEnemyPoisoned,
+                        PlayerCritBonus = outCritBonus,
+                        PlayerCritBonusTurns = outCritTurns
                     });
                 }
 
@@ -314,7 +359,10 @@ namespace backend.Controllers
                     PlayerEnergy = player.CurrentEnergy,
                     PlayerAttacks = attacks,
                     isPlayerBlocking = false, 
-                    isEnemyPoisoned = isEnemyPoisoned
+                    isPlayerEvading = false,
+                    isEnemyPoisoned = isEnemyPoisoned,
+                    PlayerCritBonus = outCritBonus,
+                    PlayerCritBonusTurns = outCritTurns
                 });
             }
             return BadRequest("Unknown action or missing attack id");
@@ -342,6 +390,7 @@ namespace backend.Controllers
                 enemyMaxHp = selectedEnemy.MaxHp,
             });
         }
+
         [HttpGet("/api/enemies")]
         public IActionResult GetEnemies()
         {
@@ -376,5 +425,9 @@ namespace backend.Controllers
         public int? AttackId { get; set; }
         public int? EnemyHp { get; set; }
         public string? EnemyName { get; set; }
+
+        // Crit-buff från frontend
+        public int? PlayerCritBonus { get; set; }       // procentenheter
+        public int? PlayerCritBonusTurns { get; set; }  // kvarvarande turer
     }
 }
