@@ -19,6 +19,11 @@ export interface Character {
   defense: number;
   agility: number;
   criticalChance: number;
+  speed?: number;
+  magic?: number;
+  
+  unspentStatPoints?: number;
+  canAllocateStats?: boolean;
 
   credits: number;
   inventoryJson: string;

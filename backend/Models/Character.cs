@@ -24,7 +24,9 @@ namespace backend.Models
         public int Defense { get; set; } = 5;
         public int Agility { get; set; } = 5;
         public int Magic { get; set; } = 0;      
-        public int Speed { get; set; } = 0;      
+        public int Speed { get; set; } = 0;     
+        public int UnspentStatPoints { get; set; } = 0;
+
         public int HealAmount { get; set; } = 0;
         public int PoisonedTurns { get; set; } = 0; 
         public bool IsBlocking { get; set; } = false; 

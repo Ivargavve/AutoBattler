@@ -2,39 +2,151 @@
   <div class="profile-page">
     <ng-container *ngIf="character$ | async as character; else noCharacter">
       <div class="character-card">
+
+        <!-- Header -->
         <div class="character-header-row">
           <img [src]="character.profileIconUrl" alt="Character Icon" class="character-profile-icon" />
           <div>
             <h2 class="character-name">{{ character.name }}</h2>
             <div class="character-class">Class: {{ character.class }}</div>
           </div>
+
+          <!-- Level up switch -->
+          <button
+            *ngIf="!editMode && character.canAllocateStats"
+            class="levelup-button"
+            type="button"
+            (click)="enterAllocateMode(character)"
+            title="Allocate 5 stat points"
+          >+</button>
+
+          <!-- Save/Cancel när i allocate-läge -->
+          <div *ngIf="editMode" class="edit-actions">
+            <button class="save-btn" type="button" [disabled]="pointsRemaining !== 0 || saving" (click)="save(character)">
+              {{ saving ? 'Saving...' : 'Save character' }}
+            </button>
+            <button class="cancel-btn" type="button" [disabled]="saving" (click)="cancel()">Cancel</button>
+          </div>
         </div>
-        <ul class="character-stats">
-          <li><strong>Level:</strong> {{ character.level }}</li>
-          <li><strong>XP:</strong> {{ character.experiencePoints }}</li>
-          <li>
-            <strong>HP:</strong> {{ character.currentHealth }} / {{ character.maxHealth }}
-            <div class="bar-container red">
-              <div class="bar-fill" [style.width.%]="(character.currentHealth / character.maxHealth) * 100"></div>
-              <span class="bar-text">{{ character.currentHealth }} / {{ character.maxHealth }}</span>
-            </div>
-          </li>
-          <li>
-            <strong>Energy:</strong> {{ character.currentEnergy }} / {{ character.maxEnergy }}
-            <div class="bar-container yellow">
-              <div class="bar-fill" [style.width.%]="(character.currentEnergy / character.maxEnergy) * 100"></div>
-              <span class="bar-text">{{ character.currentEnergy }} / {{ character.maxEnergy }}</span>
-            </div>
-          </li>
-          <li><strong>Attack:</strong> {{ character.attack }}</li>
-          <li><strong>Defense:</strong> {{ character.defense }}</li>
-          <li><strong>Agility:</strong> {{ character.agility }}</li>
-          <li><strong>Critical Chance:</strong> {{ character.criticalChance }}%</li>
-          <li><strong>Credits:</strong> {{ character.credits }}</li>
-          <li><strong>Created:</strong> {{ character.createdAt | date:'short' }}</li>
-        </ul>
+
+        <!-- View mode (read-only) -->
+        <ng-container *ngIf="!editMode; else allocateUI">
+          <ul class="character-stats">
+            <li><strong>Level:</strong> {{ character.level }}</li>
+            <li><strong>XP:</strong> {{ character.experiencePoints }}</li>
+
+            <li>
+              <strong>HP:</strong> {{ character.currentHealth }} / {{ character.maxHealth }}
+              <div class="bar-container red">
+                <div class="bar-fill" [style.width.%]="(character.currentHealth / character.maxHealth) * 100"></div>
+                <span class="bar-text">{{ character.currentHealth }} / {{ character.maxHealth }}</span>
+              </div>
+            </li>
+
+            <li>
+              <strong>Energy:</strong> {{ character.currentEnergy }} / {{ character.maxEnergy }}
+              <div class="bar-container yellow">
+                <div class="bar-fill" [style.width.%]="(character.currentEnergy / character.maxEnergy) * 100"></div>
+                <span class="bar-text">{{ character.currentEnergy }} / {{ character.maxEnergy }}</span>
+              </div>
+            </li>
+
+            <li><strong>Attack:</strong> {{ character.attack }}</li>
+            <li><strong>Defense:</strong> {{ character.defense }}</li>
+            <li><strong>Agility:</strong> {{ character.agility }}</li>
+            <li><strong>Magic:</strong> {{ character.magic }}</li>
+            <li><strong>Speed:</strong> {{ character.speed }}</li>
+            <li><strong>Critical Chance:</strong> {{ character.criticalChance * 100}}%</li>
+            <li><strong>Credits:</strong> {{ character.credits }}</li>
+            <li><strong>Created:</strong> {{ character.createdAt | date:'short' }}</li>
+          </ul>
+        </ng-container>
+
+        <!-- Allocate mode -->
+        <ng-template #allocateUI>
+          <div class="allocate-header">
+            <div class="points-left">Points left: {{ pointsRemaining }}</div>
+            <div class="hint">Add a total of 5 points. You must use all 5 to be able to save.</div>
+          </div>
+
+          <ul class="character-stats allocate">
+            <li class="stat-row">
+              <span class="stat-name">HP</span>
+              <div class="stat-controls">
+                <button type="button" (click)="decrement('hp')" [disabled]="saving || allocatedHpPoints() === 0">-</button>
+                <span class="stat-value">
+                  {{ editedMaxHealth }}
+                  <small *ngIf="allocatedHpPoints() > 0">(+{{ allocatedHpPoints() * HP_PER_POINT }})</small>
+                </span>
+                <button type="button" (click)="increment('hp')" [disabled]="saving || pointsRemaining === 0">+</button>
+              </div>
+            </li>
+
+            <li class="stat-row">
+              <span class="stat-name">Attack</span>
+              <div class="stat-controls">
+                <button type="button" (click)="decrement('attack')" [disabled]="saving || allocated('attack') === 0">-</button>
+                <span class="stat-value">
+                  {{ editedStats.attack }}
+                  <small *ngIf="allocated('attack') > 0">(+{{ allocated('attack') }})</small>
+                </span>
+                <button type="button" (click)="increment('attack')" [disabled]="saving || pointsRemaining === 0">+</button>
+              </div>
+            </li>
+
+            <li class="stat-row">
+              <span class="stat-name">Defense</span>
+              <div class="stat-controls">
+                <button type="button" (click)="decrement('defense')" [disabled]="saving || allocated('defense') === 0">-</button>
+                <span class="stat-value">
+                  {{ editedStats.defense }}
+                  <small *ngIf="allocated('defense') > 0">(+{{ allocated('defense') }})</small>
+                </span>
+                <button type="button" (click)="increment('defense')" [disabled]="saving || pointsRemaining === 0">+</button>
+              </div>
+            </li>
+
+            <li class="stat-row">
+              <span class="stat-name">Agility</span>
+              <div class="stat-controls">
+                <button type="button" (click)="decrement('agility')" [disabled]="saving || allocated('agility') === 0">-</button>
+                <span class="stat-value">
+                  {{ editedStats.agility }}
+                  <small *ngIf="allocated('agility') > 0">(+{{ allocated('agility') }})</small>
+                </span>
+                <button type="button" (click)="increment('agility')" [disabled]="saving || pointsRemaining === 0">+</button>
+              </div>
+            </li>
+
+            <li class="stat-row">
+              <span class="stat-name">Magic</span>
+              <div class="stat-controls">
+                <button type="button" (click)="decrement('magic')" [disabled]="saving || allocated('magic') === 0">-</button>
+                <span class="stat-value">
+                  {{ editedStats.magic }}
+                  <small *ngIf="allocated('magic') > 0">(+{{ allocated('magic') }})</small>
+                </span>
+                <button type="button" (click)="increment('magic')" [disabled]="saving || pointsRemaining === 0">+</button>
+              </div>
+            </li>
+
+            <li class="stat-row">
+              <span class="stat-name">Speed</span>
+              <div class="stat-controls">
+                <button type="button" (click)="decrement('speed')" [disabled]="saving || allocated('speed') === 0">-</button>
+                <span class="stat-value">
+                  {{ editedStats.speed }}
+                  <small *ngIf="allocated('speed') > 0">(+{{ allocated('speed') }})</small>
+                </span>
+                <button type="button" (click)="increment('speed')" [disabled]="saving || pointsRemaining === 0">+</button>
+              </div>
+            </li>
+          </ul>
+        </ng-template>
+
       </div>
     </ng-container>
+
     <ng-template #noCharacter>
       <div class="character-card empty">
         <p>No character found. <a routerLink="/create-character">Create one here!</a></p>

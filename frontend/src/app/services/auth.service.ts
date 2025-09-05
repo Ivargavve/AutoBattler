@@ -112,4 +112,22 @@ export class AuthService {
       return this.loadUserWithCharacter().then(() => res.currentEnergy);
     });
   }
+  updateCharacterStats(payload: {
+    attack: number;
+    defense: number;
+    agility: number;
+    magic: number;
+    speed: number;
+    maxHealth: number;
+  }) {
+    return this.http.patch<Character>(
+      `${environment.apiUrl}/characters/stats`,
+      payload
+    ).pipe(
+      tap(updated => {
+        this.characterSubject.next(updated);
+      })
+    );
+  }
+
 }

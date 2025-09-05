@@ -83,7 +83,11 @@ namespace backend.Controllers
                 chr.Attack,
                 chr.Defense,
                 chr.Agility,
+                chr.Magic,
+                chr.Speed,
                 chr.CriticalChance,
+                chr.UnspentStatPoints,
+                canAllocateStats = chr.UnspentStatPoints >= 5,
                 chr.Credits,
                 chr.InventoryJson,
                 chr.EquipmentJson,
@@ -129,7 +133,11 @@ namespace backend.Controllers
                 chr.Attack,
                 chr.Defense,
                 chr.Agility,
+                chr.Magic,
+                chr.Speed,
                 chr.CriticalChance,
+                chr.UnspentStatPoints,
+                canAllocateStats = chr.UnspentStatPoints >= 5,
                 chr.Credits,
                 chr.InventoryJson,
                 chr.EquipmentJson,
@@ -183,7 +191,11 @@ namespace backend.Controllers
                 chr.Attack,
                 chr.Defense,
                 chr.Agility,
+                chr.Magic,
+                chr.Speed,
                 chr.CriticalChance,
+                chr.UnspentStatPoints,
+                canAllocateStats = chr.UnspentStatPoints >= 5,
                 chr.Credits,
                 chr.InventoryJson,
                 chr.EquipmentJson,
@@ -211,7 +223,8 @@ namespace backend.Controllers
                 Name = dto.Name,
                 Class = dto.Class,
                 ProfileIconUrl = dto.ProfileIconUrl,
-                LastRechargeTime = DateTime.UtcNow
+                LastRechargeTime = DateTime.UtcNow,
+                // UnspentStatPoints startar på 0; Magic/Speed på 0 i modellen
             };
 
             var klass = dto.Class?.Trim().ToLower() ?? "";
@@ -257,7 +270,11 @@ namespace backend.Controllers
                     chr.Attack,
                     chr.Defense,
                     chr.Agility,
+                    chr.Magic,
+                    chr.Speed,
                     chr.CriticalChance,
+                    chr.UnspentStatPoints,
+                    canAllocateStats = chr.UnspentStatPoints >= 5,
                     chr.Credits,
                     chr.InventoryJson,
                     chr.EquipmentJson,
@@ -286,6 +303,106 @@ namespace backend.Controllers
 
             await _db.SaveChangesAsync();
             return NoContent();
+        }
+
+        // ======= Level-up stats (no crit here) =======
+        public class UpdateStatsDto
+        {
+            public int Attack { get; set; }
+            public int Defense { get; set; }
+            public int Agility { get; set; }
+            public int Magic { get; set; }
+            public int Speed { get; set; }
+            public int MaxHealth { get; set; } // HP buff in steps (10 per point)
+        }
+
+        [HttpPatch("stats")]
+        public async Task<IActionResult> UpdateStats([FromBody] UpdateStatsDto dto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+                return Unauthorized();
+
+            var chr = await _db.Characters.FirstOrDefaultAsync(c => c.UserId == userId);
+            if (chr == null)
+                return NotFound();
+
+            if (chr.UnspentStatPoints < 5)
+                return BadRequest(new { message = "No stat points available." });
+
+            const int HpPerPoint = 10;
+
+            int deltaAttack = dto.Attack - chr.Attack;
+            int deltaDefense = dto.Defense - chr.Defense;
+            int deltaAgility = dto.Agility - chr.Agility;
+            int deltaMagic  = dto.Magic  - chr.Magic;
+            int deltaSpeed  = dto.Speed  - chr.Speed;
+
+            if (deltaAttack < 0 || deltaDefense < 0 || deltaAgility < 0 || deltaMagic < 0 || deltaSpeed < 0)
+                return BadRequest(new { message = "Stats can only be increased." });
+
+            if (dto.MaxHealth < chr.MaxHealth)
+                return BadRequest(new { message = "HP can only be increased." });
+
+            int hpDiff = dto.MaxHealth - chr.MaxHealth;
+            if (hpDiff % HpPerPoint != 0)
+                return BadRequest(new { message = $"HP must be increased in steps of {HpPerPoint}." });
+
+            int hpPoints = hpDiff / HpPerPoint;
+
+            int totalPoints = deltaAttack + deltaDefense + deltaAgility + deltaMagic + deltaSpeed + hpPoints;
+            if (totalPoints != 5)
+                return BadRequest(new { message = "Exactly 5 points must be allocated." });
+
+            // Apply
+            chr.Attack = dto.Attack;
+            chr.Defense = dto.Defense;
+            chr.Agility = dto.Agility;
+            chr.Magic  = dto.Magic;
+            chr.Speed  = dto.Speed;
+            chr.MaxHealth = dto.MaxHealth;
+            chr.UnspentStatPoints -= 5; // VIKTIGT: dra av poängen
+            chr.UpdatedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+
+            // Response
+            const int energyInterval = 120;
+            var now = DateTime.UtcNow;
+            var elapsedSeconds = (now - chr.LastRechargeTime).TotalSeconds;
+            var nextTickInSeconds = energyInterval - ((int)elapsedSeconds % energyInterval);
+            if (nextTickInSeconds <= 0) nextTickInSeconds = energyInterval;
+
+            return Ok(new
+            {
+                chr.Id,
+                chr.Name,
+                chr.Class,
+                chr.ProfileIconUrl,
+                chr.Level,
+                chr.ExperiencePoints,
+                chr.MaxExperiencePoints,
+                chr.CurrentHealth,
+                chr.MaxHealth,
+                chr.CurrentEnergy,
+                chr.MaxEnergy,
+                chr.Attack,
+                chr.Defense,
+                chr.Agility,
+                chr.Magic,
+                chr.Speed,
+                chr.CriticalChance,
+                chr.UnspentStatPoints,
+                canAllocateStats = chr.UnspentStatPoints >= 5,
+                chr.Credits,
+                chr.InventoryJson,
+                chr.EquipmentJson,
+                chr.CreatedAt,
+                chr.UpdatedAt,
+                chr.LastRechargeTime,
+                nextTickInSeconds,
+                chr.AttacksJson
+            });
         }
 
         [HttpDelete]
@@ -330,7 +447,6 @@ namespace backend.Controllers
                 chr.CurrentEnergy
             });
         }
-
     }
 
     public class UseEnergyDto
@@ -350,6 +466,7 @@ namespace backend.Controllers
         public string Name { get; set; } = string.Empty;
         public string ProfileIconUrl { get; set; } = string.Empty;
     }
+
     public class AttackData
     {
         public int Id { get; set; }
@@ -364,6 +481,4 @@ namespace backend.Controllers
         public List<string>? AllowedClasses { get; set; }
         public string? Description { get; set; }
     }
-
-
 }

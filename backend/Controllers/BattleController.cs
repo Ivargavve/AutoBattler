@@ -215,6 +215,7 @@ namespace backend.Controllers
                     {
                         player.ExperiencePoints = 0;
                         player.Level += 1;
+                        player.UnspentStatPoints += 5;
                         player.MaxExperiencePoints = (int)(player.MaxExperiencePoints * 1.1);
                         player.CurrentHealth = player.MaxHealth;
                         log.Add(new BattleLogEntry { Message = $"🎉 {player.Name} has reached level {player.Level}!", Type = "levelup" });
@@ -271,7 +272,10 @@ namespace backend.Controllers
                         enemyPoisonTurnsLeft = 0,
 
                         playerCritBonus = outCritBonus,
-                        playerCritBonusTurns = outCritTurns
+                        playerCritBonusTurns = outCritTurns,
+
+                        unspentStatPoints = player.UnspentStatPoints,
+                        canAllocateStats = player.UnspentStatPoints >= 5,
                     });
                 }
 
@@ -356,7 +360,10 @@ namespace backend.Controllers
                             enemyPoisonTurnsLeft = 0,
 
                             playerCritBonus = outCritBonus,
-                            playerCritBonusTurns = outCritTurns
+                            playerCritBonusTurns = outCritTurns,
+
+                            unspentStatPoints = player.UnspentStatPoints,
+                            canAllocateStats = player.UnspentStatPoints >= 5,
                         });
                     }
                 }
@@ -457,7 +464,7 @@ namespace backend.Controllers
                         PlayerEnergy = player.CurrentEnergy,
                         PlayerAttacks = attacks,
 
-                        isPlayerBlocking = false, 
+                        isPlayerBlocking = false,
                         isPlayerEvading = false,
 
                         isEnemyPoisoned = isEnemyPoisoned,
@@ -465,7 +472,10 @@ namespace backend.Controllers
                         enemyPoisonTurnsLeft = outEnemyPoisonTurns,
 
                         playerCritBonus = outCritBonus,
-                        playerCritBonusTurns = outCritTurns
+                        playerCritBonusTurns = outCritTurns,
+                        
+                        unspentStatPoints = player.UnspentStatPoints,
+                        canAllocateStats = player.UnspentStatPoints >= 5,
                     });
                 }
 
@@ -499,7 +509,7 @@ namespace backend.Controllers
                     PlayerEnergy = player.CurrentEnergy,
                     PlayerAttacks = attacks,
 
-                    isPlayerBlocking = false, 
+                    isPlayerBlocking = false,
                     isPlayerEvading = false,
 
                     isEnemyPoisoned = isEnemyPoisoned,
@@ -507,7 +517,10 @@ namespace backend.Controllers
                     enemyPoisonTurnsLeft = outEnemyPoisonTurns,
 
                     playerCritBonus = outCritBonus,
-                    playerCritBonusTurns = outCritTurns
+                    playerCritBonusTurns = outCritTurns,
+                    
+                    unspentStatPoints = player.UnspentStatPoints,
+                    canAllocateStats = player.UnspentStatPoints >= 5,
                 });
             }
 
