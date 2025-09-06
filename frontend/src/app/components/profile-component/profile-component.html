@@ -34,7 +34,7 @@
             <p><strong>Attack:</strong> {{ character.attack }}</p>
             <p><strong>Defense:</strong> {{ character.defense }}</p>
             <p><strong>Speed:</strong> {{ character.agility }}</p>
-            <p><strong>Crit Chance:</strong> {{ character.criticalChance }}%</p>
+            <p><strong>Crit Chance:</strong> {{ character.criticalChance*100 }}%</p>
             <p><strong>Level:</strong> {{ character.level }}</p>
             <p><strong>Credits:</strong> {{ character.credits }}</p>
             <p><strong>Created:</strong> {{ character.createdAt | date:'short' }}</p>
