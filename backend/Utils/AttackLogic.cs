@@ -25,11 +25,13 @@ namespace backend.Logic
         public static AttackResult ApplyAttack(
             AttackTemplate template,
             dynamic player,   // Name, Attack, Magic, Defense, Agility, Speed
-            dynamic enemy     // Name, Type
+            dynamic enemy     // Name, Type, Defense
         )
         {
-            int damage = template.BaseDamage;
-            int heal = template.HealAmount;
+            // Kör i double för att undvika tidig truncering
+            double dmg = template.BaseDamage;
+            double heal = template.HealAmount;
+
             bool block = template.BlockNextAttack;
             bool evade = template.EvadeNextAttack;
             bool poison = template.Poison;
@@ -42,40 +44,51 @@ namespace backend.Logic
 
             var effects = new List<string>();
 
-            // Scaling
+            // === Scaling (double hela vägen) ===
             if (template.Scaling != null)
             {
                 foreach (var pair in template.Scaling)
                 {
                     var stat = pair.Key.ToLower();
                     double scale = pair.Value;
-                    switch (stat)
+
+                    double statVal = stat switch
                     {
-                        case "attack":  damage += (int)(scale * (player.Attack  ?? 0)); break;
-                        case "magic":   damage += (int)(scale * (player.Magic   ?? 0)); break;
-                        case "defense": damage += (int)(scale * (player.Defense ?? 0)); break;
-                        case "agility": damage += (int)(scale * (player.Agility ?? 0)); break;
-                        case "speed":   damage += (int)(scale * (player.Speed   ?? 0)); break;
-                    }
+                        "attack"  => (double)(player.Attack  ?? 0),
+                        "magic"   => (double)(player.Magic   ?? 0),
+                        "defense" => (double)(player.Defense ?? 0),
+                        "agility" => (double)(player.Agility ?? 0),
+                        "speed"   => (double)(player.Speed   ?? 0),
+                        _ => 0.0
+                    };
+
+                    dmg += scale * statVal;
                 }
             }
 
+            // === Specials / status-effekter ===
             switch (template.Name)
             {
                 case "Holy Light":
-                    effects.Add($"{player.Name} is healed for {heal} HP!");
+                    // Healar alltid
+                    effects.Add($"{player.Name} is healed for {(int)Math.Round(heal)} HP!");
+                    // Extra skada vs undead
                     if ((enemy?.Type as string)?.ToLower() == "undead")
                     {
-                        double magicScale = (template.Scaling != null)
-                            ? template.Scaling.GetValueOrDefault("magic", 0)
-                            : 0;
-                        damage = template.BaseDamage + 10 + (int)(magicScale * (player.Magic ?? 0));
+                        double magicScale = 0;
+                        if (template.Scaling != null && template.Scaling.TryGetValue("magic", out var s))
+                            magicScale = s;
+
+                        double magicVal = (double)(player.Magic ?? 0);
+                        dmg = template.BaseDamage + 10 + (magicScale * magicVal);
+
                         var enemyName = enemy?.Name ?? "the enemy";
                         effects.Add($"{player.Name} smites undead {enemyName}!");
                     }
                     else
                     {
-                        damage = 0;
+                        // Ingen offensiv skada annars
+                        dmg = 0;
                     }
                     break;
 
@@ -84,6 +97,7 @@ namespace backend.Logic
                 case "Mana Shield":
                     block = true;
                     effects.Add($"{player.Name} prepares to block the next attack!");
+                    // dessa har liten BaseDamage + ev. scaling redan i dmg
                     break;
 
                 case "Poison Strike":
@@ -92,6 +106,7 @@ namespace backend.Logic
                     pDmg = template.PoisonDamagePerTurn > 0 ? template.PoisonDamagePerTurn : 2;
                     pTurns = template.PoisonDuration > 0 ? template.PoisonDuration : 2;
                     effects.Add($"{player.Name} uses {template.Name} and applies poison!");
+                    // dmg från base + scaling gäller också
                     break;
 
                 case "Shadowstep":
@@ -100,14 +115,16 @@ namespace backend.Logic
                     critBonus = template.CritChanceBonus > 0 ? template.CritChanceBonus : 20;
                     critTurns = template.CritBonusTurns  > 0 ? template.CritBonusTurns  : 1;
                     effects.Add($"{player.Name} uses {template.Name} and becomes harder to hit!");
-                    damage = 0;
+                    // Utility – ingen direkt skada
+                    dmg = 0;
                     break;
 
                 case "Battle Shout":
                     critBonus = template.CritChanceBonus > 0 ? template.CritChanceBonus : 20;
                     critTurns = template.CritBonusTurns  > 0 ? template.CritBonusTurns  : 1;
                     effects.Add($"{player.Name} uses Battle Shout and rallies for the next fights!");
-                    damage = 0;
+                    // Buff – ingen direkt skada
+                    dmg = 0;
                     break;
 
                 default:
@@ -115,9 +132,10 @@ namespace backend.Logic
                     break;
             }
 
+            // Sekundära effekter/loggar
             if (heal > 0 && template.Name != "Holy Light")
             {
-                effects.Add($"{player.Name} heals for {heal} HP!");
+                effects.Add($"{player.Name} heals for {(int)Math.Round(heal)} HP!");
             }
             if (block && !(template.Name == "Shield Block" || template.Name == "Sacred Shield" || template.Name == "Mana Shield"))
             {
@@ -137,10 +155,22 @@ namespace backend.Logic
                 effects.Add($"{player.Name} gains +{critBonus}% crit chance for {critTurns} turn(s)!");
             }
 
+            // === Slutrunda & mitigation ===
+            int finalDamage = Math.Max(0, (int)Math.Round(dmg));
+            int finalHeal   = Math.Max(0, (int)Math.Round(heal));
+
+            // Dra av fiendens defense EFTER avrundning (som du önskade)
+            int enemyDefense = 0;
+            if (enemy != null)
+            {
+                try { enemyDefense = (int)enemy.Defense; } catch { enemyDefense = 0; }
+            }
+            finalDamage = Math.Max(0, finalDamage - enemyDefense);
+
             return new AttackResult
             {
-                DamageToEnemy = Math.Max(0, damage),
-                HealToPlayer = Math.Max(0, heal),
+                DamageToEnemy = finalDamage,
+                HealToPlayer = finalHeal,
                 BlockNextAttack = block,
                 EvadeNextAttack = evade,
                 ApplyPoison = poison,

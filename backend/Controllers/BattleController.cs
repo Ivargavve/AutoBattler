@@ -584,12 +584,8 @@ namespace backend.Controllers
         public int? AttackId { get; set; }
         public int? EnemyHp { get; set; }
         public string? EnemyName { get; set; }
-
-        // crit buff from frontend
         public int? PlayerCritBonus { get; set; }
         public int? PlayerCritBonusTurns { get; set; }
-
-        // enemy poison DoT state from frontend
         public int? EnemyPoisonDamagePerTurn { get; set; }
         public int? EnemyPoisonTurnsLeft { get; set; }
     }

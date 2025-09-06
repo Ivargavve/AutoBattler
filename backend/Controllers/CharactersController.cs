@@ -313,7 +313,7 @@ namespace backend.Controllers
             public int Agility { get; set; }
             public int Magic { get; set; }
             public int Speed { get; set; }
-            public int MaxHealth { get; set; } // HP buff in steps (10 per point)
+            public int MaxHealth { get; set; } 
         }
 
         [HttpPatch("stats")]
@@ -327,10 +327,10 @@ namespace backend.Controllers
             if (chr == null)
                 return NotFound();
 
-            if (chr.UnspentStatPoints < 5)
+            if (chr.UnspentStatPoints <= 0)
                 return BadRequest(new { message = "No stat points available." });
 
-            const int HpPerPoint = 10;
+            const int HpPerPoint = 5;
 
             int deltaAttack = dto.Attack - chr.Attack;
             int deltaDefense = dto.Defense - chr.Defense;
@@ -351,22 +351,24 @@ namespace backend.Controllers
             int hpPoints = hpDiff / HpPerPoint;
 
             int totalPoints = deltaAttack + deltaDefense + deltaAgility + deltaMagic + deltaSpeed + hpPoints;
-            if (totalPoints != 5)
-                return BadRequest(new { message = "Exactly 5 points must be allocated." });
+
+            if (totalPoints != chr.UnspentStatPoints)
+                return BadRequest(new { message = $"You must allocate exactly all your unspent points ({chr.UnspentStatPoints})." });
 
             // Apply
-            chr.Attack = dto.Attack;
-            chr.Defense = dto.Defense;
-            chr.Agility = dto.Agility;
-            chr.Magic  = dto.Magic;
-            chr.Speed  = dto.Speed;
+            chr.Attack    = dto.Attack;
+            chr.Defense   = dto.Defense;
+            chr.Agility   = dto.Agility;
+            chr.Magic     = dto.Magic;
+            chr.Speed     = dto.Speed;
             chr.MaxHealth = dto.MaxHealth;
-            chr.UnspentStatPoints -= 5; // VIKTIGT: dra av poängen
+
+            chr.UnspentStatPoints -= totalPoints; 
             chr.UpdatedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();
 
-            // Response
+            // Response 
             const int energyInterval = 120;
             var now = DateTime.UtcNow;
             var elapsedSeconds = (now - chr.LastRechargeTime).TotalSeconds;
@@ -404,6 +406,7 @@ namespace backend.Controllers
                 chr.AttacksJson
             });
         }
+
 
         [HttpDelete]
         public async Task<IActionResult> DeleteCharacter()

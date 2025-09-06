@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { Character } from '../../services/character';
-import { Observable, tap } from 'rxjs';
+import { Observable } from 'rxjs';
+import { tap, take } from 'rxjs/operators';
 
 type StatKey = 'attack' | 'defense' | 'agility' | 'magic' | 'speed';
 
@@ -20,9 +21,9 @@ export class HeroComponent implements OnInit {
   editMode = false;
   pointsRemaining = 0;
   saving = false;
+  readonly HP_PER_POINT = 5;
 
-  // Hur mycket MaxHealth ökar per tilldelad HP-poäng
-  readonly HP_PER_POINT = 10;
+  private availablePoints = 0;
 
   originalStats: Record<StatKey, number> = {
     attack: 0,
@@ -54,16 +55,30 @@ export class HeroComponent implements OnInit {
     const allocate = this.route.snapshot.queryParamMap.get('allocate');
     if (allocate === '1') {
       this.authService.character$
-        .pipe(tap(c => c && this.enterAllocateMode(c)))
-        .subscribe()
-        .unsubscribe();
+        .pipe(
+          take(1),
+          tap(c => c && this.enterAllocateMode(c))
+        )
+        .subscribe();
     }
   }
 
+  private getUnspent(character: Character): number {
+    // Stöd både camelCase och PascalCase från backend
+    const camel = (character as any).unspentStatPoints;
+    const pascal = (character as any).UnspentStatPoints;
+    return typeof camel === 'number' ? camel : (typeof pascal === 'number' ? pascal : 0);
+  }
+
   enterAllocateMode(character: Character): void {
-    if ((character.unspentStatPoints ?? 0) < 5) return;
+    const unspent = this.getUnspent(character);
+    if (unspent <= 0) return;
+
     this.editMode = true;
-    this.pointsRemaining = 5;
+
+    // Tillgängliga poäng denna allokering = alla ospenderade
+    this.availablePoints = unspent;
+    this.pointsRemaining = this.availablePoints;
 
     this.originalStats = {
       attack: character.attack,
@@ -81,6 +96,7 @@ export class HeroComponent implements OnInit {
   cancel(): void {
     this.editMode = false;
     this.pointsRemaining = 0;
+    this.availablePoints = 0;
   }
 
   allocated(key: StatKey): number {
@@ -102,6 +118,10 @@ export class HeroComponent implements OnInit {
     );
   }
 
+  private recomputePointsLeft(): void {
+    this.pointsRemaining = this.availablePoints - this.totalAllocated();
+  }
+
   increment(key: StatKey | 'hp'): void {
     if (this.pointsRemaining <= 0) return;
 
@@ -111,7 +131,7 @@ export class HeroComponent implements OnInit {
       this.editedStats[key]++;
     }
 
-    this.pointsRemaining = 5 - this.totalAllocated();
+    this.recomputePointsLeft();
   }
 
   decrement(key: StatKey | 'hp'): void {
@@ -123,7 +143,7 @@ export class HeroComponent implements OnInit {
       this.editedStats[key]--;
     }
 
-    this.pointsRemaining = 5 - this.totalAllocated();
+    this.recomputePointsLeft();
   }
 
   save(character: Character): void {
@@ -141,12 +161,13 @@ export class HeroComponent implements OnInit {
     this.saving = true;
 
     this.authService.updateCharacterStats(payload).subscribe({
-      next: updated => {
+      next: () => {
         this.saving = false;
         this.editMode = false;
+        // character$ uppdateras via AuthService.tap() i updateCharacterStats
       },
       error: err => {
-        console.error('save stats error:', err.error?.message ?? err.error ?? err);
+        console.error('save stats error:', err?.error?.message ?? err?.error ?? err);
         this.saving = false;
       }
     });
