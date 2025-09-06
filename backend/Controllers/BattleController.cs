@@ -238,7 +238,7 @@ namespace backend.Controllers
 
                     log.Add(new BattleLogEntry
                     {
-                        Message = $"Status: {player.Name} is now Level {player.Level}, XP: {player.ExperiencePoints}/100, Energy: {player.CurrentEnergy}/{player.MaxEnergy}",
+                        Message = $"Status: {player.Name} is now Level {player.Level}, XP: {player.ExperiencePoints}/{player.MaxExperiencePoints}, Energy: {player.CurrentEnergy}/{player.MaxEnergy}",
                         Type = "status"
                     });
                     log.Add(new BattleLogEntry
