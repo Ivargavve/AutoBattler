@@ -224,7 +224,6 @@ namespace backend.Controllers
                 Class = dto.Class,
                 ProfileIconUrl = dto.ProfileIconUrl,
                 LastRechargeTime = DateTime.UtcNow,
-                // UnspentStatPoints startar på 0; Magic/Speed på 0 i modellen
             };
 
             var klass = dto.Class?.Trim().ToLower() ?? "";
@@ -286,26 +285,7 @@ namespace backend.Controllers
             );
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateCharacter(UpdateCharacterDto dto)
-        {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
-                return Unauthorized();
-
-            var chr = await _db.Characters.FirstOrDefaultAsync(c => c.UserId == userId);
-            if (chr == null)
-                return NotFound();
-
-            chr.Name = dto.Name;
-            chr.ProfileIconUrl = dto.ProfileIconUrl;
-            chr.UpdatedAt = DateTime.UtcNow;
-
-            await _db.SaveChangesAsync();
-            return NoContent();
-        }
-
-        // ======= Level-up stats (no crit here) =======
+        // ======= Level-up stats =======
         public class UpdateStatsDto
         {
             public int Attack { get; set; }
@@ -461,12 +441,6 @@ namespace backend.Controllers
     {
         public string Name { get; set; } = string.Empty;
         public string Class { get; set; } = string.Empty;
-        public string ProfileIconUrl { get; set; } = string.Empty;
-    }
-
-    public class UpdateCharacterDto
-    {
-        public string Name { get; set; } = string.Empty;
         public string ProfileIconUrl { get; set; } = string.Empty;
     }
 
