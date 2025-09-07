@@ -166,4 +166,8 @@ async ngOnInit(): Promise<void> {
   getXpPercentage(xp: number): number {
     return Math.max(0, Math.min((xp / 100) * 100, 100));
   }
+  
+  goAllocate(): void {
+    this.router.navigate(['/hero'], { queryParams: { allocate: '1' } });
+  }
 }

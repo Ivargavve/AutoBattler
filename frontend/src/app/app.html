@@ -113,19 +113,33 @@
           <!-- Character -->
           <ng-container *ngIf="character$ | async as character; else createCharacterPrompt">
             <div class="character-header-row" routerLink="/hero">
-              <img 
-                *ngIf="character.profileIconUrl"
-                [src]="character.profileIconUrl"
-                alt="Character Icon"
-                class="character-profile-icon"
-              />
-              <div class="character-title-block">
-                <h2 class="section-title character-name">{{ character.name }}</h2>
-                <div class="character-class-meta">
-                  <span class="meta-label">Class:</span>{{ character.class }}
-                </div>
+            <img 
+              *ngIf="character.profileIconUrl"
+              [src]="character.profileIconUrl"
+              alt="Character Icon"
+              class="character-profile-icon"
+            />
+
+            <div class="character-title-block">
+              <!-- + badge visas bara om man har >=5 unspent -->
+              <button
+                *ngIf="(character.unspentStatPoints ?? 0) >= 5"
+                class="levelup-badge"
+                type="button"
+                title="Allocate stat points"
+                [attr.aria-label]="'Allocate ' + character.unspentStatPoints + ' stat points'"
+                (click)="$event.stopPropagation(); goAllocate()"
+              >+</button>
+
+              <h2 class="section-title character-name">{{ character.name }}</h2>
+              <div class="character-class-meta">
+                <span class="meta-label">Class:</span>{{ character.class }}
               </div>
             </div>
+          </div>
+
+          <div class="character-credits">{{ character.credits }} <br></div>
+
             <ul>
               <li>
                 <strong>Lvl: {{ character.level }}</strong>

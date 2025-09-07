@@ -29,6 +29,16 @@ body, html {
   font-size: 0.95rem;
 }
 
+.character-credits {
+  position: fixed;
+  padding: 0rem;
+  font-size: 0.9rem;
+  top: 12.2rem;
+  right: 2rem;
+  color: #e3ff0f;
+  font-weight: bold;
+}
+
 /* === Sidebar === */
 .sidebar {
   background-color: var(--bg, #121212);
@@ -766,6 +776,34 @@ nav a {
   text-decoration: none;
   font-weight: bold;
   letter-spacing: 1px;
+}
+
+/* Gör titeldelen till pos:relative så badgen kan placeras i förhållande till den */
+.right-panel .character-title-block {
+  position: relative;
+}
+
+/* Lilla plus-badge till vänster om namnblocket */
+.levelup-badge {
+  position: absolute;
+  left: -103px;
+  top: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--sidebar-border);
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+  line-height: 22px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 0 6px var(--accent-shadow);
+}
+
+.levelup-badge:hover {
+  background: var(--accent-hover);
+  color: var(--bg);
 }
 
 @keyframes popup-bounce {

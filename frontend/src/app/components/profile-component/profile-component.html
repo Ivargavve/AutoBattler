@@ -16,7 +16,6 @@
           <p><strong>Credits:</strong> {{ user.credits }}</p>
           <p><strong>Achievements:</strong> {{ achievementsCount$ | async }}</p>
           <p><strong>Cosmetics:</strong> {{ cosmeticsCount$ | async }}</p>
-          <p><strong>Last login:</strong> {{ user.lastLogin | date:'short' }}</p>
           <p><strong>Registered:</strong> {{ user.createdAt | date:'short' }}</p>
         </div>
       </div>

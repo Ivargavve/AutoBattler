@@ -7,6 +7,8 @@ using System.Security.Claims;
 using backend.Utils;
 using System.Text.Json;
 using System.Linq; // FirstOrDefault
+using System;
+using System.Collections.Generic;
 
 namespace backend.Controllers
 {
@@ -208,6 +210,11 @@ namespace backend.Controllers
                     log.Add(new BattleLogEntry { Message = $"{player.Name} gains {enemy.xp} XP from the battle.", Type = "xp" });
                     player.CurrentEnergy -= 1;
 
+                    // --- Credits drop ---
+                    int gainedCredits = rand.Next(selectedEnemy.CreditsMin, selectedEnemy.CreditsMax + 1);
+                    player.Credits += gainedCredits;
+                    log.Add(new BattleLogEntry { Message = $"💰 {enemy.Name} drops {gainedCredits} credits!", Type = "loot" });
+
                     int gainedXp = enemy.xp;
                     player.ExperiencePoints += gainedXp;
 
@@ -256,26 +263,34 @@ namespace backend.Controllers
                         EnemyName = enemy.Name,
                         BattleLog = log,
                         BattleEnded = true,
+
+                        // xp/level
                         GainedXp = gainedXp,
                         NewExperiencePoints = player.ExperiencePoints,
                         PlayerLevel = player.Level,
-                        UserXp = player.User?.ExperiencePoints ?? 0,
-                        UserLevel = player.User?.Level ?? 0,
+
+                        // energy & attacks
                         PlayerEnergy = player.CurrentEnergy,
                         PlayerAttacks = attacks,
 
+                        // user/account
+                        UserXp = player.User?.ExperiencePoints ?? 0,
+                        UserLevel = player.User?.Level ?? 0,
+
+                        // crit/poison state forward
                         isPlayerBlocking = isPlayerBlocking,
                         isPlayerEvading = isPlayerEvading,
-
                         isEnemyPoisoned = false,
                         enemyPoisonDamagePerTurn = 0,
                         enemyPoisonTurnsLeft = 0,
-
                         playerCritBonus = outCritBonus,
                         playerCritBonusTurns = outCritTurns,
 
+                        // stats allocation + credits
                         unspentStatPoints = player.UnspentStatPoints,
                         canAllocateStats = player.UnspentStatPoints >= 5,
+                        GainedCredits = gainedCredits,
+                        PlayerCredits = player.Credits
                     });
                 }
 
@@ -303,6 +318,11 @@ namespace backend.Controllers
                         log.Add(new BattleLogEntry { Message = $"{player.Name} gains {enemy.xp} XP from the battle.", Type = "xp" });
                         player.CurrentEnergy -= 1;
 
+                        // --- Credits drop (poison kill) ---
+                        int gainedCredits = rand.Next(selectedEnemy.CreditsMin, selectedEnemy.CreditsMax + 1);
+                        player.Credits += gainedCredits;
+                        log.Add(new BattleLogEntry { Message = $"💰 {enemy.Name} drops {gainedCredits} credits!", Type = "loot" });
+
                         int gainedXp = enemy.xp;
                         player.ExperiencePoints += gainedXp;
 
@@ -310,6 +330,7 @@ namespace backend.Controllers
                         {
                             player.ExperiencePoints = 0;
                             player.Level += 1;
+                            player.UnspentStatPoints += 5; // lägg till även här
                             player.MaxExperiencePoints = (int)(player.MaxExperiencePoints * 1.2);
                             player.CurrentHealth = player.MaxHealth;
                             log.Add(new BattleLogEntry { Message = $"🎉 {player.Name} has reached level {player.Level}!", Type = "levelup" });
@@ -344,26 +365,34 @@ namespace backend.Controllers
                             EnemyName = enemy.Name,
                             BattleLog = log,
                             BattleEnded = true,
+
+                            // xp/level
                             GainedXp = gainedXp,
                             NewExperiencePoints = player.ExperiencePoints,
                             PlayerLevel = player.Level,
-                            UserXp = player.User?.ExperiencePoints ?? 0,
-                            UserLevel = player.User?.Level ?? 0,
+
+                            // energy & attacks
                             PlayerEnergy = player.CurrentEnergy,
                             PlayerAttacks = attacks,
 
+                            // user/account
+                            UserXp = player.User?.ExperiencePoints ?? 0,
+                            UserLevel = player.User?.Level ?? 0,
+
+                            // crit/poison forward (cleared on death)
                             isPlayerBlocking = isPlayerBlocking,
                             isPlayerEvading = isPlayerEvading,
-
                             isEnemyPoisoned = false,
                             enemyPoisonDamagePerTurn = 0,
                             enemyPoisonTurnsLeft = 0,
-
                             playerCritBonus = outCritBonus,
                             playerCritBonusTurns = outCritTurns,
 
+                            // stats allocation + credits
                             unspentStatPoints = player.UnspentStatPoints,
                             canAllocateStats = player.UnspentStatPoints >= 5,
+                            GainedCredits = gainedCredits,
+                            PlayerCredits = player.Credits
                         });
                     }
                 }
@@ -464,7 +493,7 @@ namespace backend.Controllers
                         PlayerEnergy = player.CurrentEnergy,
                         PlayerAttacks = attacks,
 
-                        isPlayerBlocking = false,
+                        isPlayerBlocking = false, 
                         isPlayerEvading = false,
 
                         isEnemyPoisoned = isEnemyPoisoned,
@@ -473,9 +502,13 @@ namespace backend.Controllers
 
                         playerCritBonus = outCritBonus,
                         playerCritBonusTurns = outCritTurns,
-                        
+
                         unspentStatPoints = player.UnspentStatPoints,
                         canAllocateStats = player.UnspentStatPoints >= 5,
+
+                        // no credits on defeat
+                        GainedCredits = 0,
+                        PlayerCredits = player.Credits
                     });
                 }
 
@@ -509,7 +542,7 @@ namespace backend.Controllers
                     PlayerEnergy = player.CurrentEnergy,
                     PlayerAttacks = attacks,
 
-                    isPlayerBlocking = false,
+                    isPlayerBlocking = false, 
                     isPlayerEvading = false,
 
                     isEnemyPoisoned = isEnemyPoisoned,
@@ -518,9 +551,13 @@ namespace backend.Controllers
 
                     playerCritBonus = outCritBonus,
                     playerCritBonusTurns = outCritTurns,
-                    
+
                     unspentStatPoints = player.UnspentStatPoints,
                     canAllocateStats = player.UnspentStatPoints >= 5,
+
+                    // no credits this turn unless kill happened
+                    GainedCredits = 0,
+                    PlayerCredits = player.Credits
                 });
             }
 
