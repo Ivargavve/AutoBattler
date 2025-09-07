@@ -43,9 +43,8 @@ AutoBattler blends classic RPG elements with a modern, text based interface. The
 
 - **Frontend:** Angular 18 (deployed on Netlify)
 - **Backend:** .NET 8 Web API (deployed on Render)
-- **Database:** PostgreSQL (via Render or Supabase)
+- **Database:** PostgreSQL (via Render)
 - **Authentication:** Google Sign-In (OAuth2)
-- **Design:** Retro-futuristic style
 
 ## Project Credits
 
