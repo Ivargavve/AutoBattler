@@ -1,106 +1,180 @@
 <div class="legends-root">
-  <h1 class="legends-title neon-glow">Hall of Legends</h1>
+  <h1 class="legends-title">Hall of Legends</h1>
   <div class="legends-subtitle">
     The most legendary battlers in the history of AutoBattler.<br>
-    <span class="meta-text">Statues, achievements and moments that will never be forgotten*</span>
+    <span class="meta-text">Real characters, real achievements, real legends*</span>
   </div>
 
-  <!-- Top Legends Row -->
-  <div class="legends-section legends-row">
-    <div class="legends-col legends-main">
-      <h2 class="section-title">Legendary Players</h2>
-      <ul class="legend-list">
-        <li>
-          <div class="legend-rank neon">#1</div>
-          <div>
-            <span class="legend-name">MizTheWiz</span>
-            <div class="legend-desc">First to reach Level 100, defeated Grandbot with only emotes.</div>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading legendary heroes...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <p class="error-message">{{ error }}</p>
+    <button class="retry-button" (click)="loadTopCharacters()">Try Again</button>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="topCharactersData && !loading" class="legends-content">
+    
+    <!-- King of Autobattler - Special Highlight -->
+    <div class="legends-section king-section">
+      <h2 class="section-title king-title">
+        <span class="crown-icon">👑</span>
+        King of Autobattler
+      </h2>
+      <div class="king-card" *ngIf="topCharactersData.kingOfAutobattler.length > 0">
+        <div class="king-info">
+          <img [src]="topCharactersData.kingOfAutobattler[0].profileIconUrl" 
+               [alt]="topCharactersData.kingOfAutobattler[0].characterName"
+               class="king-avatar">
+          <div class="king-details">
+            <h3 class="king-name">{{ topCharactersData.kingOfAutobattler[0].characterName }}</h3>
+            <p class="king-user">by {{ topCharactersData.kingOfAutobattler[0].userName }}</p>
+            <p class="king-stats">{{ getStatDescription(topCharactersData.kingOfAutobattler[0]) }}</p>
+            <span class="king-class">{{ topCharactersData.kingOfAutobattler[0].class }}</span>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Categories Grid -->
+    <div class="categories-grid">
+      
+      <!-- Attack Masters -->
+      <div class="category-card" *ngIf="topCharactersData.attackMasters.length > 0">
+        <h3 class="category-title">
+          <span class="category-icon">⚔️</span>
+          Attack Masters
+        </h3>
+        <ul class="character-list">
+          <li *ngFor="let character of topCharactersData.attackMasters; let i = index" 
+              class="character-item">
+            <div class="character-rank">{{ i + 1 }}</div>
+            <img [src]="character.profileIconUrl" 
+                 [alt]="character.characterName"
+                 class="character-avatar">
+            <div class="character-info">
+              <span class="character-name">{{ character.characterName }}</span>
+              <span class="character-user">{{ character.userName }}</span>
+              <span class="character-stats">{{ character.statValue }} Attack</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Tanky Bankies -->
+      <div class="category-card" *ngIf="topCharactersData.tankyBankies.length > 0">
+        <h3 class="category-title">
+          <span class="category-icon">🛡️</span>
+          Tanky Bankies
+        </h3>
+        <ul class="character-list">
+          <li *ngFor="let character of topCharactersData.tankyBankies; let i = index" 
+              class="character-item">
+            <div class="character-rank">{{ i + 1 }}</div>
+            <img [src]="character.profileIconUrl" 
+                 [alt]="character.characterName"
+                 class="character-avatar">
+            <div class="character-info">
+              <span class="character-name">{{ character.characterName }}</span>
+              <span class="character-user">{{ character.userName }}</span>
+              <span class="character-stats">{{ character.statValue }} HP</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Defense Champions -->
+      <div class="category-card" *ngIf="topCharactersData.defenseChampions.length > 0">
+        <h3 class="category-title">
+          <span class="category-icon">🏰</span>
+          Defense Champions
+        </h3>
+        <ul class="character-list">
+          <li *ngFor="let character of topCharactersData.defenseChampions; let i = index" 
+              class="character-item">
+            <div class="character-rank">{{ i + 1 }}</div>
+            <img [src]="character.profileIconUrl" 
+                 [alt]="character.characterName"
+                 class="character-avatar">
+            <div class="character-info">
+              <span class="character-name">{{ character.characterName }}</span>
+              <span class="character-user">{{ character.userName }}</span>
+              <span class="character-stats">{{ character.statValue }} Defense</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Speed Demons -->
+      <div class="category-card" *ngIf="topCharactersData.speedDemons.length > 0">
+        <h3 class="category-title">
+          <span class="category-icon">⚡</span>
+          Speed Demons
+        </h3>
+        <ul class="character-list">
+          <li *ngFor="let character of topCharactersData.speedDemons; let i = index" 
+              class="character-item">
+            <div class="character-rank">{{ i + 1 }}</div>
+            <img [src]="character.profileIconUrl" 
+                 [alt]="character.characterName"
+                 class="character-avatar">
+            <div class="character-info">
+              <span class="character-name">{{ character.characterName }}</span>
+              <span class="character-user">{{ character.userName }}</span>
+              <span class="character-stats">{{ character.statValue }} Agility</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Magic Wielders -->
+      <div class="category-card" *ngIf="topCharactersData.magicWielders.length > 0">
+        <h3 class="category-title">
+          <span class="category-icon">🔮</span>
+          Magic Wielders
+        </h3>
+        <ul class="character-list">
+          <li *ngFor="let character of topCharactersData.magicWielders; let i = index" 
+              class="character-item">
+            <div class="character-rank">{{ i + 1 }}</div>
+            <img [src]="character.profileIconUrl" 
+                 [alt]="character.characterName"
+                 class="character-avatar">
+            <div class="character-info">
+              <span class="character-name">{{ character.characterName }}</span>
+              <span class="character-user">{{ character.userName }}</span>
+              <span class="character-stats">{{ character.statValue }} Magic</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Legendary Moments -->
+    <div class="legends-section moments-section">
+      <h2 class="section-title">Legendary Moments</h2>
+      <ul class="moments-list">
+        <li>
+          <span class="moment-date meta-text">Today</span> – Hall of Legends now features real characters and their actual achievements!
         </li>
         <li>
-          <div class="legend-rank">#2</div>
-          <div>
-            <span class="legend-name">The AFK King</span>
-            <div class="legend-desc">Longest unbroken login streak: <span class="meta-text">1,392 hours</span></div>
-          </div>
+          <span class="moment-date meta-text">Live</span> – Watch as new legends rise through the ranks with every battle fought.
         </li>
         <li>
-          <div class="legend-rank">#3</div>
-          <div>
-            <span class="legend-name">Greg (???)
-            </span>
-            <div class="legend-desc">Vendor, myth, bug, or dev? Sold 9000 invisible lootboxes.</div>
-          </div>
-        </li>
-        <li>
-          <div class="legend-rank">#4</div>
-          <div>
-            <span class="legend-name">DuckOverlord</span>
-            <div class="legend-desc">Defeated the entire Duck Uprising solo with only bread crumbs.</div>
-          </div>
-        </li>
-        <li>
-          <div class="legend-rank">#5</div>
-          <div>
-            <span class="legend-name">BreadMage</span>
-            <div class="legend-desc">Once baked 10,000 loaves in one day. Still banned from the Bazaar.</div>
-          </div>
+          <span class="moment-date meta-text">Always</span> – Your character's stats determine their place in history. Every stat point matters!
         </li>
       </ul>
     </div>
 
-    <!-- Achievements Column -->
-    <div class="legends-col legends-side">
-      <h2 class="section-title">Recent Achievements</h2>
-      <ul class="achievements-list">
-        <li>
-          <span class="achieve-name neon">Legendary Combo!</span>
-          <span class="achieve-desc">Chain 10 crits in a row</span>
-        </li>
-        <li>
-          <span class="achieve-name">Rubber Duck Tamer</span>
-          <span class="achieve-desc">Defeat the Duck Overlord</span>
-        </li>
-        <li>
-          <span class="achieve-name">Invisible Shopper</span>
-          <span class="achieve-desc">Purchase from Greg’s shop</span>
-        </li>
-        <li>
-          <span class="achieve-name">The True AFK</span>
-          <span class="achieve-desc">Stay logged in 72 hours (no clicks!)</span>
-        </li>
-        <li>
-          <span class="achieve-name">Bread Winner</span>
-          <span class="achieve-desc">Sell 1000 bread in one session</span>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Famous Moments -->
-  <div class="legends-section">
-    <h2 class="section-title">Famous Moments</h2>
-    <ul class="moments-list">
-      <li>
-        <span class="moment-date meta-text">Patch 2.0</span> – The Great Cheese Crash, when cheese became the only currency and the servers almost melted.
-      </li>
-      <li>
-        <span class="moment-date meta-text">Patch 3.2</span> – Rubber Duck Uprising: all bosses replaced by ducks, no one survived the “Bubble Blast.”
-      </li>
-      <li>
-        <span class="moment-date meta-text">Patch 4.0</span> – The Cat Button Incident: All attacks replaced by “pet cat.” Morale +999, progress 0.
-      </li>
-      <li>
-        <span class="moment-date meta-text">Patch 5.1</span> – Hall of Legends added. All player statues rendered upside-down for 48 hours.
-      </li>
-      <li>
-        <span class="moment-date meta-text">Patch 6.9</span> – First 100% speedrun of Arena using only cheese attacks.
-      </li>
-    </ul>
   </div>
 
   <div class="legends-footer meta-text">
-    *All lore 100% true (according to Greg).<br>
-    Want to see your name here? Become a legend!
+    Want to see your name here? Become a legend through battle!
   </div>
 </div>
