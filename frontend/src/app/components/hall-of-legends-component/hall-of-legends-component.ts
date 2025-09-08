@@ -1,22 +1,32 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TopCharactersService, TopCharactersData, TopCharacterEntry } from '../../services/top-characters.service';
+import { LoadingSpinnerComponent } from '../loading-component/loading-component';
+import { TitleService } from '../../services/title.service';
 
 @Component({
   selector: 'app-hall-of-legends-component',
-  imports: [CommonModule],
+  imports: [CommonModule, LoadingSpinnerComponent],
   templateUrl: './hall-of-legends-component.html',
   styleUrl: './hall-of-legends-component.scss'
 })
-export class HallOfLegendsComponent implements OnInit {
+export class HallOfLegendsComponent implements OnInit, OnDestroy {
   topCharactersData: TopCharactersData | null = null;
   loading = true;
   error: string | null = null;
 
-  constructor(private topCharactersService: TopCharactersService) {}
+  constructor(
+    private topCharactersService: TopCharactersService,
+    private titleService: TitleService
+  ) {}
 
   ngOnInit() {
+    this.titleService.setTitle('Hall of Legends');
     this.loadTopCharacters();
+  }
+
+  ngOnDestroy() {
+    this.titleService.setBaseTitle();
   }
 
   loadTopCharacters() {

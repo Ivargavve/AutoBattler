@@ -33,26 +33,11 @@
   color: var(--meta-text, #7cbfa5);
 }
 
-// Loading and Error States
-.loading-container, .error-container {
+// Error State
+.error-container {
   text-align: center;
   padding: 3rem;
   color: var(--text, #d1ffe8);
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--card-border, rgba(0, 255, 100, 0.07));
-  border-top: 3px solid var(--accent, #86f7b3);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
 
 .error-message {

@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { TitleService } from '../../services/title.service';
 
 interface Vendor {
   id: number;
@@ -26,7 +27,16 @@ interface Item {
   templateUrl: './bazaar-component.html',
   styleUrl: './bazaar-component.scss'
 })
-export class BazaarComponent {
+export class BazaarComponent implements OnInit, OnDestroy {
+  constructor(private titleService: TitleService) {}
+
+  ngOnInit() {
+    this.titleService.setTitle('Bazaar');
+  }
+
+  ngOnDestroy() {
+    this.titleService.setBaseTitle();
+  }
   // --- DUMMY DATA ---
   defaultVendor = 'https://cdn-icons-png.flaticon.com/512/1946/1946429.png';
   fallbackIcon = 'https://cdn-icons-png.flaticon.com/512/1177/1177568.png';

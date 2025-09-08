@@ -15,26 +15,86 @@
 
     <!-- Monsters -->
     <ng-container *ngIf="activeTab === 'monsters'">
-      <section class="hub-block monsters-block">
-        <h2>Monsters</h2>
-        <ul class="monsters-list">
-          <li *ngFor="let monster of monsters">
-            <button
-              class="monster-btn"
-              (click)="fight(monster.name)" 
-              [disabled]="!character || character.currentEnergy <= 0">
+      <div class="monsters-container">
+        <!-- Monster List -->
+        <div class="monster-list-section">
+          <h2 class="section-title">Choose Your Monster</h2>
+          <div class="monster-list">
+            <div 
+              *ngFor="let monster of monsters; let i = index"
+              class="monster-item"
+              [class.selected]="selectedMonster === monster"
+              [class.locked]="character && character.level < monster.level"
+              (click)="selectMonster(monster)">
               
-              <div class="monster-header">
-                <span class="monster-name">{{ monster.name }} </span>
-                <span class="monster-type">{{ monster.type | titlecase }}</span>
+              <div class="monster-item-content">
+                <div class="monster-item-info">
+                  <span class="monster-name">{{ monster.name }}</span>
+                  <span class="monster-level">Level {{ monster.level }}</span>
+                </div>
+                <div class="monster-status">
+                  <span *ngIf="character && character.level < monster.level" class="locked-text">🔒 Locked</span>
+                  <span *ngIf="!character || character.level >= monster.level" class="available-text">Available</span>
+                </div>
               </div>
-              <div class="monster-level">Lv {{ monster.level }} </div>
-              <div class="monster-desc">{{ monster.desc }}</div>
-            </button>
-          </li>
-        </ul>
-        <div class="info-note">Unlock higher level monsters by leveling up!</div>
-      </section>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monster Details -->
+        <div class="monster-details-section" *ngIf="selectedMonster">
+          <div class="monster-card">
+            <div class="monster-image">
+              <img [src]="selectedMonster.imageUrl || '/assets/default-monster.png'" 
+                   [alt]="selectedMonster.name"
+                   class="monster-img">
+            </div>
+            
+            <div class="monster-info">
+              <h3 class="monster-title">{{ selectedMonster.name }}</h3>
+              <p class="monster-type">{{ selectedMonster.type | titlecase }}</p>
+              <p class="monster-description">{{ selectedMonster.desc }}</p>
+              
+              <div class="monster-stats">
+                <div class="stat-row">
+                  <span class="stat-label">Level:</span>
+                  <span class="stat-value">{{ selectedMonster.level }}</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Health:</span>
+                  <span class="stat-value">{{ selectedMonster.maxHp }}</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Attack:</span>
+                  <span class="stat-value">{{ selectedMonster.attack }}</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Defense:</span>
+                  <span class="stat-value">{{ selectedMonster.defense }}</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">XP Reward:</span>
+                  <span class="stat-value">{{ selectedMonster.xp }}</span>
+                </div>
+              </div>
+
+              <button 
+                class="fight-button"
+                [disabled]="!character || character.currentEnergy <= 0 || (character && character.level < selectedMonster.level)"
+                (click)="fight(selectedMonster.name)">
+                <span *ngIf="!character || character.currentEnergy <= 0">No Energy</span>
+                <span *ngIf="character && character.currentEnergy > 0 && character.level < selectedMonster.level">Level Too Low</span>
+                <span *ngIf="character && character.currentEnergy > 0 && character.level >= selectedMonster.level">Fight Monster</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Selection Message -->
+        <div class="no-selection" *ngIf="!selectedMonster">
+          <p>Select a monster from the list to view details</p>
+        </div>
+      </div>
     </ng-container>
 
     <ng-container *ngIf="['challenges', 'makgora', 'dungeons', 'raids'].includes(activeTab)">

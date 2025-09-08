@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FriendsService } from '../../services/friends.service';
 import { FriendsListComponent } from '../friends-list/friends-list';
 import { CommonModule } from '@angular/common';
+import { TitleService } from '../../services/title.service';
 
 export interface UserItem {
   id: number;
@@ -18,14 +19,18 @@ export interface UserItem {
   standalone: true,
   imports: [FriendsListComponent, CommonModule]
 })
-export class SocialComponent implements OnInit {
+export class SocialComponent implements OnInit, OnDestroy {
   users: UserItem[] = [];
   loading = true;
   error: string | null = null;
 
-  constructor(private friendsService: FriendsService) {}
+  constructor(
+    private friendsService: FriendsService,
+    private titleService: TitleService
+  ) {}
 
   ngOnInit() {
+    this.titleService.setTitle('Social');
     this.friendsService.getAllUsers().subscribe({
       next: (users: any[]) => {
         this.users = users.map(u => ({
@@ -42,5 +47,9 @@ export class SocialComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.titleService.setBaseTitle();
   }
 }

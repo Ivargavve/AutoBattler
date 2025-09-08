@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { Character } from '../../services/character';
 import { PlayerAttack } from '../../services/battle-interfaces';
 import { Observable, Subscription, of } from 'rxjs';
+import { TitleService } from '../../services/title.service';
 
 @Component({
   selector: 'app-vault-component',
@@ -12,7 +13,7 @@ import { Observable, Subscription, of } from 'rxjs';
   templateUrl: './vault-component.html',
   styleUrls: ['./vault-component.scss'],
 })
-export class VaultComponent implements OnInit {
+export class VaultComponent implements OnInit, OnDestroy {
   character: Character | null = null;
   characterSub!: Subscription;
   inventory: any[] = [];
@@ -25,9 +26,13 @@ export class VaultComponent implements OnInit {
   totalItems = 0;
   uniqueGearCount = 0;
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private titleService: TitleService
+  ) {}
 
   ngOnInit() {
+    this.titleService.setTitle('Vault');
     this.characterSub = this.authService.character$.subscribe(character => {
       if (character) {
         this.character = character;
@@ -83,5 +88,6 @@ export class VaultComponent implements OnInit {
 
   ngOnDestroy() {
     if (this.characterSub) this.characterSub.unsubscribe();
+    this.titleService.setBaseTitle();
   }
 }
