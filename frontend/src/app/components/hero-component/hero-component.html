@@ -1,155 +1,185 @@
-<div class="profile-bg">
-  <div class="profile-page">
+<div class="hero-container">
+  <div class="hero-content">
     <ng-container *ngIf="character$ | async as character; else noCharacter">
       <div class="character-card">
-
-        <!-- Header -->
-        <div class="character-header-row">
-          <img [src]="character.profileIconUrl" alt="Character Icon" class="character-profile-icon" />
-          <div>
-            <h2 class="character-name">{{ character.name }}</h2>
-            <div class="character-class">Class: {{ character.class }}</div>
+        
+        <!-- Hero Header -->
+        <div class="hero-header">
+          <div class="character-avatar">
+            <img [src]="character.profileIconUrl" alt="Character Icon" class="avatar-image" />
+            <div class="level-badge">{{ character.level }}</div>
+          </div>
+          
+          <div class="character-info">
+            <h1 class="character-name">{{ character.name }}</h1>
+            <div class="character-class">{{ character.class | titlecase }}</div>
+            <div class="character-xp">XP: {{ character.experiencePoints }}</div>
           </div>
 
-          <!-- Level up switch -->
-          <button
-            *ngIf="!editMode && character.canAllocateStats"
-            class="levelup-button"
-            type="button"
-            (click)="enterAllocateMode(character)"
-            title="Allocate stat points"
-          >+</button>
-
-          <!-- Save/Cancel när i allocate-läge -->
-          <div *ngIf="editMode" class="edit-actions">
-            <button class="save-btn" type="button" [disabled]="pointsRemaining !== 0 || saving" (click)="save(character)">
-              {{ saving ? 'Saving...' : 'Save character' }}
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button
+              *ngIf="!editMode && character.canAllocateStats"
+              class="levelup-btn"
+              type="button"
+              (click)="enterAllocateMode(character)"
+              title="Allocate stat points">
+              <span class="btn-icon">⚡</span>
+              Level Up
             </button>
-            <button class="cancel-btn" type="button" [disabled]="saving" (click)="cancel()">Cancel</button>
+
+            <div *ngIf="editMode" class="edit-actions">
+              <button class="save-btn" type="button" [disabled]="pointsRemaining !== 0 || saving" (click)="save(character)">
+                <span class="btn-icon">💾</span>
+                {{ saving ? 'Saving...' : 'Save' }}
+              </button>
+              <button class="cancel-btn" type="button" [disabled]="saving" (click)="cancel()">
+                <span class="btn-icon">❌</span>
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
 
         <!-- View mode (read-only) -->
         <ng-container *ngIf="!editMode; else allocateUI">
-          <ul class="character-stats">
-            <li><strong>Level:</strong> {{ character.level }}</li>
-            <li><strong>XP:</strong> {{ character.experiencePoints }}</li>
-
-            <li>
-              <strong>HP:</strong> {{ character.currentHealth }} / {{ character.maxHealth }}
-              <div class="bar-container red">
-                <div class="bar-fill" [style.width.%]="(character.currentHealth / character.maxHealth) * 100"></div>
-                <span class="bar-text">{{ character.currentHealth }} / {{ character.maxHealth }}</span>
+          <div class="stats-grid">
+            <!-- Health & Energy Bars -->
+            <div class="stat-section health-section">
+              <div class="stat-header">
+                <span class="stat-icon">❤️</span>
+                <span class="stat-label">Health</span>
+                <span class="stat-value">{{ character.currentHealth }} / {{ character.maxHealth }}</span>
               </div>
-            </li>
-
-            <li>
-              <strong>Energy:</strong> {{ character.currentEnergy }} / {{ character.maxEnergy }}
-              <div class="bar-container yellow">
-                <div class="bar-fill" [style.width.%]="(character.currentEnergy / character.maxEnergy) * 100"></div>
-                <span class="bar-text">{{ character.currentEnergy }} / {{ character.maxEnergy }}</span>
+              <div class="progress-bar">
+                <div class="progress-fill health" [style.width.%]="(character.currentHealth / character.maxHealth) * 100"></div>
               </div>
-            </li>
+            </div>
 
-            <li><strong>Attack:</strong> {{ character.attack }}</li>
-            <li><strong>Defense:</strong> {{ character.defense }}</li>
-            <li><strong>Agility:</strong> {{ character.agility }}</li>
-            <li><strong>Magic:</strong> {{ character.magic }}</li>
-            <li><strong>Speed:</strong> {{ character.speed }}</li>
-            <li><strong>Critical Chance:</strong> {{ character.criticalChance * 100}}%</li>
-            <li><strong>Credits:</strong> {{ character.credits }}</li>
-            <li><strong>Created:</strong> {{ character.createdAt | date:'short' }}</li>
-          </ul>
+            <div class="stat-section energy-section">
+              <div class="stat-header">
+                <span class="stat-icon">⚡</span>
+                <span class="stat-label">Energy</span>
+                <span class="stat-value">{{ character.currentEnergy }} / {{ character.maxEnergy }}</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill energy" [style.width.%]="(character.currentEnergy / character.maxEnergy) * 100"></div>
+              </div>
+            </div>
+
+            <!-- Combat Stats -->
+            <div class="stat-section combat-stats">
+              <h3 class="section-title">Combat Stats</h3>
+              <div class="stats-row">
+                <div class="stat-item">
+                  <span class="stat-icon">⚔️</span>
+                  <span class="stat-label">Attack</span>
+                  <span class="stat-value">{{ character.attack }}</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-icon">🛡️</span>
+                  <span class="stat-label">Defense</span>
+                  <span class="stat-value">{{ character.defense }}</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-icon">💨</span>
+                  <span class="stat-label">Agility</span>
+                  <span class="stat-value">{{ character.agility }}</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-icon">🔮</span>
+                  <span class="stat-label">Magic</span>
+                  <span class="stat-value">{{ character.magic }}</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-icon">🏃</span>
+                  <span class="stat-label">Speed</span>
+                  <span class="stat-value">{{ character.speed }}</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-icon">💥</span>
+                  <span class="stat-label">Crit Chance</span>
+                  <span class="stat-value">{{ (character.criticalChance * 100).toFixed(1) }}%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Resources -->
+            <div class="stat-section resources">
+              <h3 class="section-title">Resources</h3>
+              <div class="resources-row">
+                <div class="resource-item">
+                  <span class="resource-icon">💰</span>
+                  <span class="resource-label">Credits</span>
+                  <span class="resource-value">{{ character.credits | number }}</span>
+                </div>
+                <div class="resource-item">
+                  <span class="resource-icon">📅</span>
+                  <span class="resource-label">Created</span>
+                  <span class="resource-value">{{ character.createdAt | date:'MMM d, y' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </ng-container>
 
         <!-- Allocate mode -->
         <ng-template #allocateUI>
-          <div class="allocate-header">
-            <div class="points-left">Points left: {{ pointsRemaining }}</div>
-            <div class="hint">Add a total of {{ pointsRemaining }} points. You must use all {{ pointsRemaining }} to be able to save.</div>
+          <div class="allocate-mode">
+            <div class="allocate-header">
+              <div class="points-remaining">
+                <span class="points-icon">⭐</span>
+                <span class="points-text">Points Remaining: {{ pointsRemaining }}</span>
+              </div>
+              <div class="allocate-hint">Distribute all {{ pointsRemaining }} points to save your changes</div>
+            </div>
+
+            <div class="allocate-grid">
+              <div class="allocate-item">
+                <div class="allocate-header-item">
+                  <span class="allocate-icon">❤️</span>
+                  <span class="allocate-label">Health</span>
+                </div>
+                <div class="allocate-controls">
+                  <button type="button" class="allocate-btn minus" (click)="decrement('hp')" [disabled]="saving || allocatedHpPoints() === 0">-</button>
+                  <div class="allocate-value">
+                    {{ editedMaxHealth }}
+                    <small *ngIf="allocatedHpPoints() > 0" class="allocate-bonus">+{{ allocatedHpPoints() * HP_PER_POINT }}</small>
+                  </div>
+                  <button type="button" class="allocate-btn plus" (click)="increment('hp')" [disabled]="saving || pointsRemaining === 0">+</button>
+                </div>
+              </div>
+
+              <div class="allocate-item" *ngFor="let stat of statKeys">
+                <div class="allocate-header-item">
+                  <span class="allocate-icon">{{ getStatIcon(stat) }}</span>
+                  <span class="allocate-label">{{ stat | titlecase }}</span>
+                </div>
+                <div class="allocate-controls">
+                  <button type="button" class="allocate-btn minus" (click)="decrement(stat)" [disabled]="saving || allocated(stat) === 0">-</button>
+                  <div class="allocate-value">
+                    {{ editedStats[stat] }}
+                    <small *ngIf="allocated(stat) > 0" class="allocate-bonus">+{{ allocated(stat) }}</small>
+                  </div>
+                  <button type="button" class="allocate-btn plus" (click)="increment(stat)" [disabled]="saving || pointsRemaining === 0">+</button>
+                </div>
+              </div>
+            </div>
           </div>
-
-          <ul class="character-stats allocate">
-            <li class="stat-row">
-              <span class="stat-name">HP</span>
-              <div class="stat-controls">
-                <button type="button" (click)="decrement('hp')" [disabled]="saving || allocatedHpPoints() === 0">-</button>
-                <span class="stat-value">
-                  {{ editedMaxHealth }}
-                  <small *ngIf="allocatedHpPoints() > 0">(+{{ allocatedHpPoints() * HP_PER_POINT }})</small>
-                </span>
-                <button type="button" (click)="increment('hp')" [disabled]="saving || pointsRemaining === 0">+</button>
-              </div>
-            </li>
-
-            <li class="stat-row">
-              <span class="stat-name">Attack</span>
-              <div class="stat-controls">
-                <button type="button" (click)="decrement('attack')" [disabled]="saving || allocated('attack') === 0">-</button>
-                <span class="stat-value">
-                  {{ editedStats.attack }}
-                  <small *ngIf="allocated('attack') > 0">(+{{ allocated('attack') }})</small>
-                </span>
-                <button type="button" (click)="increment('attack')" [disabled]="saving || pointsRemaining === 0">+</button>
-              </div>
-            </li>
-
-            <li class="stat-row">
-              <span class="stat-name">Defense</span>
-              <div class="stat-controls">
-                <button type="button" (click)="decrement('defense')" [disabled]="saving || allocated('defense') === 0">-</button>
-                <span class="stat-value">
-                  {{ editedStats.defense }}
-                  <small *ngIf="allocated('defense') > 0">(+{{ allocated('defense') }})</small>
-                </span>
-                <button type="button" (click)="increment('defense')" [disabled]="saving || pointsRemaining === 0">+</button>
-              </div>
-            </li>
-
-            <li class="stat-row">
-              <span class="stat-name">Agility</span>
-              <div class="stat-controls">
-                <button type="button" (click)="decrement('agility')" [disabled]="saving || allocated('agility') === 0">-</button>
-                <span class="stat-value">
-                  {{ editedStats.agility }}
-                  <small *ngIf="allocated('agility') > 0">(+{{ allocated('agility') }})</small>
-                </span>
-                <button type="button" (click)="increment('agility')" [disabled]="saving || pointsRemaining === 0">+</button>
-              </div>
-            </li>
-
-            <li class="stat-row">
-              <span class="stat-name">Magic</span>
-              <div class="stat-controls">
-                <button type="button" (click)="decrement('magic')" [disabled]="saving || allocated('magic') === 0">-</button>
-                <span class="stat-value">
-                  {{ editedStats.magic }}
-                  <small *ngIf="allocated('magic') > 0">(+{{ allocated('magic') }})</small>
-                </span>
-                <button type="button" (click)="increment('magic')" [disabled]="saving || pointsRemaining === 0">+</button>
-              </div>
-            </li>
-
-            <li class="stat-row">
-              <span class="stat-name">Speed</span>
-              <div class="stat-controls">
-                <button type="button" (click)="decrement('speed')" [disabled]="saving || allocated('speed') === 0">-</button>
-                <span class="stat-value">
-                  {{ editedStats.speed }}
-                  <small *ngIf="allocated('speed') > 0">(+{{ allocated('speed') }})</small>
-                </span>
-                <button type="button" (click)="increment('speed')" [disabled]="saving || pointsRemaining === 0">+</button>
-              </div>
-            </li>
-          </ul>
         </ng-template>
 
       </div>
     </ng-container>
 
     <ng-template #noCharacter>
-      <div class="character-card empty">
-        <p>No character found. <a routerLink="/create-character">Create one here!</a></p>
+      <div class="empty-state">
+        <div class="empty-icon">👤</div>
+        <h2 class="empty-title">No Character Found</h2>
+        <p class="empty-description">Create your first character to start your adventure!</p>
+        <a routerLink="/create-character" class="create-character-btn">
+          <span class="btn-icon">✨</span>
+          Create Character
+        </a>
       </div>
     </ng-template>
   </div>

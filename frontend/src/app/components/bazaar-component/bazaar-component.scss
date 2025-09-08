@@ -420,6 +420,23 @@
     flex-wrap: wrap;
   }
 
+  .filter-select {
+    background: var(--btn-bg, #1b1d1b);
+    border: 1px solid var(--card-border, rgba(0, 255, 100, 0.07));
+    color: var(--text, #d1ffe8);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+    min-width: 150px;
+
+    &:focus {
+      outline: none;
+      border-color: var(--accent, #86f7b3);
+      box-shadow: 0 0 8px var(--accent-shadow, #86f7b366);
+    }
+  }
+
   .item-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));

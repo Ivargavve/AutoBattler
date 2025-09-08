@@ -8,6 +8,8 @@ import { tap, take } from 'rxjs/operators';
 
 type StatKey = 'attack' | 'defense' | 'agility' | 'magic' | 'speed';
 
+const STAT_KEYS: StatKey[] = ['attack', 'defense', 'agility', 'magic', 'speed'];
+
 @Component({
   selector: 'app-hero',
   standalone: true,
@@ -17,6 +19,9 @@ type StatKey = 'attack' | 'defense' | 'agility' | 'magic' | 'speed';
 })
 export class HeroComponent implements OnInit {
   character$: Observable<Character | null>;
+  
+  // Expose STAT_KEYS for template
+  readonly statKeys = STAT_KEYS;
 
   editMode = false;
   pointsRemaining = 0;
@@ -171,5 +176,16 @@ export class HeroComponent implements OnInit {
         this.saving = false;
       }
     });
+  }
+
+  getStatIcon(stat: string): string {
+    const icons: { [key: string]: string } = {
+      'attack': '⚔️',
+      'defense': '🛡️',
+      'agility': '💨',
+      'magic': '🔮',
+      'speed': '🏃'
+    };
+    return icons[stat] || '📊';
   }
 }

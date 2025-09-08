@@ -1,65 +1,184 @@
-<div class="profile-bg">
-  <div class="profile-page">
+<div class="profile-container">
+  <div class="profile-content">
     <ng-container *ngIf="user$ | async as user; else loading">
-
-      <!-- User Profile Card -->
-      <div class="profile-card">
-        <div class="profile-header">
-          <img [src]="user.profilePictureUrl" alt="Profile Picture" class="profile-pic" />
-          <h2 class="username">{{ user.username }}</h2>
-        </div>
-        <div class="profile-body">
-          <p class="fullname">{{ user.fullName }}</p>
-          <p><strong>Role:</strong> {{ user.role }}</p>
-          <p><strong>Level:</strong> {{ user.level }}</p>
-          <p><strong>XP:</strong> {{ user.experiencePoints }}</p>
-          <p><strong>Credits:</strong> {{ user.credits }}</p>
-          <p><strong>Achievements:</strong> {{ achievementsCount$ | async }}</p>
-          <p><strong>Cosmetics:</strong> {{ cosmeticsCount$ | async }}</p>
-          <p><strong>Registered:</strong> {{ user.createdAt | date:'short' }}</p>
+      
+      <!-- User Profile Section -->
+      <div class="profile-section">
+        <div class="profile-card user-card">
+          <div class="card-header">
+            <div class="user-avatar">
+              <img [src]="user.profilePictureUrl" alt="Profile Picture" class="avatar-image" />
+              <div class="user-level-badge">{{ user.level }}</div>
+            </div>
+            <div class="user-info">
+              <h1 class="username">{{ user.username }}</h1>
+              <p class="fullname">{{ user.fullName }}</p>
+              <div class="user-role">{{ user.role | titlecase }}</div>
+            </div>
+          </div>
+          
+          <div class="card-content">
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-info">
+                  <div class="stat-label">Experience</div>
+                  <div class="stat-value">{{ user.experiencePoints | number }}</div>
+                </div>
+              </div>
+              
+              <div class="stat-item">
+                <div class="stat-icon">💰</div>
+                <div class="stat-info">
+                  <div class="stat-label">Credits</div>
+                  <div class="stat-value">{{ user.credits | number }}</div>
+                </div>
+              </div>
+              
+              <div class="stat-item">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-info">
+                  <div class="stat-label">Achievements</div>
+                  <div class="stat-value">{{ achievementsCount$ | async }}</div>
+                </div>
+              </div>
+              
+              <div class="stat-item">
+                <div class="stat-icon">✨</div>
+                <div class="stat-info">
+                  <div class="stat-label">Cosmetics</div>
+                  <div class="stat-value">{{ cosmeticsCount$ | async }}</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="user-meta">
+              <div class="meta-item">
+                <span class="meta-icon">📅</span>
+                <span class="meta-text">Joined {{ user.createdAt | date:'MMM d, y' }}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Character Profile -->
-      <ng-container *ngIf="character$ | async as character; else noCharacter">
-        <div class="profile-card character-profile-card">
-          <div class="profile-header">
-            <img [src]="character.profileIconUrl" alt="Character Image" class="profile-pic" />
-            <h2 class="username">{{ character.name || 'Character' }}</h2>
+      <!-- Character Profile Section -->
+      <div class="profile-section">
+        <ng-container *ngIf="character$ | async as character; else noCharacter">
+          <div class="profile-card character-card">
+            <div class="card-header">
+              <div class="character-avatar">
+                <img [src]="character.profileIconUrl" alt="Character Image" class="avatar-image" />
+                <div class="character-level-badge">{{ character.level }}</div>
+              </div>
+              <div class="character-info">
+                <h2 class="character-name">{{ character.name || 'Unnamed Character' }}</h2>
+                <div class="character-class">{{ character.class | titlecase }}</div>
+                <div class="character-xp">XP: {{ character.experiencePoints | number }}</div>
+              </div>
+            </div>
+            
+            <div class="card-content">
+              <!-- Health & Energy -->
+              <div class="character-bars">
+                <div class="bar-section">
+                  <div class="bar-header">
+                    <span class="bar-icon">❤️</span>
+                    <span class="bar-label">Health</span>
+                    <span class="bar-value">{{ character.currentHealth }} / {{ character.maxHealth }}</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill health" [style.width.%]="(character.currentHealth / character.maxHealth) * 100"></div>
+                  </div>
+                </div>
+                
+                <div class="bar-section">
+                  <div class="bar-header">
+                    <span class="bar-icon">⚡</span>
+                    <span class="bar-label">Energy</span>
+                    <span class="bar-value">{{ character.currentEnergy }} / {{ character.maxEnergy }}</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill energy" [style.width.%]="(character.currentEnergy / character.maxEnergy) * 100"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Combat Stats -->
+              <div class="combat-stats">
+                <h3 class="section-title">Combat Statistics</h3>
+                <div class="stats-grid">
+                  <div class="stat-item">
+                    <span class="stat-icon">⚔️</span>
+                    <span class="stat-label">Attack</span>
+                    <span class="stat-value">{{ character.attack }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-icon">🛡️</span>
+                    <span class="stat-label">Defense</span>
+                    <span class="stat-value">{{ character.defense }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-icon">💨</span>
+                    <span class="stat-label">Agility</span>
+                    <span class="stat-value">{{ character.agility }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-icon">🔮</span>
+                    <span class="stat-label">Magic</span>
+                    <span class="stat-value">{{ character.magic }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-icon">🏃</span>
+                    <span class="stat-label">Speed</span>
+                    <span class="stat-value">{{ character.speed }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-icon">💥</span>
+                    <span class="stat-label">Crit Chance</span>
+                    <span class="stat-value">{{ (character.criticalChance * 100).toFixed(1) }}%</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Character Meta -->
+              <div class="character-meta">
+                <div class="meta-item">
+                  <span class="meta-icon">💰</span>
+                  <span class="meta-text">Credits: {{ character.credits | number }}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-icon">📅</span>
+                  <span class="meta-text">Created: {{ character.createdAt | date:'MMM d, y' }}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-icon">🔄</span>
+                  <span class="meta-text">Updated: {{ character.updatedAt | date:'MMM d, y' }}</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="profile-body">
-            <p><strong>Class:</strong> {{ character.class }}</p>
-            <p><strong>HP:</strong> {{ character.currentHealth }}</p>
-            <p><strong>Attack:</strong> {{ character.attack }}</p>
-            <p><strong>Defense:</strong> {{ character.defense }}</p>
-            <p><strong>Speed:</strong> {{ character.agility }}</p>
-            <p><strong>Crit Chance:</strong> {{ character.criticalChance*100 }}%</p>
-            <p><strong>Level:</strong> {{ character.level }}</p>
-            <p><strong>Credits:</strong> {{ character.credits }}</p>
-            <p><strong>Created:</strong> {{ character.createdAt | date:'short' }}</p>
-            <p><strong>Last updated:</strong> {{ character.updatedAt | date:'short' }}</p>
-          </div>
-        </div>
-      </ng-container>
+        </ng-container>
 
-      <!-- If character does not exist -->
-      <ng-template #noCharacter>
-        <div class="profile-card character-profile-card character-empty">
-          <div class="profile-header">
-            <img src="assets/char1.jpeg" alt="No Character" class="profile-pic" />
-            <h2 class="username">No character</h2>
+        <!-- No Character State -->
+        <ng-template #noCharacter>
+          <div class="profile-card character-card empty-character">
+            <div class="empty-state">
+              <div class="empty-icon">👤</div>
+              <h3 class="empty-title">No Character</h3>
+              <p class="empty-description">This user hasn't created a character yet.</p>
+            </div>
           </div>
-          <div class="profile-body">
-            <p>No character created yet.</p>
-          </div>
-        </div>
-      </ng-template>
+        </ng-template>
+      </div>
 
     </ng-container>
 
-    <!-- Loading spinner while user data is loading -->
+    <!-- Loading State -->
     <ng-template #loading>
-      <app-loading-spinner></app-loading-spinner>
+      <div class="loading-container">
+        <app-loading-spinner></app-loading-spinner>
+      </div>
     </ng-template>
 
   </div>
