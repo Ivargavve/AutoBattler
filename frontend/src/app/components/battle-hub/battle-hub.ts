@@ -27,6 +27,8 @@ export class BattleHubComponent implements OnInit, OnDestroy {
   ) {
     this.authService.character$.subscribe(char => {
       this.character = char;
+      // Re-select first available monster when character changes
+      this.selectFirstAvailableMonster();
     });
 
     this.http.get<any[]>(`${environment.apiUrl}/enemies`).subscribe(enemies => {
@@ -43,6 +45,9 @@ export class BattleHubComponent implements OnInit, OnDestroy {
           critChance: e.critChance
         }))
         .sort((a, b) => a.level - b.level);
+      
+      // Select the first available monster by default
+      this.selectFirstAvailableMonster();
     });
   }
 
@@ -56,6 +61,18 @@ export class BattleHubComponent implements OnInit, OnDestroy {
 
   selectMonster(monster: any) {
     this.selectedMonster = monster;
+  }
+
+  selectFirstAvailableMonster() {
+    if (this.monsters.length > 0) {
+      // Find the first monster that the character can fight
+      const availableMonster = this.monsters.find(monster => 
+        !this.character || this.character.level >= monster.level
+      );
+      
+      // If no available monster found, select the first one anyway (will be locked)
+      this.selectedMonster = availableMonster || this.monsters[0];
+    }
   }
 
   fight(enemyName: string) {

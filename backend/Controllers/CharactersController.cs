@@ -227,25 +227,44 @@ namespace backend.Controllers
             };
 
             var klass = dto.Class?.Trim().ToLower() ?? "";
-            var matchingAttacks = AttackTemplates.All
+            
+            // Give only the first (basic) attack for each class
+            var basicAttack = AttackTemplates.All
                 .Where(atk => atk.AllowedClasses.Any(ac => ac.ToLower() == klass))
-                .Select(atk => new
-                {
-                    atk.Id,
-                    atk.Name,
-                    atk.Type,
-                    atk.DamageType,
-                    atk.BaseDamage,
-                    atk.MaxCharges,
-                    CurrentCharges = atk.MaxCharges,
-                    atk.Scaling,
-                    atk.RequiredStats,
-                    atk.AllowedClasses,
-                    atk.Description
-                })
-                .ToList();
+                .OrderBy(atk => atk.Id) // First attack is usually the basic one
+                .FirstOrDefault();
 
-            chr.AttacksJson = JsonSerializer.Serialize(matchingAttacks);
+            if (basicAttack != null)
+            {
+                var startingAttack = new
+                {
+                    basicAttack.Id,
+                    basicAttack.Name,
+                    basicAttack.Type,
+                    basicAttack.DamageType,
+                    basicAttack.BaseDamage,
+                    basicAttack.MaxCharges,
+                    CurrentCharges = basicAttack.MaxCharges,
+                    basicAttack.Scaling,
+                    basicAttack.RequiredStats,
+                    basicAttack.AllowedClasses,
+                    basicAttack.Description,
+                    basicAttack.HealAmount,
+                    basicAttack.BlockNextAttack,
+                    basicAttack.Poison,
+                    basicAttack.EvadeNextAttack,
+                    basicAttack.CritChanceBonus,
+                    basicAttack.CritBonusTurns,
+                    basicAttack.PoisonDamagePerTurn,
+                    basicAttack.PoisonDuration
+                };
+
+                chr.AttacksJson = JsonSerializer.Serialize(new[] { startingAttack });
+            }
+            else
+            {
+                chr.AttacksJson = "[]";
+            }
 
             _db.Characters.Add(chr);
             await _db.SaveChangesAsync();

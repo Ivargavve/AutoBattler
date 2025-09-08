@@ -7,74 +7,241 @@
   <div class="bazaar-row">
 
     <div class="bazaar-col bazaar-main">
-      <section class="section-box vendor-section">
-        <h2 class="section-title">Vendors</h2>
-        <div class="vendor-list">
+      <!-- Shop Tabs -->
+      <div class="shop-tabs">
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'items'"
+          (click)="activeTab = 'items'">
+          Items
+        </button>
           <button 
-            *ngFor="let v of vendors" 
-            class="vendor-btn" 
-            [class.active]="v.id === selectedVendor.id"
-            (click)="selectVendor(v)">
-            <img [src]="v.avatarUrl || defaultVendor" class="vendor-avatar" alt="{{ v.name }}">
-            <div class="vendor-info">
-              <div class="vendor-name">{{ v.name }}</div>
-              <div class="vendor-level">Level: {{ v.minLevel }}+</div>
-            </div>
+          class="tab-btn" 
+          [class.active]="activeTab === 'abilities'"
+          (click)="activeTab = 'abilities'">
+          Abilities
           </button>
         </div>
-      </section>
 
-      <section class="section-box search-section">
-        <h2 class="section-title">Search Items</h2>
-        <div class="search-row">
-          <input [(ngModel)]="searchQuery" placeholder="Search items..." class="search-input" />
-          <button (click)="searchItems()" class="search-btn">Search</button>
-        </div>
-      </section>
-
-      <section class="section-box itemlist-section">
-        <h2 class="section-title">Available Items</h2>
-        <ul class="item-list">
-          <li *ngFor="let item of filteredItems" class="item-row">
-            <img [src]="item.iconUrl || fallbackIcon" class="item-icon" alt="{{ item.name }}">
-            <div class="item-details">
-              <div class="item-name">{{ item.name }}</div>
-              <div class="item-type">{{ item.type }}</div>
-              <div class="item-desc">{{ item.description }}</div>
+      <!-- Items Tab -->
+      <div *ngIf="activeTab === 'items'">
+        <section class="section-box items-section">
+          <h2 class="section-title">Available Items</h2>
+          
+          <!-- Error Message -->
+          <div *ngIf="error" class="error-message">
+            {{ error }}
+          </div>
+          
+          <!-- Loading Spinner -->
+          <div *ngIf="itemsLoading" class="loading-container">
+            <app-loading-spinner></app-loading-spinner>
+          </div>
+          
+          <!-- Filters and Content -->
+          <div *ngIf="!itemsLoading">
+            <div class="item-filters">
+              <select [(ngModel)]="itemSortBy" (ngModelChange)="onItemSortChange()" class="filter-select">
+                <option value="price">Sort by Price</option>
+                <option value="name">Sort by Name</option>
+                <option value="rarity">Sort by Rarity</option>
+                <option value="level">Sort by Level</option>
+              </select>
+              <select [(ngModel)]="itemFilterSlot" (ngModelChange)="onItemSlotFilterChange()" class="filter-select">
+                <option value="">All Slots</option>
+                <option value="weapon">Weapon</option>
+                <option value="chest">Chest</option>
+                <option value="head">Head</option>
+                <option value="arms">Arms</option>
+                <option value="legs">Legs</option>
+                <option value="feet">Feet</option>
+                <option value="hands">Hands</option>
+                <option value="ring">Ring</option>
+                <option value="amulet">Amulet</option>
+                <option value="belt">Belt</option>
+                <option value="back">Back</option>
+              </select>
+              <select [(ngModel)]="itemFilterRarity" (ngModelChange)="onItemRarityFilterChange()" class="filter-select">
+                <option value="">All Rarities</option>
+                <option value="common">Common</option>
+                <option value="uncommon">Uncommon</option>
+                <option value="rare">Rare</option>
+                <option value="epic">Epic</option>
+                <option value="legendary">Legendary</option>
+              </select>
             </div>
-            <div class="item-price">{{ item.price }} <span class="gold">G</span></div>
-            <button class="buy-btn" (click)="buyItem(item)">Buy</button>
-          </li>
-        </ul>
-        <div *ngIf="filteredItems.length === 0" class="empty-msg">
-          No items found.
-        </div>
-      </section>
+            
+            <div class="item-list">
+            <div *ngFor="let item of filteredItems" class="item-card" [class.unavailable]="!item.isAvailable">
+              <div class="item-image">
+                <img [src]="item.imageUrl || '/assets/items/default-item.png'" 
+                     [alt]="item.name"
+                     class="item-img">
+                <div class="item-rarity" [style.background-color]="getRarityColor(item.rarity)">
+                  {{ item.rarity | titlecase }}
+                </div>
+                <div *ngIf="!item.isAvailable" class="level-lock">
+                  Level {{ item.requiredLevel }}+
+                </div>
+              </div>
+              
+              <div class="item-info">
+                <h3 class="item-name">{{ item.name }}</h3>
+                <p class="item-type">{{ item.type }} - {{ item.slot | titlecase }}</p>
+                <p class="item-description">{{ item.description }}</p>
+                
+                <div class="item-stats">
+                  <div *ngIf="getStatBonusEntries(item.statBonuses).length > 0" class="stat-bonuses">
+                    <strong>Stat Bonuses:</strong>
+                    <div class="stat-list">
+                      <span *ngFor="let stat of getStatBonusEntries(item.statBonuses)" 
+                            class="stat-bonus"
+                            [class.positive]="stat[1] > 0">
+                        +{{ stat[1] }} {{ stat[0] | titlecase }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="item-requirements">
+                  <div class="requirement-item">
+                    <span class="req-label">Level:</span>
+                    <span class="req-value">{{ item.requiredLevel }}</span>
+                  </div>
+                  <div *ngIf="item.requiredClass" class="requirement-item">
+                    <span class="req-label">Class:</span>
+                    <span class="req-value">{{ item.requiredClass | titlecase }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="item-actions">
+                <div class="item-price">{{ item.price }} Credits</div>
+                <button 
+                  class="purchase-item-btn"
+                  [disabled]="!item.isAvailable || !item.canAfford || !item.meetsRequirements"
+                  (click)="purchaseItem(item)">
+                  <span *ngIf="!item.isAvailable">Level {{ item.requiredLevel }}+ Required</span>
+                  <span *ngIf="item.isAvailable && !item.canAfford">Not Enough Credits</span>
+                  <span *ngIf="item.isAvailable && item.canAfford && !item.meetsRequirements">Requirements Not Met</span>
+                  <span *ngIf="item.isAvailable && item.canAfford && item.meetsRequirements">Purchase</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+            <div *ngIf="filteredItems.length === 0" class="empty-msg">
+              No items available for your level.
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Abilities Tab -->
+      <div *ngIf="activeTab === 'abilities'">
+        <section class="section-box abilities-section">
+          <h2 class="section-title">Available Abilities</h2>
+          
+          <!-- Error Message -->
+          <div *ngIf="error" class="error-message">
+            {{ error }}
+          </div>
+          
+          <!-- Loading Spinner -->
+          <div *ngIf="attacksLoading" class="loading-container">
+            <app-loading-spinner></app-loading-spinner>
+          </div>
+          
+          <!-- Filters and Content -->
+          <div *ngIf="!attacksLoading">
+            <div class="ability-filters">
+              <select [(ngModel)]="attackSortBy" (ngModelChange)="onAttackSortChange()" class="filter-select">
+                <option value="price">Sort by Price</option>
+                <option value="name">Sort by Name</option>
+                <option value="requirements">Sort by Requirements</option>
+              </select>
+              <select [(ngModel)]="attackFilterClass" (ngModelChange)="onAttackClassFilterChange()" class="filter-select">
+                <option value="">All Classes</option>
+                <option value="warrior">Warrior</option>
+                <option value="paladin">Paladin</option>
+                <option value="mage">Mage</option>
+                <option value="rogue">Rogue</option>
+              </select>
+            </div>
+            
+            <div class="ability-list">
+            <div *ngFor="let attack of filteredAttacks" class="attack-item" [class.unavailable]="!attack.isAvailable">
+              <div class="attack-header">
+                <h3 class="attack-name">{{ attack.name }}</h3>
+                <div class="attack-price">{{ attack.price }} Credits</div>
+              </div>
+              
+              <div class="attack-details">
+                <div class="attack-type">{{ attack.type | titlecase }} - {{ attack.damageType | titlecase }}</div>
+                <div class="attack-damage">Damage: {{ attack.baseDamage }}</div>
+                <div class="attack-charges">Charges: {{ attack.maxCharges }}</div>
+                <div class="attack-description">{{ attack.description }}</div>
+                
+                <div class="attack-requirements">
+                  <div *ngIf="attack.requiredStats && getRequirementEntries(attack.requiredStats).length > 0" class="requirements">
+                    <strong>Requirements:</strong>
+                    <span *ngFor="let req of getRequirementEntries(attack.requiredStats)" 
+                          class="requirement"
+                          [class.met]="attack.meetsRequirements">
+                      {{ req[0] | titlecase }}: {{ req[1] }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="attack-classes">
+                  <strong>Classes:</strong>
+                  <span *ngFor="let cls of attack.allowedClasses" class="class-tag">
+                    {{ cls | titlecase }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="attack-actions">
+                <button 
+                  class="purchase-btn"
+                  [disabled]="!attack.isAvailable || !attack.canAfford || !attack.meetsRequirements"
+                  (click)="purchaseAttack(attack)">
+                  <span *ngIf="!attack.isAvailable">Not Available</span>
+                  <span *ngIf="attack.isAvailable && !attack.canAfford">Not Enough Credits</span>
+                  <span *ngIf="attack.isAvailable && attack.canAfford && !attack.meetsRequirements">Requirements Not Met</span>
+                  <span *ngIf="attack.isAvailable && attack.canAfford && attack.meetsRequirements">Purchase</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+            <div *ngIf="filteredAttacks.length === 0" class="empty-msg">
+              No abilities available for your class.
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
 
     <div class="bazaar-col bazaar-side">
-      <section class="section-box sell-section">
-        <h2 class="section-title">Sell Items</h2>
-        <ul class="inventory-list">
-          <li *ngFor="let item of playerInventory" class="inventory-item-row">
-            <img [src]="item.iconUrl || fallbackIcon" class="inv-icon" alt="{{ item.name }}">
-            <div class="inv-details">
-              <div class="inv-name">{{ item.name }}</div>
-              <div class="inv-qty">x{{ item.quantity }}</div>
+      <section class="section-box character-info-section">
+        <h2 class="section-title">Character Info</h2>
+        <div class="character-stats" *ngIf="character">
+          <div class="stat-item">
+            <span class="stat-label">Credits:</span>
+            <span class="stat-value">{{ character.credits }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Level:</span>
+            <span class="stat-value">{{ character.level }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Class:</span>
+            <span class="stat-value">{{ character.class | titlecase }}</span>
             </div>
-            <div class="inv-price">{{ sellPrice(item) }} <span class="gold">G</span></div>
-            <button class="sell-btn" (click)="sellItem(item)" [disabled]="item.quantity === 0">Sell</button>
-          </li>
-        </ul>
-        <div *ngIf="playerInventory.length === 0" class="empty-msg">
-          Your inventory is empty.
         </div>
-      </section>
-
-      <section class="section-box info-section">
-        <div class="player-gold">
-          <span class="gold-label">Gold:</span>
-          <span class="gold-amount">{{ playerGold }}</span>
+        <div *ngIf="!character" class="no-character">
+          <p>No character found. Please create a character first.</p>
         </div>
       </section>
     </div>
