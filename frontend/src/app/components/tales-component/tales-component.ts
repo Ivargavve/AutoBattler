@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { TitleService } from '../../services/title.service';
 import { AuthService } from '../../services/auth.service';
@@ -58,7 +58,7 @@ interface MissionProgressUpdateRequest {
 
 @Component({
   selector: 'app-tales-component',
-  imports: [CommonModule],
+  imports: [CommonModule, NgIf, NgFor],
   templateUrl: './tales-component.html',
   styleUrl: './tales-component.scss'
 })
@@ -106,7 +106,7 @@ export class TalesComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         },
         error: (error) => {
-          console.warn('Authenticated endpoint failed, falling back to public endpoint:', error);
+          console.debug('User missions 401; falling back to public endpoint');
           // Fallback to public endpoint if authenticated request fails
           this.loadPublicTalesData();
         }
@@ -276,9 +276,8 @@ export class TalesComponent implements OnInit, OnDestroy {
   }
 
   isMissionCompleted(missionId: string): boolean {
-    // For now, missions are completed when they have any progress
-    // In a real implementation, you'd check against specific requirements
-    return this.getMissionProgress(missionId) > 0;
+    // Legacy helper: default to daily threshold
+    return this.getMissionProgress(missionId) >= 10;
   }
 
   isMissionClaimed(missionId: string): boolean {
@@ -291,21 +290,33 @@ export class TalesComponent implements OnInit, OnDestroy {
     return this.claimedMissions.has(todayKey) || this.claimedMissions.has(weekKey);
   }
 
+  // New helpers: split completion and claimed logic by mission type
+  isDailyMissionCompleted(missionId: string): boolean {
+    return this.getMissionProgress(missionId) >= 10;
+  }
+
+  isWeeklyMissionCompleted(missionId: string): boolean {
+    return this.getMissionProgress(missionId) >= 20;
+  }
+
+  isDailyMissionClaimed(missionId: string): boolean {
+    const now = new Date();
+    const todayKey = `${missionId}_${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}`;
+    return this.claimedMissions.has(todayKey);
+  }
+
+  isWeeklyMissionClaimed(missionId: string): boolean {
+    const now = new Date();
+    const weekNumber = this.getWeekNumber(now);
+    const weekKey = `${missionId}_week_${weekNumber}`;
+    return this.claimedMissions.has(weekKey);
+  }
+
   private getWeekNumber(date: Date): number {
     const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
     const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
     return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
   }
 
-  completeMission(missionId: string, missionType: 'daily' | 'weekly') {
-    if (this.isMissionCompleted(missionId) || this.isMissionClaimed(missionId)) {
-      return;
-    }
-
-    // Update local progress
-    this.missionProgress.set(missionId, 1);
-    
-    // Send to backend
-    this.updateMissionProgress(missionId, 1);
-  }
+  // Removed manual complete button flow; missions auto-start at 0 and progress via gameplay triggers.
 }

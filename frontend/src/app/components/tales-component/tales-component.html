@@ -72,7 +72,7 @@
 
             <p class="mission-description">{{ mission.description }}</p>
 
-            <div class="mission-progress" *ngIf="getMissionProgress(mission.id) > 0">
+            <div class="mission-progress">
               <div class="progress-bar">
                 <div class="progress-fill" [style.width.%]="(getMissionProgress(mission.id) / 10) * 100"></div>
               </div>
@@ -85,15 +85,11 @@
                 <span class="mission-status" *ngIf="isMissionClaimed(mission.id)">✓ Claimed</span>
               </div>
               <div class="mission-actions">
-                <button *ngIf="!isMissionClaimed(mission.id) && isMissionCompleted(mission.id)" 
-                        class="action-button claim-button" 
-                        (click)="claimMission(mission.id, 'daily')">
+                <button 
+                  class="action-button claim-button" 
+                  [disabled]="!isDailyMissionCompleted(mission.id) || isDailyMissionClaimed(mission.id)"
+                  (click)="claimMission(mission.id, 'daily')">
                   Claim Reward
-                </button>
-                <button *ngIf="!isMissionClaimed(mission.id) && !isMissionCompleted(mission.id)" 
-                        class="action-button complete-button" 
-                        (click)="completeMission(mission.id, 'daily')">
-                  Complete Mission
                 </button>
               </div>
             </div>
@@ -126,7 +122,7 @@
 
             <p class="mission-description">{{ mission.description }}</p>
 
-            <div class="mission-progress" *ngIf="getMissionProgress(mission.id) > 0">
+            <div class="mission-progress">
               <div class="progress-bar">
                 <div class="progress-fill" [style.width.%]="(getMissionProgress(mission.id) / 20) * 100"></div>
               </div>
@@ -139,15 +135,11 @@
                 <span class="mission-status" *ngIf="isMissionClaimed(mission.id)">✓ Claimed</span>
               </div>
               <div class="mission-actions">
-                <button *ngIf="!isMissionClaimed(mission.id) && isMissionCompleted(mission.id)" 
-                        class="action-button claim-button weekly-claim" 
-                        (click)="claimMission(mission.id, 'weekly')">
+                <button 
+                  class="action-button claim-button weekly-claim" 
+                  [disabled]="!isWeeklyMissionCompleted(mission.id) || isWeeklyMissionClaimed(mission.id)"
+                  (click)="claimMission(mission.id, 'weekly')">
                   Claim Reward
-                </button>
-                <button *ngIf="!isMissionClaimed(mission.id) && !isMissionCompleted(mission.id)" 
-                        class="action-button complete-button weekly-complete" 
-                        (click)="completeMission(mission.id, 'weekly')">
-                  Complete Mission
                 </button>
               </div>
             </div>

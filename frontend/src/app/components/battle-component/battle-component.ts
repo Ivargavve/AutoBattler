@@ -333,7 +333,49 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onBattleEnd() {
     this.showNextButton = true;
+    // Update mission progress for battle-related missions on victory
+    if (this.player && (this.player.hp ?? 0) > 0 && this.authService.isLoggedIn) {
+      this.updateBattleMissionsProgress();
+    }
     this.saveBattleState();
+  }
+
+  private async updateBattleMissionsProgress() {
+    try {
+      const talesData: any = await firstValueFrom(this.http.get(`${environment.apiUrl}/tales/user-missions`));
+      const missionProgress: Record<string, number> = talesData?.missionProgress || {};
+      const dailyMissions: any[] = talesData?.dailyMissions || [];
+      const weeklyMissions: any[] = talesData?.weeklyMissions || [];
+
+      const isBattleMission = (desc: string) => /play\s+\d+\s+battles?/i.test(desc || '');
+
+      const updates: Array<{ id: string; value: number }> = [];
+
+      dailyMissions.forEach(m => {
+        if (isBattleMission(m.description)) {
+          const current = missionProgress[m.id] || 0;
+          updates.push({ id: m.id, value: current + 1 });
+        }
+      });
+
+      weeklyMissions.forEach(m => {
+        if (isBattleMission(m.description)) {
+          const current = missionProgress[m.id] || 0;
+          updates.push({ id: m.id, value: current + 1 });
+        }
+      });
+
+      // Send updates sequentially to ensure persistence
+      for (const u of updates) {
+        try {
+          await firstValueFrom(this.http.post(`${environment.apiUrl}/tales/update-progress`, {
+            missionId: u.id,
+            progress: u.value,
+            characterId: this.player?.id
+          }));
+        } catch {}
+      }
+    } catch {}
   }
 
   runFromBattle() {

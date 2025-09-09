@@ -5,6 +5,7 @@ using backend.Data;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace backend.Controllers
 {
@@ -63,7 +64,7 @@ namespace backend.Controllers
         {
             try
             {
-                var userId = User.FindFirst("userId")?.Value;
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
                     return Unauthorized("User not authenticated");
@@ -122,7 +123,7 @@ namespace backend.Controllers
         {
             try
             {
-                var userId = User.FindFirst("userId")?.Value;
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
                     return Unauthorized("User not authenticated");
@@ -218,7 +219,7 @@ namespace backend.Controllers
         {
             try
             {
-                var userId = User.FindFirst("userId")?.Value;
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
                     return Unauthorized("User not authenticated");
@@ -393,8 +394,6 @@ namespace backend.Controllers
 
         private bool IsMissionCompleted(string missionId, string missionType, Dictionary<string, int> progress)
         {
-            // This is a simplified version - in reality you'd check against mission requirements
-            // For now, we'll assume missions are completed if they have progress > 0
             if (!progress.ContainsKey(missionId))
                 return false;
                 
@@ -407,9 +406,9 @@ namespace backend.Controllers
 
         private int GetRequiredProgress(string missionId, string missionType)
         {
-            // Define specific progress requirements for each mission
-            // This is a simplified version - in reality you'd have more complex logic
-            return missionType == "daily" ? 1 : 1; // For now, all missions require 1 progress point
+            // Basic thresholds: daily missions require 10, weekly missions require 20
+            // (Future enhancement: derive per-mission requirements from data files)
+            return missionType == "daily" ? 10 : 20;
         }
 
         private string GetClaimKey(string missionId, string missionType, DateTime now)

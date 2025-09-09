@@ -20,6 +20,17 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
+  private normalizeCharacterIcon<T extends { profileIconUrl?: string }>(obj: T | null | undefined): T | null | undefined {
+    if (!obj) return obj;
+    const url = obj.profileIconUrl || '';
+    if (/^char\d+\.jpeg$/i.test(url)) {
+      obj.profileIconUrl = `assets/characters/${url}` as any;
+    } else if (/^assets\/char\d+\.jpeg$/i.test(url)) {
+      obj.profileIconUrl = url.replace(/^assets\//i, 'assets/characters/') as any;
+    }
+    return obj;
+  }
+
   googleLogin(credential: string) {
     return this.http.post<{ token: string }>(`${this.googleUrl}/login`, { credential })
       .pipe(tap(response => this.saveToken(response.token)));
@@ -76,17 +87,21 @@ export class AuthService {
 
   public setUser(user: User): void {
     localStorage.setItem('user', JSON.stringify(user));
-    this.userSubject.next({ ...user });
+    const normalizedUser: any = { ...user };
+    if (normalizedUser.character) {
+      this.normalizeCharacterIcon(normalizedUser.character);
+    }
+    this.userSubject.next(normalizedUser);
 
     if (user.character) {
-      this.characterSubject.next(user.character);
+      this.characterSubject.next(this.normalizeCharacterIcon(user.character) as any);
     }
   }
   loadUserWithCharacter(): Promise<void> {
     return lastValueFrom(this.getProfile()).then(profile => {
       return lastValueFrom(this.getCharacter())
         .then(character => {
-          this.characterSubject.next(character);
+          this.characterSubject.next(this.normalizeCharacterIcon(character) as any);
           const newUser = { ...profile, character };
           this.setUser(newUser);
         })
@@ -100,7 +115,7 @@ export class AuthService {
     return lastValueFrom(
       this.http.put<Character>(`${environment.apiUrl}/characters/recharge`, {})
     ).then(character => {
-      this.characterSubject.next(character);
+      this.characterSubject.next(this.normalizeCharacterIcon(character) as any);
     });
   }
   useEnergy(amount = 1): Promise<number> {

@@ -468,6 +468,14 @@
   &:active {
     transform: translateY(0);
   }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    filter: grayscale(0.6) brightness(0.8);
+    transform: none;
+    box-shadow: none;
+  }
 }
 
 .claim-button {
