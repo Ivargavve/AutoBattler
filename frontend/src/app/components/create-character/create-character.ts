@@ -20,11 +20,11 @@ export class CreateCharacterComponent implements OnInit {
   isSubmitting = false;
 
   characterClasses = ['Warrior', 'Mage', 'Ranger', 'Rogue', 'Paladin'];
-  profileIcons = [
-    'assets/char1.jpeg', 'assets/char2.jpeg', 'assets/char3.jpeg',
-    'assets/char4.jpeg', 'assets/char5.jpeg', 'assets/char6.jpeg', 'assets/char7.jpeg',
-    'assets/char8.jpeg', 'assets/char9.jpeg', 'assets/char10.jpeg', 'assets/char11.jpeg',
-    'assets/char12.jpeg', 'assets/char13.jpeg', 'assets/char14.jpeg', 'assets/char15.jpeg'
+  profileIcons = [ 
+    'assets/characters/char1.jpeg', 'assets/characters/char2.jpeg', 'assets/characters/char3.jpeg',
+    'assets/characters/char4.jpeg', 'assets/characters/char5.jpeg', 'assets/characters/char6.jpeg', 'assets/characters/char7.jpeg',
+    'assets/characters/char8.jpeg', 'assets/characters/char9.jpeg', 'assets/characters/char10.jpeg', 'assets/characters/char11.jpeg',
+    'assets/characters/char12.jpeg', 'assets/characters/char13.jpeg', 'assets/characters/char14.jpeg', 'assets/characters/char15.jpeg'
   ];
   selectedIcon = this.profileIcons[0];
 

@@ -18,7 +18,7 @@ import { LoadingSpinnerComponent } from '../loading-component/loading-component'
 })
 export class BazaarComponent implements OnInit, OnDestroy {
   // Shop properties
-  activeTab: string = 'abilities';
+  activeTab: string = 'items';
   character: Character | null = null;
   loading: boolean = false;
   error: string | null = null;
@@ -236,5 +236,11 @@ export class BazaarComponent implements OnInit, OnDestroy {
       case 'legendary': return '#f59e0b';
       default: return '#9ca3af';
     }
+  }
+
+  onImageError(event: any) {
+    console.log('Image failed to load:', event.target.src);
+    // Set fallback image
+    event.target.src = 'assets/items/chainmail.jpg';
   }
 }

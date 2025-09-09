@@ -73,4 +73,10 @@ export class ProfileComponent implements OnInit {
       })
     );
   }
+
+  onImageError(event: any) {
+    console.log('Character image failed to load:', event.target.src);
+    // Set fallback image
+    event.target.src = 'assets/characters/char1.jpeg';
+  }
 }

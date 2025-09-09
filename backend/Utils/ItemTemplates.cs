@@ -29,7 +29,7 @@ namespace backend.Utils
                 Type = "Weapon",
                 Slot = "weapon",
                 Rarity = "common",
-                ImageUrl = "/assets/items/iron-sword.png",
+                ImageUrl = "assets/items/ironsword.jpg",
                 StatBonuses = new Dictionary<string, int> { { "attack", 5 } },
                 RequiredLevel = 1,
                 RequiredClass = "warrior"
@@ -42,7 +42,7 @@ namespace backend.Utils
                 Type = "Weapon",
                 Slot = "weapon",
                 Rarity = "uncommon",
-                ImageUrl = "/assets/items/steel-greatsword.png",
+                ImageUrl = "assets/items/steelgreatsword.jpg",
                 StatBonuses = new Dictionary<string, int> { { "attack", 12 }, { "defense", 2 } },
                 RequiredLevel = 5,
                 RequiredClass = "warrior"
@@ -55,7 +55,7 @@ namespace backend.Utils
                 Type = "Weapon",
                 Slot = "weapon",
                 Rarity = "rare",
-                ImageUrl = "/assets/items/holy-mace.png",
+                ImageUrl = "assets/items/holymace.jpg",
                 StatBonuses = new Dictionary<string, int> { { "attack", 8 }, { "magic", 6 } },
                 RequiredLevel = 8,
                 RequiredClass = "paladin"
@@ -68,7 +68,7 @@ namespace backend.Utils
                 Type = "Weapon",
                 Slot = "weapon",
                 Rarity = "uncommon",
-                ImageUrl = "/assets/items/mystic-staff.png",
+                ImageUrl = "assets/items/mysticstaff.jpg",
                 StatBonuses = new Dictionary<string, int> { { "magic", 10 } },
                 RequiredLevel = 3,
                 RequiredClass = "mage"
@@ -83,7 +83,7 @@ namespace backend.Utils
                 Type = "Armor",
                 Slot = "chest",
                 Rarity = "common",
-                ImageUrl = "/assets/items/leather-armor.png",
+                ImageUrl = "assets/items/leatherarmor.jpg",
                 StatBonuses = new Dictionary<string, int> { { "defense", 3 }, { "agility", 2 } },
                 RequiredLevel = 1,
                 RequiredClass = ""
@@ -96,7 +96,7 @@ namespace backend.Utils
                 Type = "Armor",
                 Slot = "chest",
                 Rarity = "uncommon",
-                ImageUrl = "/assets/items/chain-mail.png",
+                ImageUrl = "assets/items/chainmail.jpg",
                 StatBonuses = new Dictionary<string, int> { { "defense", 8 } },
                 RequiredLevel = 4,
                 RequiredClass = "warrior"
@@ -109,7 +109,7 @@ namespace backend.Utils
                 Type = "Armor",
                 Slot = "chest",
                 Rarity = "rare",
-                ImageUrl = "/assets/items/robe-of-power.png",
+                ImageUrl = "assets/items/robeofpower.jpg",
                 StatBonuses = new Dictionary<string, int> { { "magic", 8 }, { "defense", 3 } },
                 RequiredLevel = 6,
                 RequiredClass = "mage"
@@ -124,7 +124,7 @@ namespace backend.Utils
                 Type = "Accessory",
                 Slot = "ring",
                 Rarity = "common",
-                ImageUrl = "/assets/items/ring-of-strength.png",
+                ImageUrl = "assets/items/ringofstrength.jpg",
                 StatBonuses = new Dictionary<string, int> { { "attack", 3 } },
                 RequiredLevel = 2,
                 RequiredClass = ""
@@ -137,7 +137,7 @@ namespace backend.Utils
                 Type = "Accessory",
                 Slot = "amulet",
                 Rarity = "uncommon",
-                ImageUrl = "/assets/items/amulet-of-wisdom.png",
+                ImageUrl = "assets/items/amuletofwisdom.jpg",
                 StatBonuses = new Dictionary<string, int> { { "magic", 5 }, { "agility", 2 } },
                 RequiredLevel = 4,
                 RequiredClass = ""
@@ -150,7 +150,7 @@ namespace backend.Utils
                 Type = "Accessory",
                 Slot = "feet",
                 Rarity = "rare",
-                ImageUrl = "/assets/items/boots-of-speed.png",
+                ImageUrl = "assets/items/bootsofspeed.jpg",
                 StatBonuses = new Dictionary<string, int> { { "agility", 8 }, { "speed", 5 } },
                 RequiredLevel = 7,
                 RequiredClass = ""
@@ -165,7 +165,7 @@ namespace backend.Utils
                 Type = "Weapon",
                 Slot = "weapon",
                 Rarity = "legendary",
-                ImageUrl = "/assets/items/dragon-slayer.png",
+                ImageUrl = "assets/items/dragonslayer.jpg",
                 StatBonuses = new Dictionary<string, int> { { "attack", 25 }, { "magic", 10 } },
                 RequiredLevel = 15,
                 RequiredClass = "warrior"
@@ -178,7 +178,7 @@ namespace backend.Utils
                 Type = "Weapon",
                 Slot = "weapon",
                 Rarity = "epic",
-                ImageUrl = "/assets/items/shadow-blade.png",
+                ImageUrl = "assets/items/shadowblade.jpg",
                 StatBonuses = new Dictionary<string, int> { { "attack", 15 }, { "agility", 12 } },
                 RequiredLevel = 12,
                 RequiredClass = "rogue"
@@ -191,7 +191,7 @@ namespace backend.Utils
                 Type = "Weapon",
                 Slot = "weapon",
                 Rarity = "epic",
-                ImageUrl = "/assets/items/arcane-staff.png",
+                ImageUrl = "assets/items/arcanestaff.jpg",
                 StatBonuses = new Dictionary<string, int> { { "magic", 20 }, { "defense", 5 } },
                 RequiredLevel = 10,
                 RequiredClass = "mage"
@@ -204,7 +204,7 @@ namespace backend.Utils
                 Type = "Weapon",
                 Slot = "weapon",
                 Rarity = "rare",
-                ImageUrl = "/assets/items/divine-hammer.png",
+                ImageUrl = "assets/items/divinehammer.jpg",
                 StatBonuses = new Dictionary<string, int> { { "attack", 12 }, { "magic", 8 } },
                 RequiredLevel = 8,
                 RequiredClass = "paladin"
@@ -217,7 +217,7 @@ namespace backend.Utils
                 Type = "Weapon",
                 Slot = "weapon",
                 Rarity = "uncommon",
-                ImageUrl = "/assets/items/crystal-sword.png",
+                ImageUrl = "assets/items/crystalsword.jpg",
                 StatBonuses = new Dictionary<string, int> { { "attack", 8 }, { "magic", 4 } },
                 RequiredLevel = 6,
                 RequiredClass = ""
@@ -232,7 +232,7 @@ namespace backend.Utils
                 Type = "Armor",
                 Slot = "chest",
                 Rarity = "uncommon",
-                ImageUrl = "/assets/items/plate-armor.png",
+                ImageUrl = "assets/items/plate armor.jpg",
                 StatBonuses = new Dictionary<string, int> { { "defense", 12 } },
                 RequiredLevel = 6,
                 RequiredClass = "warrior"
@@ -245,7 +245,7 @@ namespace backend.Utils
                 Type = "Armor",
                 Slot = "chest",
                 Rarity = "common",
-                ImageUrl = "/assets/items/mage-robes.png",
+                ImageUrl = "assets/items/magerobes.jpg",
                 StatBonuses = new Dictionary<string, int> { { "magic", 6 }, { "defense", 2 } },
                 RequiredLevel = 3,
                 RequiredClass = "mage"
@@ -258,7 +258,7 @@ namespace backend.Utils
                 Type = "Armor",
                 Slot = "head",
                 Rarity = "common",
-                ImageUrl = "/assets/items/leather-helmet.png",
+                ImageUrl = "assets/items/leatherhelmet.jpg",
                 StatBonuses = new Dictionary<string, int> { { "defense", 3 } },
                 RequiredLevel = 2,
                 RequiredClass = ""
@@ -271,7 +271,7 @@ namespace backend.Utils
                 Type = "Armor",
                 Slot = "arms",
                 Rarity = "uncommon",
-                ImageUrl = "/assets/items/steel-gauntlets.png",
+                ImageUrl = "assets/items/steelgauntlets.jpg",
                 StatBonuses = new Dictionary<string, int> { { "attack", 5 }, { "defense", 4 } },
                 RequiredLevel = 5,
                 RequiredClass = "warrior"
@@ -284,7 +284,7 @@ namespace backend.Utils
                 Type = "Armor",
                 Slot = "legs",
                 Rarity = "common",
-                ImageUrl = "/assets/items/chain-leggings.png",
+                ImageUrl = "assets/items/chainleggings.jpg",
                 StatBonuses = new Dictionary<string, int> { { "defense", 5 } },
                 RequiredLevel = 3,
                 RequiredClass = ""
@@ -299,7 +299,7 @@ namespace backend.Utils
                 Type = "Accessory",
                 Slot = "ring",
                 Rarity = "epic",
-                ImageUrl = "/assets/items/ring-of-power.png",
+                ImageUrl = "assets/items/ringofpower.jpg",
                 StatBonuses = new Dictionary<string, int> { { "magic", 12 }, { "attack", 5 } },
                 RequiredLevel = 10,
                 RequiredClass = ""
@@ -312,7 +312,7 @@ namespace backend.Utils
                 Type = "Accessory",
                 Slot = "amulet",
                 Rarity = "rare",
-                ImageUrl = "/assets/items/amulet-of-vitality.png",
+                ImageUrl = "assets/items/amuletofvitality.jpg",
                 StatBonuses = new Dictionary<string, int> { { "health", 20 }, { "defense", 6 } },
                 RequiredLevel = 8,
                 RequiredClass = ""
@@ -325,7 +325,7 @@ namespace backend.Utils
                 Type = "Accessory",
                 Slot = "belt",
                 Rarity = "uncommon",
-                ImageUrl = "/assets/items/belt-of-strength.png",
+                ImageUrl = "assets/items/beltofstrength.jpg",
                 StatBonuses = new Dictionary<string, int> { { "attack", 8 } },
                 RequiredLevel = 4,
                 RequiredClass = ""
@@ -338,7 +338,7 @@ namespace backend.Utils
                 Type = "Accessory",
                 Slot = "back",
                 Rarity = "rare",
-                ImageUrl = "/assets/items/cape-of-shadows.png",
+                ImageUrl = "assets/items/capeofshadows.jpg",
                 StatBonuses = new Dictionary<string, int> { { "agility", 10 }, { "stealth", 8 } },
                 RequiredLevel = 9,
                 RequiredClass = "rogue"
@@ -351,7 +351,7 @@ namespace backend.Utils
                 Type = "Accessory",
                 Slot = "hands",
                 Rarity = "common",
-                ImageUrl = "/assets/items/gloves-of-dexterity.png",
+                ImageUrl = "assets/items/glovesofdexterity.jpg",
                 StatBonuses = new Dictionary<string, int> { { "agility", 4 } },
                 RequiredLevel = 2,
                 RequiredClass = ""
@@ -366,7 +366,7 @@ namespace backend.Utils
                 Type = "Weapon",
                 Slot = "weapon",
                 Rarity = "legendary",
-                ImageUrl = "/assets/items/excalibur.png",
+                ImageUrl = "assets/items/excalibur.jpg",
                 StatBonuses = new Dictionary<string, int> { { "attack", 30 }, { "magic", 15 }, { "defense", 10 } },
                 RequiredLevel = 20,
                 RequiredClass = "paladin"
@@ -379,7 +379,7 @@ namespace backend.Utils
                 Type = "Armor",
                 Slot = "chest",
                 Rarity = "legendary",
-                ImageUrl = "/assets/items/archmage-robes.png",
+                ImageUrl = "assets/items/archmagerobes.jpg",
                 StatBonuses = new Dictionary<string, int> { { "magic", 25 }, { "defense", 8 }, { "health", 15 } },
                 RequiredLevel = 18,
                 RequiredClass = "mage"
@@ -392,7 +392,7 @@ namespace backend.Utils
                 Type = "Accessory",
                 Slot = "back",
                 Rarity = "legendary",
-                ImageUrl = "/assets/items/assassins-cloak.png",
+                ImageUrl = "assets/items/assasinscloak.jpg",
                 StatBonuses = new Dictionary<string, int> { { "agility", 20 }, { "stealth", 15 }, { "attack", 10 } },
                 RequiredLevel = 16,
                 RequiredClass = "rogue"
@@ -405,7 +405,7 @@ namespace backend.Utils
                 Type = "Armor",
                 Slot = "chest",
                 Rarity = "legendary",
-                ImageUrl = "/assets/items/titans-plate.png",
+                ImageUrl = "assets/items/titansplate.jpg",
                 StatBonuses = new Dictionary<string, int> { { "defense", 30 }, { "health", 25 }, { "attack", 5 } },
                 RequiredLevel = 22,
                 RequiredClass = "warrior"
@@ -418,7 +418,7 @@ namespace backend.Utils
                 Type = "Accessory",
                 Slot = "head",
                 Rarity = "legendary",
-                ImageUrl = "/assets/items/crown-of-kings.png",
+                ImageUrl = "assets/items/crownofkings.jpg",
                 StatBonuses = new Dictionary<string, int> { { "magic", 20 }, { "attack", 15 }, { "defense", 12 } },
                 RequiredLevel = 25,
                 RequiredClass = ""

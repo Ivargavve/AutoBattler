@@ -584,6 +584,7 @@ namespace backend.Controllers
                 enemyName = selectedEnemy.Name,
                 enemyHp = selectedEnemy.MaxHp,
                 enemyMaxHp = selectedEnemy.MaxHp,
+                enemyImageUrl = selectedEnemy.ImageUrl,
             });
         }
 

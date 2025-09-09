@@ -197,7 +197,8 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
             id: enemyData.enemyId ?? 0,
             name: enemyData.enemyName,
             hp: enemyData.enemyHp,
-            maxHp: enemyData.enemyMaxHp
+            maxHp: enemyData.enemyMaxHp,
+            imageUrl: enemyData.enemyImageUrl || "assets/monsters/skeleton.jpg"
           };
           this.battleLog.push({ message: `You encounter a wild ${this.enemyName}! Prepare for battle!`, type: "encounter" });
           this.isLoading = false;
@@ -471,5 +472,11 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
       case 'encounter':      return 'battle-encounter';
       default:               return '';
     }
+  }
+
+  onImageError(event: any) {
+    console.log('Monster image failed to load:', event.target.src);
+    // Set fallback image
+    event.target.src = 'assets/monsters/skeleton.jpg';
   }
 }

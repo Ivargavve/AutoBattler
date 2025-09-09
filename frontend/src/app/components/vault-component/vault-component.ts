@@ -90,4 +90,10 @@ export class VaultComponent implements OnInit, OnDestroy {
     if (this.characterSub) this.characterSub.unsubscribe();
     this.titleService.setBaseTitle();
   }
+
+  onImageError(event: any) {
+    console.log('Character image failed to load:', event.target.src);
+    // Set fallback image
+    event.target.src = 'assets/characters/char1.jpeg';
+  }
 }

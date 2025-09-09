@@ -74,9 +74,10 @@
             <div class="item-list">
             <div *ngFor="let item of filteredItems" class="item-card" [class.unavailable]="!item.isAvailable">
               <div class="item-image">
-                <img [src]="item.imageUrl || '/assets/items/default-item.png'" 
+                <img [src]="item.imageUrl || 'assets/items/chainmail.jpg'" 
                      [alt]="item.name"
-                     class="item-img">
+                     class="item-img"
+                     (error)="onImageError($event)">
                 <div class="item-rarity" [style.background-color]="getRarityColor(item.rarity)">
                   {{ item.rarity | titlecase }}
                 </div>

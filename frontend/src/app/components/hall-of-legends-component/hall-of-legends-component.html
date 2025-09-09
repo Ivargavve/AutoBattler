@@ -27,7 +27,8 @@
         <div class="king-info">
           <img [src]="topCharactersData.kingOfAutobattler[0].profileIconUrl" 
                [alt]="topCharactersData.kingOfAutobattler[0].characterName"
-               class="king-avatar">
+               class="king-avatar"
+               (error)="onImageError($event)">
           <div class="king-details">
             <h3 class="king-name">{{ topCharactersData.kingOfAutobattler[0].characterName }}</h3>
             <p class="king-user">by {{ topCharactersData.kingOfAutobattler[0].userName }}</p>
@@ -53,7 +54,8 @@
             <div class="character-rank">{{ i + 1 }}</div>
             <img [src]="character.profileIconUrl" 
                  [alt]="character.characterName"
-                 class="character-avatar">
+                 class="character-avatar"
+                 (error)="onImageError($event)">
             <div class="character-info">
               <span class="character-name">{{ character.characterName }}</span>
               <span class="character-user">{{ character.userName }}</span>
@@ -75,7 +77,8 @@
             <div class="character-rank">{{ i + 1 }}</div>
             <img [src]="character.profileIconUrl" 
                  [alt]="character.characterName"
-                 class="character-avatar">
+                 class="character-avatar"
+                 (error)="onImageError($event)">
             <div class="character-info">
               <span class="character-name">{{ character.characterName }}</span>
               <span class="character-user">{{ character.userName }}</span>
@@ -97,7 +100,8 @@
             <div class="character-rank">{{ i + 1 }}</div>
             <img [src]="character.profileIconUrl" 
                  [alt]="character.characterName"
-                 class="character-avatar">
+                 class="character-avatar"
+                 (error)="onImageError($event)">
             <div class="character-info">
               <span class="character-name">{{ character.characterName }}</span>
               <span class="character-user">{{ character.userName }}</span>
@@ -119,7 +123,8 @@
             <div class="character-rank">{{ i + 1 }}</div>
             <img [src]="character.profileIconUrl" 
                  [alt]="character.characterName"
-                 class="character-avatar">
+                 class="character-avatar"
+                 (error)="onImageError($event)">
             <div class="character-info">
               <span class="character-name">{{ character.characterName }}</span>
               <span class="character-user">{{ character.userName }}</span>
@@ -141,7 +146,8 @@
             <div class="character-rank">{{ i + 1 }}</div>
             <img [src]="character.profileIconUrl" 
                  [alt]="character.characterName"
-                 class="character-avatar">
+                 class="character-avatar"
+                 (error)="onImageError($event)">
             <div class="character-info">
               <span class="character-name">{{ character.characterName }}</span>
               <span class="character-user">{{ character.userName }}</span>

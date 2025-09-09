@@ -11,7 +11,7 @@
         <h2 class="section-title">Character</h2>
         <ng-container *ngIf="character as c">
           <div class="character-card">
-            <img [src]="c.profileIconUrl || defaultAvatar" class="character-avatar" alt="Character" />
+            <img [src]="c.profileIconUrl || defaultAvatar" class="character-avatar" alt="Character" (error)="onImageError($event)" />
             <div class="character-details">
               <div class="character-name">{{ c.name }}</div>
               <div class="character-class">Class: {{ c.class }}</div>

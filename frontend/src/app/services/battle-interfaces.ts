@@ -3,6 +3,7 @@ export interface Fighter {
   name: string;
   hp: number;
   maxHp: number;
+  imageUrl?: string;
 }
 
 export interface BattleResponse {

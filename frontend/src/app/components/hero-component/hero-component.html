@@ -6,7 +6,7 @@
         <!-- Hero Header -->
         <div class="hero-header">
           <div class="character-avatar">
-            <img [src]="character.profileIconUrl" alt="Character Icon" class="avatar-image" />
+            <img [src]="character.profileIconUrl" alt="Character Icon" class="avatar-image" (error)="onImageError($event)" />
             <div class="level-badge">{{ character.level }}</div>
           </div>
           

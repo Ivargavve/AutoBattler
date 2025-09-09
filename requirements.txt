@@ -1,0 +1,123 @@
+# AutoBattler Project Requirements
+# This file contains all the dependencies and tools needed to run the project
+
+# ===========================================
+# SYSTEM REQUIREMENTS
+# ===========================================
+
+# .NET 8.0 SDK
+# Download from: https://dotnet.microsoft.com/download/dotnet/8.0
+# Or install via package manager:
+#   macOS: brew install dotnet
+#   Ubuntu: sudo apt-get install dotnet-sdk-8.0
+#   Windows: Use the installer from Microsoft
+
+# Node.js (LTS version recommended)
+# Download from: https://nodejs.org/
+# Or install via package manager:
+#   macOS: brew install node
+#   Ubuntu: sudo apt-get install nodejs npm
+#   Windows: Use the installer from nodejs.org
+
+# ===========================================
+# BACKEND DEPENDENCIES (.NET)
+# ===========================================
+
+# These are automatically restored when running 'dotnet restore'
+# Listed here for reference:
+
+# BCrypt.Net-Next (4.0.3) - Password hashing
+# Google.Apis.Auth (1.70.0) - Google OAuth integration
+# Microsoft.AspNetCore.Authentication.JwtBearer (7.0.0) - JWT authentication
+# Microsoft.AspNetCore.OpenApi (7.0.4) - OpenAPI/Swagger support
+# Microsoft.EntityFrameworkCore (9.0.1) - Entity Framework Core
+# Microsoft.EntityFrameworkCore.Design (9.0.1) - EF Core design tools
+# Microsoft.EntityFrameworkCore.Sqlite (7.0.14) - SQLite provider
+# Microsoft.EntityFrameworkCore.Tools (9.0.1) - EF Core tools
+# Npgsql.EntityFrameworkCore.PostgreSQL (9.0.4) - PostgreSQL provider
+# Swashbuckle.AspNetCore (6.4.0) - Swagger/OpenAPI
+# System.IdentityModel.Tokens.Jwt (8.12.1) - JWT token handling
+
+# ===========================================
+# FRONTEND DEPENDENCIES (Node.js)
+# ===========================================
+
+# Angular CLI (Global installation required)
+# npm install -g @angular/cli
+
+# Production Dependencies:
+@angular/common@^20.0.0
+@angular/compiler@^20.0.0
+@angular/core@^20.0.0
+@angular/forms@^20.0.0
+@angular/platform-browser@^20.0.0
+@angular/router@^20.0.0
+@fortawesome/angular-fontawesome@^2.0.1
+@fortawesome/fontawesome-free@^6.7.2
+@fortawesome/free-solid-svg-icons@^6.7.2
+bootstrap@^5.3.7
+jwt-decode@^4.0.0
+rxjs@~7.8.0
+tslib@^2.3.0
+zone.js@~0.15.0
+
+# Development Dependencies:
+@angular/build@^20.0.3
+@angular/cli@^20.0.3
+@angular/compiler-cli@^20.0.0
+@types/bootstrap@^5.2.10
+@types/google.accounts@^0.0.17
+@types/jasmine@~5.1.0
+@types/jwt-decode@^2.2.1
+jasmine-core@~5.7.0
+karma@~6.4.0
+karma-chrome-launcher@~3.2.0
+karma-coverage@~2.2.0
+karma-jasmine@~5.1.0
+karma-jasmine-html-reporter@~2.1.0
+typescript@~5.8.2
+
+# ===========================================
+# DATABASE REQUIREMENTS
+# ===========================================
+
+# PostgreSQL (for production)
+# Download from: https://www.postgresql.org/download/
+# Or install via package manager:
+#   macOS: brew install postgresql
+#   Ubuntu: sudo apt-get install postgresql postgresql-contrib
+#   Windows: Use the installer from postgresql.org
+
+# SQLite (for development - included with .NET)
+# No additional installation required
+
+# ===========================================
+# OPTIONAL TOOLS
+# ===========================================
+
+# Git (for version control)
+# Download from: https://git-scm.com/
+
+# Docker (for containerized deployment)
+# Download from: https://www.docker.com/products/docker-desktop
+
+# ===========================================
+# INSTALLATION COMMANDS
+# ===========================================
+
+# 1. Install system requirements (.NET 8.0 and Node.js)
+# 2. Clone the repository: git clone <repository-url>
+# 3. Run the setup script: ./setup.sh (macOS/Linux) or setup.bat (Windows)
+# 4. Start the application: ./run.sh (macOS/Linux) or run.bat (Windows)
+
+# ===========================================
+# PROJECT STRUCTURE
+# ===========================================
+
+# backend/          - .NET 8 Web API
+# frontend/         - Angular 20 application
+# requirements.txt  - This file
+# setup.sh         - Setup script for macOS/Linux
+# setup.bat        - Setup script for Windows
+# run.sh           - Run script for macOS/Linux
+# run.bat          - Run script for Windows

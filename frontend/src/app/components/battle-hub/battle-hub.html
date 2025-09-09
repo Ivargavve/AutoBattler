@@ -45,9 +45,10 @@
         <div class="monster-details-section" *ngIf="selectedMonster">
           <div class="monster-card">
             <div class="monster-image">
-              <img [src]="selectedMonster.imageUrl || '/assets/default-monster.png'" 
+              <img [src]="selectedMonster.imageUrl || 'assets/monsters/skeleton.jpg'" 
                    [alt]="selectedMonster.name"
-                   class="monster-img">
+                   class="monster-img"
+                   (error)="onImageError($event)">
             </div>
             
             <div class="monster-info">

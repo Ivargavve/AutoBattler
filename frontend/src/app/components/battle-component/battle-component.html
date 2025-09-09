@@ -41,10 +41,19 @@
 
     <div class="battle-main-row">
       <div class="battle-graphic-col">
-        <img 
-          src="assets/battle/battle.jpg" 
-          alt="Battle Graphic" 
-          class="battle-graphic-img">
+        <div class="monster-image-container" *ngIf="enemy">
+          <img 
+            [src]="enemy.imageUrl || 'assets/monsters/skeleton.jpg'" 
+            [alt]="enemy.name + ' image'" 
+            class="monster-battle-img"
+            (error)="onImageError($event)">
+        </div>
+        <div class="battle-graphic-fallback" *ngIf="!enemy">
+          <img 
+            src="assets/battle/battle.jpg" 
+            alt="Battle Graphic" 
+            class="battle-graphic-img">
+        </div>
       </div>
       <div class="battle-controls-col">
         

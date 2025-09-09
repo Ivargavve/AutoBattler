@@ -118,6 +118,7 @@
               [src]="character.profileIconUrl"
               alt="Character Icon"
               class="character-profile-icon"
+              (error)="onImageError($event)"
             />
 
             <div class="character-title-block">

@@ -42,7 +42,8 @@ export class BattleHubComponent implements OnInit, OnDestroy {
           attack: e.attack,
           defense: e.defense,
           xp: e.xp,
-          critChance: e.critChance
+          critChance: e.critChance,
+          imageUrl: e.imageUrl || "assets/monsters/skeleton.jpg"
         }))
         .sort((a, b) => a.level - b.level);
       
@@ -81,5 +82,11 @@ export class BattleHubComponent implements OnInit, OnDestroy {
         queryParams: { enemy: enemyName }
       });
     }
+  }
+
+  onImageError(event: any) {
+    console.log('Monster image failed to load:', event.target.src);
+    // Set fallback image
+    event.target.src = 'assets/monsters/skeleton.jpg';
   }
 }
