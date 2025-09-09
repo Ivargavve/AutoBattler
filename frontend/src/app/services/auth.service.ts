@@ -145,4 +145,38 @@ export class AuthService {
     );
   }
 
+  equipItem(slot: string, itemId: number) {
+    return this.http.post<{ id: number; equipmentJson: string }>(
+      `${environment.apiUrl}/characters/equipment/equip`,
+      { slot, itemId }
+    ).pipe(
+      tap(() => {
+        // Refresh character after change
+        this.loadUserWithCharacter();
+      })
+    );
+  }
+
+  unequipItem(slot: string) {
+    return this.http.post<{ message: string; equipmentJson: string }>(
+      `${environment.apiUrl}/characters/equipment/unequip`,
+      { slot }
+    ).pipe(
+      tap(() => {
+        this.loadUserWithCharacter();
+      })
+    );
+  }
+
+  equipAbilities(attackIds: number[]) {
+    return this.http.post<{ attacksJson: string }>(
+      `${environment.apiUrl}/characters/attacks/equip`,
+      { attackIds }
+    ).pipe(
+      tap(() => {
+        this.loadUserWithCharacter();
+      })
+    );
+  }
+
 }

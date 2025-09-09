@@ -1,56 +1,169 @@
 <div class="vault-root">
   <h1 class="vault-title">Vault</h1>
-  <div class="vault-subtitle">
-    View and manage your character, equipment, and inventory.<br>
-    All your hard-earned loot, stored in one place.
-  </div>
-
-  <div class="vault-row">
-    <div class="vault-col vault-main">
-      <section class="section-box character-section">
-        <h2 class="section-title">Character</h2>
-        <ng-container *ngIf="character as c">
-          <div class="character-card">
-            <img [src]="'assets/characters/' + (c.profileIconUrl ? c.profileIconUrl.split('/').pop() : 'char1.jpeg')" class="character-avatar" alt="Character" (error)="onImageError($event)" />
-            <div class="character-details">
-              <div class="character-name">{{ c.name }}</div>
-              <div class="character-class">Class: {{ c.class }}</div>
-              <div class="character-level">Level: {{ c.level }}</div>
-              <div class="character-xp">XP: {{ c.experiencePoints }}</div>
-              <div class="character-hp">HP: {{ c.currentHealth }} / {{ c.maxHealth }}</div>
-              <div class="character-energy">Energy: {{ c.currentEnergy }} / {{ c.maxEnergy }}</div>
-              <div class="character-attack">Attack: {{ c.attack }}</div>
-              <div class="character-defense">Defense: {{ c.defense }}</div>
-              <div class="character-agility">Speed: {{ c.agility }}</div>
-              <div class="character-crit">Crit Chance: {{ c.criticalChance }}%</div>
-              <div class="character-credits">Credits: {{ c.credits }}</div>
-              <div class="character-date">Created: {{ c.createdAt | date:'short' }}</div>
-              <div class="character-date">Last updated: {{ c.updatedAt | date:'short' }}</div>
-              <div *ngIf="c.lastRechargeTime">Last Recharge: {{ c.lastRechargeTime | date:'short' }}</div>
-              <div *ngIf="c.nextTickInSeconds !== undefined">Next Tick: {{ c.nextTickInSeconds }}s</div>
-            </div>
-          </div>
-        </ng-container>
+  <div class="vault-row redesign">
+    <div class="vault-col vault-left">
+      <section class="section-box stats-section" *ngIf="character as c">
+        <h2 class="section-title">Stats</h2>
+        <div class="stat-row" *ngFor="let s of ['attack','defense','agility','magic','speed','maxHealth']">
+          <span class="stat-name">{{ s | titlecase }}</span>
+          <span class="stat-values">
+            <span class="base">{{ getBaseStat(s) }}</span>
+            <span class="bonus" *ngIf="getBonusStat(s) as b" [hidden]="!b">+{{ b }}</span>
+            <span class="total" *ngIf="getBonusStat(s)">= {{ getTotalStat(s) }}</span>
+          </span>
+        </div>
       </section>
 
-      <section class="section-box equipped-section">
-        <h2 class="section-title">Equipped Gear</h2>
-        <div class="equipped-grid">
-          <ng-container *ngFor="let slot of equippedSlots">
-            <div class="gear-slot">
-              <div class="slot-label">{{ slot.label }}</div>
-              <div class="gear-item" *ngIf="slot.item; else emptySlot">
-                <img [src]="slot.item.iconUrl || fallbackIcon" class="gear-icon" alt="{{ slot.item.name }}" />
-                <div class="gear-info">
-                  <div class="gear-name">{{ slot.item.name }}</div>
-                  <div class="gear-stats">{{ slot.item.stats }}</div>
-                </div>
-              </div>
-              <ng-template #emptySlot>
-                <div class="empty-slot">-</div>
-              </ng-template>
+      <section class="section-box abilities-section" *ngIf="ownedAttacks.length">
+        <h2 class="section-title">Abilities</h2>
+        <div class="abilities-grid">
+          <div class="ability-slot" *ngFor="let idx of [0,1,2,3]">
+            <div class="slot-label">Slot {{ idx+1 }}</div>
+            <div class="slot-body">
+              <select (change)="changeAbilityAtIndex(idx, $any($event.target).value)">
+                <option [value]="''">Empty</option>
+                <option *ngFor="let a of ownedAttacks" [selected]="equippedAttackIds[idx]===a.id" [value]="a.id">{{ a.name }}</option>
+              </select>
             </div>
-          </ng-container>
+          </div>
+        </div>
+        <div class="owned-abilities">
+          <div class="owned-title">Owned</div>
+          <div class="owned-list">
+            <button class="ability-chip" *ngFor="let a of ownedAttacks" [class.equipped]="equippedAttackIds.includes(a.id)" (click)="toggleEquipAttack(a.id)">
+              {{ a.name }}
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="vault-col vault-right" *ngIf="character as c">
+      <section class="section-box mannequin-section">
+        <h2 class="section-title">Equipment</h2>
+        <div class="mannequin-wrap">
+          <img [src]="'assets/characters/' + (c.profileIconUrl ? c.profileIconUrl.split('/').pop() : 'char1.jpeg')" class="mannequin" alt="Character" (error)="onImageError($event)" />
+          <div class="slot head">
+            <div class="slot-label">Head</div>
+            <div class="slot-content">
+              <img *ngIf="getEquippedItem('head') as item" [src]="item.imageUrl" class="slot-icon" alt="{{item.name}}" />
+              <select (change)="equip('head', $any($event.target).value)">
+                <option value="">Choose...</option>
+                <option *ngFor="let it of itemsForSlot('head')" [selected]="(getEquippedItem('head')?.id)===it.id" [value]="it.id">{{ it.name }}</option>
+              </select>
+              <button *ngIf="getEquippedItem('head')" (click)="unequip('head')">Remove</button>
+            </div>
+          </div>
+          <div class="slot weapon">
+            <div class="slot-label">Weapon</div>
+            <div class="slot-content">
+              <img *ngIf="getEquippedItem('weapon') as item" [src]="item.imageUrl" class="slot-icon" alt="{{item.name}}" />
+              <select (change)="equip('weapon', $any($event.target).value)">
+                <option value="">Choose...</option>
+                <option *ngFor="let it of itemsForSlot('weapon')" [selected]="(getEquippedItem('weapon')?.id)===it.id" [value]="it.id">{{ it.name }}</option>
+              </select>
+              <button *ngIf="getEquippedItem('weapon')" (click)="unequip('weapon')">Remove</button>
+            </div>
+          </div>
+          <div class="slot chest">
+            <div class="slot-label">Chest</div>
+            <div class="slot-content">
+              <img *ngIf="getEquippedItem('chest') as item" [src]="item.imageUrl" class="slot-icon" alt="{{item.name}}" />
+              <select (change)="equip('chest', $any($event.target).value)">
+                <option value="">Choose...</option>
+                <option *ngFor="let it of itemsForSlot('chest')" [selected]="(getEquippedItem('chest')?.id)===it.id" [value]="it.id">{{ it.name }}</option>
+              </select>
+              <button *ngIf="getEquippedItem('chest')" (click)="unequip('chest')">Remove</button>
+            </div>
+          </div>
+          <div class="slot legs">
+            <div class="slot-label">Legs</div>
+            <div class="slot-content">
+              <img *ngIf="getEquippedItem('legs') as item" [src]="item.imageUrl" class="slot-icon" alt="{{item.name}}" />
+              <select (change)="equip('legs', $any($event.target).value)">
+                <option value="">Choose...</option>
+                <option *ngFor="let it of itemsForSlot('legs')" [selected]="(getEquippedItem('legs')?.id)===it.id" [value]="it.id">{{ it.name }}</option>
+              </select>
+              <button *ngIf="getEquippedItem('legs')" (click)="unequip('legs')">Remove</button>
+            </div>
+          </div>
+          <div class="slot arms">
+            <div class="slot-label">Arms</div>
+            <div class="slot-content">
+              <img *ngIf="getEquippedItem('arms') as item" [src]="item.imageUrl" class="slot-icon" alt="{{item.name}}" />
+              <select (change)="equip('arms', $any($event.target).value)">
+                <option value="">Choose...</option>
+                <option *ngFor="let it of itemsForSlot('arms')" [selected]="(getEquippedItem('arms')?.id)===it.id" [value]="it.id">{{ it.name }}</option>
+              </select>
+              <button *ngIf="getEquippedItem('arms')" (click)="unequip('arms')">Remove</button>
+            </div>
+          </div>
+          <div class="slot hands">
+            <div class="slot-label">Hands</div>
+            <div class="slot-content">
+              <img *ngIf="getEquippedItem('hands') as item" [src]="item.imageUrl" class="slot-icon" alt="{{item.name}}" />
+              <select (change)="equip('hands', $any($event.target).value)">
+                <option value="">Choose...</option>
+                <option *ngFor="let it of itemsForSlot('hands')" [selected]="(getEquippedItem('hands')?.id)===it.id" [value]="it.id">{{ it.name }}</option>
+              </select>
+              <button *ngIf="getEquippedItem('hands')" (click)="unequip('hands')">Remove</button>
+            </div>
+          </div>
+          <div class="slot feet">
+            <div class="slot-label">Feet</div>
+            <div class="slot-content">
+              <img *ngIf="getEquippedItem('feet') as item" [src]="item.imageUrl" class="slot-icon" alt="{{item.name}}" />
+              <select (change)="equip('feet', $any($event.target).value)">
+                <option value="">Choose...</option>
+                <option *ngFor="let it of itemsForSlot('feet')" [selected]="(getEquippedItem('feet')?.id)===it.id" [value]="it.id">{{ it.name }}</option>
+              </select>
+              <button *ngIf="getEquippedItem('feet')" (click)="unequip('feet')">Remove</button>
+            </div>
+          </div>
+          <div class="slot belt">
+            <div class="slot-label">Belt</div>
+            <div class="slot-content">
+              <img *ngIf="getEquippedItem('belt') as item" [src]="item.imageUrl" class="slot-icon" alt="{{item.name}}" />
+              <select (change)="equip('belt', $any($event.target).value)">
+                <option value="">Choose...</option>
+                <option *ngFor="let it of itemsForSlot('belt')" [selected]="(getEquippedItem('belt')?.id)===it.id" [value]="it.id">{{ it.name }}</option>
+              </select>
+              <button *ngIf="getEquippedItem('belt')" (click)="unequip('belt')">Remove</button>
+            </div>
+          </div>
+          <div class="slot back">
+            <div class="slot-label">Back</div>
+            <div class="slot-content">
+              <img *ngIf="getEquippedItem('back') as item" [src]="item.imageUrl" class="slot-icon" alt="{{item.name}}" />
+              <select (change)="equip('back', $any($event.target).value)">
+                <option value="">Choose...</option>
+                <option *ngFor="let it of itemsForSlot('back')" [selected]="(getEquippedItem('back')?.id)===it.id" [value]="it.id">{{ it.name }}</option>
+              </select>
+              <button *ngIf="getEquippedItem('back')" (click)="unequip('back')">Remove</button>
+            </div>
+          </div>
+          <div class="slot ring">
+            <div class="slot-label">Ring</div>
+            <div class="slot-content">
+              <img *ngIf="getEquippedItem('ring') as item" [src]="item.imageUrl" class="slot-icon" alt="{{item.name}}" />
+              <select (change)="equip('ring', $any($event.target).value)">
+                <option value="">Choose...</option>
+                <option *ngFor="let it of itemsForSlot('ring')" [selected]="(getEquippedItem('ring')?.id)===it.id" [value]="it.id">{{ it.name }}</option>
+              </select>
+              <button *ngIf="getEquippedItem('ring')" (click)="unequip('ring')">Remove</button>
+            </div>
+          </div>
+          <div class="slot amulet">
+            <div class="slot-label">Amulet</div>
+            <div class="slot-content">
+              <img *ngIf="getEquippedItem('amulet') as item" [src]="item.imageUrl" class="slot-icon" alt="{{item.name}}" />
+              <select (change)="equip('amulet', $any($event.target).value)">
+                <option value="">Choose...</option>
+                <option *ngFor="let it of itemsForSlot('amulet')" [selected]="(getEquippedItem('amulet')?.id)===it.id" [value]="it.id">{{ it.name }}</option>
+              </select>
+              <button *ngIf="getEquippedItem('amulet')" (click)="unequip('amulet')">Remove</button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -59,61 +172,20 @@
         <div *ngIf="inventory.length === 0" class="inventory-empty">No items in your inventory.</div>
         <ul class="inventory-list" *ngIf="inventory.length > 0">
           <li class="inventory-item" *ngFor="let item of inventory">
-            <img [src]="item.iconUrl || fallbackIcon" class="inv-icon" alt="{{ item.name }}" />
+            <img [src]="item.ImageUrl || item.imageUrl" class="inv-icon" alt="{{ item.Name || item.name }}" />
             <div class="inv-details">
-              <div class="inv-name">{{ item.name }}</div>
-              <div class="inv-type">{{ item.type }}</div>
-              <div class="inv-stats">{{ item.stats }}</div>
-            </div>
-            <div class="inv-qty" *ngIf="item.quantity > 1">x{{ item.quantity }}</div>
-          </li>
-        </ul>
-      </section>
-
-      <section class="section-box summary-section">
-        <h2 class="section-title">Summary</h2>
-        <div class="summary-row">
-          <span>Total Items:</span>
-          <span>{{ totalItems }}</span>
-        </div>
-        <div class="summary-row">
-          <span>Unique Gear:</span>
-          <span>{{ uniqueGearCount }}</span>
-        </div>
-      </section>
-    </div>
-
-    <div class="vault-col vault-side">
-      <section *ngIf="attacks && attacks.length > 0" class="character-attacks-box section-box">
-        <h3>Attacks</h3>
-        <ul class="attack-list">
-          <li *ngFor="let atk of attacks" class="attack-item">
-            <div class="atk-row">
-              <span class="atk-name">{{ atk.name }}</span>
-              <span class="atk-type">({{ atk.type }}, {{ atk.damageType }})</span>
-            </div>
-            <div class="atk-meta">
-              <span>Base damage: {{ atk.baseDamage }}</span>
-              <span>Charges: {{ atk.currentCharges }}/{{ atk.maxCharges }}</span>
-            </div>
-            <div *ngIf="atk.scaling && (atk.scaling | keyvalue).length > 0">
-              <span>Scaling:
-                <span *ngFor="let stat of (atk.scaling | keyvalue); let last = last">
-                  {{ stat.key }}: x{{ stat.value }}<span *ngIf="!last">, </span>
+              <div class="inv-name">{{ item.Name || item.name }}</div>
+              <div class="inv-type">{{ (item.Type || item.type) }} — Slot: {{ (item.Slot || item.slot) }}</div>
+              <div class="inv-stats" *ngIf="(item.StatBonuses || item.statBonuses) as sb">
+                <span *ngFor="let kv of (sb | keyvalue); let last = last">
+                  {{ kv.key }} +{{ kv.value }}<span *ngIf="!last">, </span>
                 </span>
-              </span>
+              </div>
             </div>
-            <div *ngIf="atk.requiredStats && (atk.requiredStats | keyvalue).length > 0">
-              <span>Requires:
-                <span *ngFor="let req of (atk.requiredStats | keyvalue); let last = last">
-                  {{ req.key }}: {{ req.value }}<span *ngIf="!last">, </span>
-                </span>
-              </span>
+            <div class="inv-qty" *ngIf="(item.Quantity || item.quantity) > 1">x{{ item.Quantity || item.quantity }}</div>
+            <div>
+              <button (click)="equip((item.Slot || item.slot).toLowerCase(), (item.Id || item.id))">Equip</button>
             </div>
-            <div *ngIf="atk.allowedClasses?.length">
-              <span>Allowed classes: {{ atk.allowedClasses.join(', ') }}</span>
-            </div>
-            <div class="atk-desc">{{ atk.description }}</div>
           </li>
         </ul>
       </section>

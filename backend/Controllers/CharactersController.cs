@@ -21,6 +21,188 @@ namespace backend.Controllers
             _db = db;
         }
 
+        // ======= Equipment management =======
+        public class EquipItemDto
+        {
+            public string Slot { get; set; } = string.Empty; // e.g., "head", "weapon", "chest"
+            public int ItemId { get; set; } // template Id
+        }
+
+        [HttpPost("equipment/equip")]
+        public async Task<IActionResult> EquipItem([FromBody] EquipItemDto dto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+                return Unauthorized();
+
+            if (string.IsNullOrWhiteSpace(dto.Slot))
+                return BadRequest(new { message = "Slot is required" });
+
+            var chr = await _db.Characters.FirstOrDefaultAsync(c => c.UserId == userId);
+            if (chr == null)
+                return NotFound();
+
+            // Parse inventory and equipment
+            var inventory = new List<System.Text.Json.Nodes.JsonObject>();
+            if (!string.IsNullOrWhiteSpace(chr.InventoryJson))
+            {
+                try
+                {
+                    var arr = System.Text.Json.Nodes.JsonNode.Parse(chr.InventoryJson)?.AsArray();
+                    if (arr != null)
+                    {
+                        foreach (var node in arr)
+                        {
+                            if (node is System.Text.Json.Nodes.JsonObject obj)
+                                inventory.Add(obj);
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            // Validate item exists in inventory and matches slot
+            var matchingItem = inventory.FirstOrDefault(o =>
+                (o["Id"]?.GetValue<int>() ?? 0) == dto.ItemId &&
+                string.Equals((o["Slot"]?.GetValue<string>() ?? (o["slot"]?.GetValue<string>() ?? "")).ToString(), dto.Slot, StringComparison.OrdinalIgnoreCase)
+            );
+
+            if (matchingItem == null)
+                return BadRequest(new { message = "Item not found in inventory for this slot" });
+
+            // Update equipment map (array of { slot, itemId })
+            var equipment = new List<System.Text.Json.Nodes.JsonObject>();
+            if (!string.IsNullOrWhiteSpace(chr.EquipmentJson))
+            {
+                try
+                {
+                    var arr = System.Text.Json.Nodes.JsonNode.Parse(chr.EquipmentJson)?.AsArray();
+                    if (arr != null)
+                    {
+                        foreach (var node in arr)
+                        {
+                            if (node is System.Text.Json.Nodes.JsonObject obj)
+                                equipment.Add(obj);
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            // Remove existing for slot
+            equipment.RemoveAll(e => string.Equals((e["slot"]?.GetValue<string>() ?? (e["Slot"]?.GetValue<string>() ?? "")).ToString(), dto.Slot, StringComparison.OrdinalIgnoreCase));
+            // Add new
+            var newEquip = new System.Text.Json.Nodes.JsonObject
+            {
+                ["slot"] = dto.Slot.ToLower(),
+                ["itemId"] = dto.ItemId
+            };
+            equipment.Add(newEquip);
+
+            chr.EquipmentJson = System.Text.Json.JsonSerializer.Serialize(equipment);
+            chr.UpdatedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync();
+
+            return Ok(new
+            {
+                chr.Id,
+                chr.EquipmentJson
+            });
+        }
+
+        public class UnequipItemDto
+        {
+            public string Slot { get; set; } = string.Empty;
+        }
+
+        [HttpPost("equipment/unequip")]
+        public async Task<IActionResult> UnequipItem([FromBody] UnequipItemDto dto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+                return Unauthorized();
+
+            if (string.IsNullOrWhiteSpace(dto.Slot))
+                return BadRequest(new { message = "Slot is required" });
+
+            var chr = await _db.Characters.FirstOrDefaultAsync(c => c.UserId == userId);
+            if (chr == null)
+                return NotFound();
+
+            var equipment = new List<System.Text.Json.Nodes.JsonObject>();
+            if (!string.IsNullOrWhiteSpace(chr.EquipmentJson))
+            {
+                try
+                {
+                    var arr = System.Text.Json.Nodes.JsonNode.Parse(chr.EquipmentJson)?.AsArray();
+                    if (arr != null)
+                    {
+                        foreach (var node in arr)
+                        {
+                            if (node is System.Text.Json.Nodes.JsonObject obj)
+                                equipment.Add(obj);
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            int removed = equipment.RemoveAll(e => string.Equals((e["slot"]?.GetValue<string>() ?? (e["Slot"]?.GetValue<string>() ?? "")).ToString(), dto.Slot, StringComparison.OrdinalIgnoreCase));
+            if (removed == 0)
+                return Ok(new { message = "Nothing equipped in this slot" });
+
+            chr.EquipmentJson = System.Text.Json.JsonSerializer.Serialize(equipment);
+            chr.UpdatedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync();
+
+            return Ok(new { message = "Unequipped", chr.EquipmentJson });
+        }
+
+        // ======= Equip abilities (mark 4 as equipped in AttacksJson) =======
+        public class EquipAbilitiesDto
+        {
+            public List<int> AttackIds { get; set; } = new(); // up to 4 ids
+        }
+
+        [HttpPost("attacks/equip")]
+        public async Task<IActionResult> EquipAbilities([FromBody] EquipAbilitiesDto dto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+                return Unauthorized();
+
+            var chr = await _db.Characters.FirstOrDefaultAsync(c => c.UserId == userId);
+            if (chr == null)
+                return NotFound();
+
+            if (string.IsNullOrEmpty(chr.AttacksJson))
+                return BadRequest(new { message = "No attacks owned" });
+
+            var arr = System.Text.Json.Nodes.JsonNode.Parse(chr.AttacksJson)?.AsArray();
+            if (arr == null)
+                return BadRequest(new { message = "Invalid attacks data" });
+
+            // Limit to 4 unique ids
+            var toEquip = dto.AttackIds.Distinct().Take(4).ToHashSet();
+
+            foreach (var node in arr)
+            {
+                if (node is System.Text.Json.Nodes.JsonObject obj)
+                {
+                    int id = 0;
+                    if (obj.ContainsKey("Id")) id = obj["Id"]?.GetValue<int>() ?? 0;
+                    else if (obj.ContainsKey("id")) id = obj["id"]?.GetValue<int>() ?? 0;
+                    obj["Equipped"] = toEquip.Contains(id);
+                }
+            }
+
+            chr.AttacksJson = System.Text.Json.JsonSerializer.Serialize(arr);
+            chr.UpdatedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync();
+
+            return Ok(new { chr.AttacksJson });
+        }
+
         [HttpPut("recharge")]
         public async Task<IActionResult> RechargeCharacter()
         {

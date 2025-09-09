@@ -342,3 +342,35 @@
     font-size: 0.97em;
   }
 }
+
+/* === Simplified overrides for faster iteration === */
+.vault-title { margin-bottom: 0.8rem; }
+.vault-row { gap: 1rem; }
+.vault-col { flex: 1 1 auto; }
+.section-box { padding: 1rem; margin-bottom: 1rem; box-shadow: none; }
+.section-title { margin-bottom: 0.6rem; border-bottom: 1px solid #2a2a2a; }
+
+/* Stats */
+.stats-section .stat-row { display: flex; justify-content: space-between; margin: 0.35rem 0; }
+.stats-section .base { color: #cfcfcf; }
+.stats-section .bonus { color: #79ff97; }
+
+/* Mannequin & slots simplified: stack slots instead of absolute positioning */
+.mannequin-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; padding: 0.5rem; }
+.mannequin { width: 180px; height: auto; border: 1px solid #333; border-radius: 4px; }
+.slot { position: static; display: flex; align-items: center; gap: 0.5rem; }
+.slot .slot-label { color: #aaa; font-weight: 700; }
+.slot .slot-content { display: flex; align-items: center; gap: 0.4rem; }
+.slot .slot-icon { width: 28px; height: 28px; border: 1px solid #3a3a3a; border-radius: 3px; }
+.slot select, .slot button { background: #1e1e1e; color: #eaeaea; border: 1px solid #333; border-radius: 4px; padding: 0.15rem 0.4rem; }
+
+/* Inventory */
+.inventory-item { margin-bottom: 0.7rem; }
+
+/* Abilities */
+.abilities-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 0.6rem; }
+.ability-slot { border: 1px solid #2a2a2a; border-radius: 4px; padding: 0.4rem; }
+.ability-empty { color: #666; font-style: italic; }
+.owned-abilities .owned-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.ability-chip { background: #1e1e1e; color: #eaeaea; border: 1px solid #333; border-radius: 999px; padding: 0.2rem 0.5rem; cursor: pointer; }
+.ability-chip.equipped { border-color: #79ff97; }
