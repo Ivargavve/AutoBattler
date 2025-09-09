@@ -1,6 +1,7 @@
 using backend.Data;
 using backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -84,6 +85,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAngularApp");
+
+// Ensure correct scheme when behind a reverse proxy (e.g., Render)
+// This needs to run before HTTPS redirection so the middleware can respect X-Forwarded-Proto
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 app.UseHttpsRedirection();
 
