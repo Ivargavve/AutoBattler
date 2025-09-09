@@ -21,6 +21,10 @@
         public string SettingsJson { get; set; } = string.Empty;
         public string AchievementsJson { get; set; } = string.Empty;
 
+        // Mission progression tracking
+        public string MissionProgressJson { get; set; } = "{}";
+        public string ClaimedMissionsJson { get; set; } = "{}";
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime LastLogin { get; set; } = DateTime.UtcNow;
 

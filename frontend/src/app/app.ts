@@ -173,6 +173,20 @@ async ngOnInit(): Promise<void> {
 
   onImageError(event: any) {
     console.log('Character image failed to load:', event.target.src);
+    
+    // If the image path doesn't start with 'assets/', try to fix it
+    const currentSrc = event.target.src;
+    if (!currentSrc.includes('assets/characters/') && currentSrc.includes('char')) {
+      // Extract the character filename (e.g., 'char11.jpeg')
+      const match = currentSrc.match(/char\d+\.jpeg/);
+      if (match) {
+        const fixedSrc = `assets/characters/${match[0]}`;
+        console.log('Trying fixed path:', fixedSrc);
+        event.target.src = fixedSrc;
+        return;
+      }
+    }
+    
     // Set fallback image
     event.target.src = 'assets/characters/char1.jpeg';
   }

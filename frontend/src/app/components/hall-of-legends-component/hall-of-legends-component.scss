@@ -3,7 +3,7 @@
   color: var(--text, #d1ffe8);
   max-width: 95%;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1.2rem;
   font-family: 'Share Tech Mono', monospace;
   box-shadow: 0 4px 44px 0 rgba(0, 0, 0, 0.3);
   border-radius: 8px;
@@ -11,10 +11,10 @@
 }
 
 .legends-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 800;
   text-align: center;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   color: var(--accent, #86f7b3);
   margin-bottom: 0.5rem;
   text-shadow: 0 0 10px var(--accent-shadow, #86f7b366);
@@ -22,9 +22,9 @@
 
 .legends-subtitle {
   text-align: center;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--text, #d1ffe8);
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   letter-spacing: 0.3px;
   font-style: italic;
 }
@@ -62,18 +62,18 @@
 
 // King Section
 .king-section {
-  margin-bottom: 3rem;
-  padding: 2rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
   background: linear-gradient(135deg, var(--accent-shadow, #86f7b366) 0%, transparent 100%);
   border-radius: 12px;
   border: 2px solid var(--accent, #86f7b3);
 }
 
 .king-title {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   color: var(--accent, #86f7b3);
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
   text-shadow: 0 0 8px var(--accent-shadow, #86f7b366);
   display: flex;
   align-items: center;
@@ -90,22 +90,22 @@
   background: var(--btn-bg, #1b1d1b);
   border: 1px solid var(--btn-border, #52d798);
   border-radius: 12px;
-  padding: 2rem;
+  padding: 1.5rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .king-info {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .king-avatar {
-  width: 120px;
-  height: 120px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  border: 4px solid var(--accent, #86f7b3);
-  box-shadow: 0 0 20px var(--accent-shadow, #86f7b366);
+  border: 3px solid var(--accent, #86f7b3);
+  box-shadow: 0 0 15px var(--accent-shadow, #86f7b366);
   object-fit: cover;
 }
 
@@ -114,22 +114,22 @@
 }
 
 .king-name {
-  font-size: 2rem;
+  font-size: 1.6rem;
   color: var(--accent, #86f7b3);
   margin-bottom: 0.5rem;
   text-shadow: 0 0 8px var(--accent-shadow, #86f7b366);
 }
 
 .king-user {
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: var(--meta-text, #7cbfa5);
   margin-bottom: 0.5rem;
 }
 
 .king-stats {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--text, #d1ffe8);
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
   font-weight: 600;
 }
 
@@ -148,16 +148,16 @@
 // Categories Grid
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-bottom: 3rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .category-card {
   background: var(--btn-bg, #1b1d1b);
   border: 1px solid var(--card-border, rgba(0, 255, 100, 0.07));
   border-radius: 8px;
-  padding: 1.5rem;
+  padding: 1.2rem;
   transition: all 0.3s ease;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 
@@ -169,9 +169,9 @@
 }
 
 .category-title {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   color: var(--accent, #86f7b3);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
   text-shadow: 0 0 6px var(--accent-shadow, #86f7b366);
   display: flex;
   align-items: center;
@@ -194,8 +194,8 @@
 .character-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
+  gap: 0.8rem;
+  padding: 0.8rem;
   margin-bottom: 0.5rem;
   background: var(--bg, #0b0c0b);
   border: 1px solid var(--card-border, rgba(0, 255, 100, 0.07));
@@ -223,8 +223,8 @@
 }
 
 .character-avatar {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 2px solid var(--btn-border, #52d798);
   object-fit: cover;

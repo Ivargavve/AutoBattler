@@ -40,5 +40,9 @@ namespace backend.Models
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public DateTime LastRechargeTime { get; set; } = DateTime.UtcNow;
         public string AttacksJson { get; set; } = "";
+
+        // Mission progression tracking
+        public string MissionProgressJson { get; set; } = "{}";
+        public string ClaimedMissionsJson { get; set; } = "{}";
     }
 }

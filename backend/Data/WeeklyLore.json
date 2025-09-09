@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "title": "The Great Cheese Patch Shakes the Realm",
+    "author": "Edith Breadcrumb, Senior Reporter",
+    "content": "It was a morning like any other, until the world woke up to the fabled Cheese Patch. Over a single night, all coins had turned into glistening cheddar. Merchants panicked, warriors clashed for the last crumbs, and the Great Cheese Market Crash followed. \"Never in my career have I seen so many barter with dairy,\" says vault historian Sir Gouda, still sifting through mountains of pungent deposits. The Cheese Age ended as suddenly as it began, but some claim hidden cheese reserves fuel today's black market. Survivors of this era still whisper about \"cheese laundering rings\" and the legendary artifact: The Golden Fondue Fork, said to melt any locked treasure. Skeptics doubt such relics exist, but then again, the cheese never really left, did it?",
+    "weeklyMissions": [
+      {
+        "id": "cheese_1",
+        "title": "Cheese Collector",
+        "description": "Play 15 battles this week",
+        "rewardType": "character",
+        "rewardAmount": 200,
+        "rewardItem": "xp"
+      },
+      {
+        "id": "cheese_2", 
+        "title": "Golden Fondue Fork Quest",
+        "description": "Use 20 physical attacks in battles",
+        "rewardType": "character",
+        "rewardAmount": 300,
+        "rewardItem": "xp"
+      },
+      {
+        "id": "cheese_3",
+        "title": "Cheese Market Crash",
+        "description": "Spend 1000 credits in the bazaar",
+        "rewardType": "user",
+        "rewardAmount": 500,
+        "rewardItem": "credits"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "The Duck Uprising Chronicles",
+    "author": "Winnie Quackford, Wildlife Editor", 
+    "content": "The Duck Uprising continues to confound strategists and players alike. What began as a harmless April patch rapidly evolved into chaos: monsters vanished, replaced by rubber ducks with cryptic battle moves and inexplicable resistance to damage. No guide could explain how to defeat the Duck Overlord, whose final attack—\"Bubble Blast\"—crashed a record 208 user sessions. Emergency duck-ban measures were enacted, but the duck invasion lingers in the codebase. Rumors persist of hidden achievements for those who complete the \"Quack Quest\" in under 60 seconds. The duck resistance grows stronger each day, and some say they've seen the legendary Duck King himself, wielding the mythical Rubber Mallet of Doom.",
+    "weeklyMissions": [
+      {
+        "id": "duck_1",
+        "title": "Duck Hunter",
+        "description": "Defeat 10 beast-type enemies",
+        "rewardType": "character", 
+        "rewardAmount": 150,
+        "rewardItem": "xp"
+      },
+      {
+        "id": "duck_2",
+        "title": "Quack Quest Master",
+        "description": "Use 15 agility-based attacks",
+        "rewardType": "character",
+        "rewardAmount": 200,
+        "rewardItem": "xp"
+      },
+      {
+        "id": "duck_3",
+        "title": "Duck Resistance Leader",
+        "description": "Play 20 battles this week",
+        "rewardType": "user",
+        "rewardAmount": 750,
+        "rewardItem": "credits"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "The AFK King's Legend",
+    "author": "Roxy Idler, Features",
+    "content": "1,392 hours. Zero clicks. One legend. In a Chronicle exclusive, we tracked down the elusive \"AFKKing\"—the only player to achieve Grandmaster status simply by staying logged in and walking away. \"Honestly, I just had to go to class,\" the King admits. \"When I came back, there was a statue of me in the Hall of Legends and a note: 'Congrats, you did nothing!'\" As for future plans, the King says, \"Maybe I'll try moving the mouse next season.\" The AFK King's passive strategy has inspired a new generation of idle warriors, proving that sometimes the best move is no move at all. His throne room is said to contain the legendary Idle Crown, which grants infinite patience to its wearer.",
+    "weeklyMissions": [
+      {
+        "id": "afk_1",
+        "title": "Idle Warrior",
+        "description": "Play 25 battles this week",
+        "rewardType": "character",
+        "rewardAmount": 300,
+        "rewardItem": "xp"
+      },
+      {
+        "id": "afk_2",
+        "title": "Patience Master",
+        "description": "Use 30 basic attacks in battles",
+        "rewardType": "character",
+        "rewardAmount": 175,
+        "rewardItem": "xp"
+      },
+      {
+        "id": "afk_3",
+        "title": "Idle Crown Seeker",
+        "description": "Reach level 10 with any character",
+        "rewardType": "user",
+        "rewardAmount": 1000,
+        "rewardItem": "credits"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "The Greg Mystery Deepens",
+    "author": "Marley Snooper, Bazaar Correspondent",
+    "content": "Reports are pouring in from across the server: Greg the Vendor, infamous for his \"invisible lootboxes\" and disappearing deals, was allegedly spotted twice in the past week. One witness claims to have bought \"nothing at all\" for 100 credits, only to receive a mysterious coupon reading \"Thanks, Greg.\" The Bazaar's moderators urge caution: \"If you see Greg, don't blink. And whatever you do, never ask for a refund.\" Legends say Greg can appear on any Friday the 13th at precisely 3:33 AM server time, always behind a curtain of smoke and low-rez particle effects. Whether he is a glitch, an event, or just a bored admin remains unknown. Some say Greg holds the secret to the ultimate weapon: The Invisible Sword of Infinite Confusion.",
+    "weeklyMissions": [
+      {
+        "id": "greg_1",
+        "title": "Greg Spotter",
+        "description": "Visit the bazaar 15 times",
+        "rewardType": "character",
+        "rewardAmount": 125,
+        "rewardItem": "xp"
+      },
+      {
+        "id": "greg_2",
+        "title": "Invisible Lootbox Hunter",
+        "description": "Purchase 5 items from the bazaar",
+        "rewardType": "character",
+        "rewardAmount": 200,
+        "rewardItem": "xp"
+      },
+      {
+        "id": "greg_3",
+        "title": "Mystery Shopper",
+        "description": "Spend 2000 credits on mysterious items",
+        "rewardType": "user",
+        "rewardAmount": 800,
+        "rewardItem": "credits"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "title": "The Patch Tuesday Chronicles",
+    "author": "Patch Notes, Staff",
+    "content": "Every veteran shudders at the phrase: Patch Tuesday. Last month's infamous update swapped the \"Attack\" and \"Pet Cat\" buttons, sending an army of felines onto the battlefield. While cats offered no damage, they did boost morale (and allergies) across the server. Developers now test all future patches on their grandma's laptop first. The Great Cat Uprising of 2024 will forever be remembered as the day when warriors learned that sometimes the best strategy is to just pet the cat and hope for the best. The legendary Cat Army still roams the battlefields, occasionally appearing to offer moral support and the occasional hairball attack.",
+    "weeklyMissions": [
+      {
+        "id": "patch_1",
+        "title": "Cat Army Recruit",
+        "description": "Use 20 defensive abilities in battles",
+        "rewardType": "character",
+        "rewardAmount": 180,
+        "rewardItem": "xp"
+      },
+      {
+        "id": "patch_2",
+        "title": "Patch Tester",
+        "description": "Play 18 battles this week",
+        "rewardType": "character",
+        "rewardAmount": 220,
+        "rewardItem": "xp"
+      },
+      {
+        "id": "patch_3",
+        "title": "Grandma's Laptop Hero",
+        "description": "Use 25 basic attacks in battles",
+        "rewardType": "user",
+        "rewardAmount": 600,
+        "rewardItem": "credits"
+      }
+    ]
+  }
+]

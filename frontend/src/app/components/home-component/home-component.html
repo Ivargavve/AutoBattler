@@ -1,76 +1,219 @@
 <div class="home-wrapper">
-  <section class="home-block welcome-block">
-    <h1>Welcome to AutoBattler</h1>
-    <p>
-      This is your command center. From here you can enter battles, upgrade gear, unlock dungeons, collect cosmetics, and chat with your friends.
-    </p>
-  </section>
-
-  <div class="home-row">
-    <section class="home-block block-recommended">
-      <h2>⚔️ Recommended Fights</h2>
-      <ul>
-        <li>Practice Arena (easy XP)</li>
-        <li>Bounty Hunt: Goblin Chief</li>
-        <li>Challenge: Rival Player</li>
-      </ul>
-    </section>
-    <section class="home-block block-dungeons">
-      <h2>🗺️ Dungeons & Raids</h2>
-      <ul>
-        <li>Skeleton Crypt <span class="tag-unlocked">Unlocked</span></li>
-        <li>Frost Cavern <span class="tag-unlocked">Unlocked</span></li>
-        <li>Drake’s Lair <span class="tag-locked">Unlocks at level 10</span></li>
-        <li>Raids: <span class="tag-locked">Unlocks at level 10</span></li>
-      </ul>
-    </section>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading your adventure...</p>
   </div>
 
-  <div class="home-row">
-    <section class="home-block block-cosmetics">
-      <h2>🎨 Cosmetic Shop</h2>
-      <ul>
-        <li>New: "Neon Ninja" Skin</li>
-        <li>Pets, Mounts & Titles</li>
-        <li>Shop refreshes every Friday</li>
-      </ul>
-    </section>
-    <section class="home-block block-armory">
-      <h2>🛡️ Armor Shop</h2>
-      <ul>
-        <li>Starter Sets (Free!)</li>
-        <li>Epic Armors (requires rank 5+)</li>
-        <li>Try before you buy</li>
-      </ul>
-    </section>
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <div class="error-icon">⚠️</div>
+    <p>{{ error }}</p>
+    <button (click)="loadData()" class="retry-btn">Try Again</button>
   </div>
 
-  <section class="home-block block-themes">
-    <h2>🌈 Upcoming Themes</h2>
-    <ul>
-      <li>Cyberpunk Night (July 15–22)</li>
-      <li>Medieval Festival (August)</li>
-      <li>Spooky Halloween (October)</li>
-    </ul>
-  </section>
+  <!-- Main Content -->
+  <div *ngIf="!loading && !error" class="home-content">
+    
+    <!-- Welcome Header -->
+    <section class="welcome-section">
+      <div class="welcome-content">
+        <h1>Welcome to AutoBattler</h1>
+        <p class="welcome-subtitle">Your epic adventure awaits</p>
+        <div class="character-info" *ngIf="character">
+          <div class="character-avatar">
+            <img [src]="character.profileIconUrl" [alt]="character.name" class="avatar-img" (error)="onImageError($event)">
+          </div>
+          <div class="character-details">
+            <h2>{{ character.name }}</h2>
+            <p>Level {{ character.level }} {{ character.class | titlecase }}</p>
+            <div class="character-stats">
+              <span class="stat">❤️ {{ character.currentHealth }}/{{ character.maxHealth }}</span>
+              <span class="stat">⚡ {{ character.currentEnergy }}/{{ character.maxEnergy }}</span>
+              <span class="stat">💰 {{ character.credits | number }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <section class="home-block block-tips">
-    <h2>📘 Tips & Tricks</h2>
-    <ul>
-      <li>💡 Equip abilities and passives in your profile to gain bonus effects.</li>
-      <li>🏆 Complete daily challenges for bonus XP and rare rewards.</li>
-      <li>🤝 Add friends to unlock social achievements.</li>
-    </ul>
-  </section>
+    <!-- King of AutoBattler -->
+    <section class="king-section" *ngIf="kingData">
+      <div class="section-header">
+        <div class="section-icon">👑</div>
+        <h2>King of AutoBattler</h2>
+      </div>
+      <div class="king-card">
+        <div class="king-avatar">
+          <img [src]="kingData.profileIconUrl" [alt]="kingData.characterName" class="king-img">
+          <div class="crown-badge">👑</div>
+        </div>
+        <div class="king-info">
+          <h3>{{ kingData.characterName }}</h3>
+          <p class="king-user">by {{ kingData.userName }}</p>
+          <div class="king-stats">
+            <span class="king-level">Level {{ kingData.level }}</span>
+            <span class="king-class">{{ kingData.class | titlecase }}</span>
+          </div>
+          <div class="king-achievement">
+            <strong>{{ kingData.statValue }} {{ kingData.statName }}</strong>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <div class="home-quick-note">
-    <p>
-      <strong>Note:</strong> The PvP Arena unlocks at level 5. Raids and harder dungeons unlock at level 10. Visit the Social tab to find new friends or join a guild!
-    </p>
+    <!-- Recommended Fights -->
+    <section class="recommended-section" *ngIf="recommendedEnemies.length > 0">
+      <div class="section-header">
+        <div class="section-icon">⚔️</div>
+        <h2>Recommended Fights</h2>
+        <p class="section-subtitle">Perfect challenges for your level</p>
+      </div>
+      <div class="enemies-grid">
+        <div *ngFor="let enemy of recommendedEnemies" class="enemy-card" (click)="fightEnemy(enemy.name)">
+          <div class="enemy-image">
+            <img [src]="enemy.imageUrl" [alt]="enemy.name" class="enemy-img">
+            <div class="difficulty-badge" [style.background-color]="getDifficultyColor(enemy.difficulty)">
+              {{ enemy.difficulty }}
+            </div>
+          </div>
+          <div class="enemy-info">
+            <h3>{{ enemy.name }}</h3>
+            <p class="enemy-type">{{ enemy.type | titlecase }}</p>
+            <p class="enemy-description">{{ enemy.description }}</p>
+            <div class="enemy-stats">
+              <div class="stat-item">
+                <span class="stat-icon">📊</span>
+                <span>Level {{ enemy.level }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">⭐</span>
+                <span>{{ enemy.xp }} XP</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">💰</span>
+                <span>{{ enemy.credits }} Credits</span>
+              </div>
+            </div>
+          </div>
+          <div class="fight-button">
+            <span>Fight</span>
+            <span class="arrow">→</span>
+          </div>
+        </div>
+      </div>
+      <div class="section-footer">
+        <button (click)="goToBattleHub()" class="view-all-btn">
+          View All Enemies
+          <span class="arrow">→</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Bazaar Information -->
+    <section class="bazaar-section">
+      <div class="section-header">
+        <div class="section-icon">🏪</div>
+        <h2>The Bazaar</h2>
+        <p class="section-subtitle">Your one-stop shop for gear and abilities</p>
+      </div>
+      <div class="bazaar-content">
+        <div class="bazaar-info">
+          <div class="info-card">
+            <div class="card-icon">⚔️</div>
+            <h3>Weapons & Armor</h3>
+            <p>Powerful weapons and protective armor to enhance your combat effectiveness</p>
+            <ul>
+              <li>Weapons with stat bonuses</li>
+              <li>Armor for all equipment slots</li>
+              <li>Rarity-based progression</li>
+            </ul>
+          </div>
+          <div class="info-card">
+            <div class="card-icon">🔮</div>
+            <h3>Abilities & Skills</h3>
+            <p>Learn new combat abilities and magical skills to diversify your fighting style</p>
+            <ul>
+              <li>Class-specific abilities</li>
+              <li>Elemental damage types</li>
+              <li>Strategic combat options</li>
+            </ul>
+          </div>
+          <div class="info-card">
+            <div class="card-icon">💎</div>
+            <h3>Rare Items</h3>
+            <p>Exclusive items and legendary gear that can only be found in the bazaar</p>
+            <ul>
+              <li>Epic and legendary items</li>
+              <li>Unique stat combinations</li>
+              <li>Level-appropriate gear</li>
+            </ul>
+          </div>
+        </div>
+        <div class="bazaar-cta">
+          <button (click)="goToBazaar()" class="bazaar-btn">
+            <span class="btn-icon">🏪</span>
+            Visit the Bazaar
+            <span class="arrow">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="quick-actions">
+      <div class="section-header">
+        <div class="section-icon">⚡</div>
+        <h2>Quick Actions</h2>
+      </div>
+      <div class="actions-grid">
+        <a routerLink="/battle-hub" class="action-card battle">
+          <div class="action-icon">⚔️</div>
+          <h3>Battle Hub</h3>
+          <p>Fight monsters and gain experience</p>
+        </a>
+        <a routerLink="/vault" class="action-card vault">
+          <div class="action-icon">📦</div>
+          <h3>Vault</h3>
+          <p>Manage your inventory and equipment</p>
+        </a>
+        <a routerLink="/bazaar" class="action-card bazaar">
+          <div class="action-icon">🏪</div>
+          <h3>Bazaar</h3>
+          <p>Buy weapons, armor, and abilities</p>
+        </a>
+        <a routerLink="/social" class="action-card social">
+          <div class="action-icon">👥</div>
+          <h3>Social</h3>
+          <p>Connect with other players</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Tips & Tricks -->
+    <section class="tips-section">
+      <div class="section-header">
+        <div class="section-icon">💡</div>
+        <h2>Tips & Tricks</h2>
+      </div>
+      <div class="tips-grid">
+        <div class="tip-card">
+          <div class="tip-icon">⚔️</div>
+          <h3>Combat Strategy</h3>
+          <p>Equip abilities and passives in your profile to gain bonus effects during battle</p>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">🏆</div>
+          <h3>Daily Challenges</h3>
+          <p>Complete daily challenges for bonus XP and rare rewards to accelerate your progress</p>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">🤝</div>
+          <h3>Social Features</h3>
+          <p>Add friends to unlock social achievements and compare your progress with others</p>
+        </div>
+      </div>
+    </section>
+
   </div>
-
-  <section class="home-block under-construction">
-    <h2>🛠️ Under Construction</h2>
-    <p>More features are coming soon. Stay tuned for special events and seasonal updates!</p>
-  </section>
 </div>
