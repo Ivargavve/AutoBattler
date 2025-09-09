@@ -190,8 +190,15 @@ export class HeroComponent implements OnInit {
   }
 
   onImageError(event: any) {
-    console.log('Character image failed to load:', event.target.src);
-    // Set fallback image
+    const currentSrc = event.target.src;
+    if (!currentSrc.includes('assets/characters/') && currentSrc.includes('char')) {
+      const match = currentSrc.match(/char\d+\.jpeg/);
+      if (match) {
+        const fixedSrc = `assets/characters/${match[0]}`;
+        event.target.src = fixedSrc;
+        return;
+      }
+    }
     event.target.src = 'assets/characters/char1.jpeg';
   }
 }

@@ -130,6 +130,13 @@ async ngOnInit(): Promise<void> {
     let character: Character | null = null;
     try {
       character = await firstValueFrom(this.auth.getCharacter());
+      // Ensure character image is always in 'assets/characters/' folder
+      if (character && character.profileIconUrl) {
+        const filenameMatch = character.profileIconUrl.match(/char\d+\.jpeg/);
+        if (filenameMatch) {
+          character.profileIconUrl = `assets/characters/${filenameMatch[0]}`;
+        }
+      }
       this.auth['characterSubject'].next(character); 
     } catch {
       character = null;
@@ -173,14 +180,14 @@ async ngOnInit(): Promise<void> {
 
   onImageError(event: any) {
     console.log('Character image failed to load:', event.target.src);
-    
-    // If the image path doesn't start with 'assets/', try to fix it
+
+    // Always try to use the 'assets/characters/' folder for character images
     const currentSrc = event.target.src;
-    if (!currentSrc.includes('assets/characters/') && currentSrc.includes('char')) {
-      // Extract the character filename (e.g., 'char11.jpeg')
-      const match = currentSrc.match(/char\d+\.jpeg/);
-      if (match) {
-        const fixedSrc = `assets/characters/${match[0]}`;
+    // Extract the character filename (e.g., 'char11.jpeg')
+    const match = currentSrc.match(/char\d+\.jpeg/);
+    if (match) {
+      const fixedSrc = `assets/characters/${match[0]}`;
+      if (currentSrc !== fixedSrc) {
         console.log('Trying fixed path:', fixedSrc);
         event.target.src = fixedSrc;
         return;

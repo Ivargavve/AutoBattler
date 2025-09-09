@@ -25,7 +25,7 @@
       </h2>
       <div class="king-card" *ngIf="topCharactersData.kingOfAutobattler.length > 0">
         <div class="king-info">
-          <img [src]="topCharactersData.kingOfAutobattler[0].profileIconUrl" 
+          <img [src]="'assets/characters/' + (topCharactersData.kingOfAutobattler[0].profileIconUrl ? topCharactersData.kingOfAutobattler[0].profileIconUrl.split('/').pop() : 'char1.jpeg')" 
                [alt]="topCharactersData.kingOfAutobattler[0].characterName"
                class="king-avatar"
                (error)="onImageError($event)">
@@ -52,7 +52,7 @@
           <li *ngFor="let character of topCharactersData.attackMasters; let i = index" 
               class="character-item">
             <div class="character-rank">{{ i + 1 }}</div>
-            <img [src]="character.profileIconUrl" 
+            <img [src]="'assets/characters/' + (character.profileIconUrl ? character.profileIconUrl.split('/').pop() : 'char1.jpeg')" 
                  [alt]="character.characterName"
                  class="character-avatar"
                  (error)="onImageError($event)">
@@ -75,7 +75,7 @@
           <li *ngFor="let character of topCharactersData.tankyBankies; let i = index" 
               class="character-item">
             <div class="character-rank">{{ i + 1 }}</div>
-            <img [src]="character.profileIconUrl" 
+            <img [src]="'assets/characters/' + (character.profileIconUrl ? character.profileIconUrl.split('/').pop() : 'char1.jpeg')" 
                  [alt]="character.characterName"
                  class="character-avatar"
                  (error)="onImageError($event)">
@@ -98,7 +98,7 @@
           <li *ngFor="let character of topCharactersData.defenseChampions; let i = index" 
               class="character-item">
             <div class="character-rank">{{ i + 1 }}</div>
-            <img [src]="character.profileIconUrl" 
+            <img [src]="'assets/characters/' + (character.profileIconUrl ? character.profileIconUrl.split('/').pop() : 'char1.jpeg')" 
                  [alt]="character.characterName"
                  class="character-avatar"
                  (error)="onImageError($event)">
@@ -121,7 +121,7 @@
           <li *ngFor="let character of topCharactersData.speedDemons; let i = index" 
               class="character-item">
             <div class="character-rank">{{ i + 1 }}</div>
-            <img [src]="character.profileIconUrl" 
+            <img [src]="'assets/characters/' + (character.profileIconUrl ? character.profileIconUrl.split('/').pop() : 'char1.jpeg')" 
                  [alt]="character.characterName"
                  class="character-avatar"
                  (error)="onImageError($event)">
@@ -144,7 +144,7 @@
           <li *ngFor="let character of topCharactersData.magicWielders; let i = index" 
               class="character-item">
             <div class="character-rank">{{ i + 1 }}</div>
-            <img [src]="character.profileIconUrl" 
+            <img [src]="'assets/characters/' + (character.profileIconUrl ? character.profileIconUrl.split('/').pop() : 'char1.jpeg')" 
                  [alt]="character.characterName"
                  class="character-avatar"
                  (error)="onImageError($event)">

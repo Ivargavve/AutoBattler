@@ -115,7 +115,7 @@
             <div class="character-header-row" routerLink="/hero">
             <img 
               *ngIf="character.profileIconUrl"
-              [src]="character.profileIconUrl"
+              [src]="'assets/characters/' + (character.profileIconUrl ? character.profileIconUrl.split('/').pop() : 'char1.jpeg')"
               alt="Character Icon"
               class="character-profile-icon"
               (error)="onImageError($event)"

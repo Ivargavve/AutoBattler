@@ -68,7 +68,7 @@
           <div class="profile-card character-card">
             <div class="card-header">
               <div class="character-avatar">
-                <img [src]="character.profileIconUrl" alt="Character Image" class="avatar-image" (error)="onImageError($event)" />
+                <img [src]="'assets/characters/' + (character.profileIconUrl ? character.profileIconUrl.split('/').pop() : 'char1.jpeg')" alt="Character Image" class="avatar-image" (error)="onImageError($event)" />
                 <div class="character-level-badge">{{ character.level }}</div>
               </div>
               <div class="character-info">

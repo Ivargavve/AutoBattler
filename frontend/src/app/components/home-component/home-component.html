@@ -22,7 +22,7 @@
         <p class="welcome-subtitle">Your epic adventure awaits</p>
         <div class="character-info" *ngIf="character">
           <div class="character-avatar">
-            <img [src]="character.profileIconUrl" [alt]="character.name" class="avatar-img" (error)="onImageError($event)">
+            <img [src]="'assets/characters/' + (character.profileIconUrl ? character.profileIconUrl.split('/').pop() : 'char1.jpeg')" [alt]="character.name" class="avatar-img" (error)="onImageError($event)">
           </div>
           <div class="character-details">
             <h2>{{ character.name }}</h2>
@@ -45,7 +45,7 @@
       </div>
       <div class="king-card">
         <div class="king-avatar">
-          <img [src]="kingData.profileIconUrl" [alt]="kingData.characterName" class="king-img">
+          <img [src]="'assets/characters/' + (kingData.profileIconUrl ? kingData.profileIconUrl.split('/').pop() : 'char1.jpeg')" [alt]="kingData.characterName" class="king-img" (error)="onImageError($event)">
           <div class="crown-badge">👑</div>
         </div>
         <div class="king-info">
