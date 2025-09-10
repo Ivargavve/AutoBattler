@@ -175,14 +175,29 @@ namespace backend.Controllers
                 }
 
                 // Check if mission is completed
-                var missionProgress = GetMissionProgress(rewardType == "character" ? (object?)character ?? user : user, rewardType);
-                var currentProgress = missionProgress.GetValueOrDefault(request.MissionId, 0);
+                // For daily missions, check both user and character progress and use the higher value
+                var userProgress = GetMissionProgress(user, "user");
+                var characterProgress = character != null ? GetMissionProgress(character, "character") : new Dictionary<string, int>();
+                
+                var currentProgress = 0;
+                if (request.MissionType == "daily")
+                {
+                    // For daily missions, use the higher progress between user and character
+                    var userProgressValue = userProgress.GetValueOrDefault(request.MissionId, 0);
+                    var characterProgressValue = characterProgress.GetValueOrDefault(request.MissionId, 0);
+                    currentProgress = Math.Max(userProgressValue, characterProgressValue);
+                }
+                else
+                {
+                    // For weekly missions, use the appropriate progress based on reward type
+                    var missionProgress = GetMissionProgress(rewardType == "character" ? (object?)character ?? user : user, rewardType);
+                    currentProgress = missionProgress.GetValueOrDefault(request.MissionId, 0);
+                }
+                
                 var requiredProgress = await GetRequiredProgress(request.MissionId, request.MissionType);
                 
-                _logger.LogInformation("Mission progress check: MissionId={MissionId}, Current={Current}, Required={Required}", 
-                    request.MissionId, currentProgress, requiredProgress);
                 
-                if (!await IsMissionCompleted(request.MissionId, request.MissionType, missionProgress))
+                if (currentProgress < requiredProgress)
                 {
                     _logger.LogWarning("Mission not completed: MissionId={MissionId}, Current={Current}, Required={Required}", 
                         request.MissionId, currentProgress, requiredProgress);

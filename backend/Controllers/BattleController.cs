@@ -663,9 +663,9 @@ namespace backend.Controllers
                 player.User.MissionProgressJson = JsonSerializer.Serialize(userProgress);
                 player.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error updating enemy type defeat mission progress: {ex.Message}");
+                // Error updating enemy type defeat mission progress
             }
         }
 
@@ -765,10 +765,9 @@ namespace backend.Controllers
             player.User.MissionProgressJson = JsonSerializer.Serialize(userProgress);
             player.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            // Log error but don't fail the battle
-            Console.WriteLine($"Error updating credit mission progress: {ex.Message}");
+            // Error updating credit mission progress
         }
     }
 
@@ -882,9 +881,9 @@ namespace backend.Controllers
                 player.User.MissionProgressJson = JsonSerializer.Serialize(userProgress);
                 player.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error updating battle count mission progress: {ex.Message}");
+                // Error updating battle count mission progress
             }
         }
 
@@ -929,9 +928,9 @@ namespace backend.Controllers
                 player.User.MissionProgressJson = JsonSerializer.Serialize(userProgress);
                 player.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error updating critical hit mission progress: {ex.Message}");
+                // Error updating critical hit mission progress
             }
         }
 
@@ -1116,9 +1115,9 @@ namespace backend.Controllers
                 player.User.MissionProgressJson = JsonSerializer.Serialize(userProgress);
                 player.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error updating attack type mission progress: {ex.Message}");
+                // Error updating attack type mission progress
             }
         }
 
