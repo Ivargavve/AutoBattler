@@ -48,6 +48,8 @@ interface MissionClaimResponse {
   rewardAmount: number;
   rewardType: string;
   rewardItem: string;
+  character?: any; // Include character data when rewardType is "character"
+  user?: any; // Include user data when rewardType is "user"
 }
 
 interface MissionProgressUpdateRequest {
@@ -147,6 +149,10 @@ export class TalesComponent implements OnInit, OnDestroy {
       next: (response) => {
         if (response.success) {
           this.claimedMissions.add(missionId);
+          
+          // Update character and/or user data directly from mission claim response
+          this.authService.updateMissionRewardData(response.character, response.user);
+          
           // Update user information immediately after claiming
           this.authService.loadUserWithCharacter().then(() => {
             // Reload data to get updated state

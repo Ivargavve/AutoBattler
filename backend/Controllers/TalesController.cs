@@ -94,9 +94,18 @@ namespace backend.Controllers
                 var characterProgress = character != null ? GetMissionProgress(character, "character") : new Dictionary<string, int>();
                 var characterClaimed = character != null ? GetClaimedMissions(character, "character") : new Dictionary<string, DateTime>();
                 
-                // Combine progress and claimed missions
-                var allProgress = userProgress.Concat(characterProgress).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-                var allClaimed = userClaimed.Concat(characterClaimed).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                // Combine progress and claimed missions (character progress takes precedence over user progress)
+                var allProgress = new Dictionary<string, int>(userProgress);
+                foreach (var kvp in characterProgress)
+                {
+                    allProgress[kvp.Key] = kvp.Value; // This will overwrite if key exists
+                }
+                
+                var allClaimed = new Dictionary<string, DateTime>(userClaimed);
+                foreach (var kvp in characterClaimed)
+                {
+                    allClaimed[kvp.Key] = kvp.Value; // This will overwrite if key exists
+                }
                 
                 return Ok(new TalesResponse
                 {
@@ -123,15 +132,20 @@ namespace backend.Controllers
         {
             try
             {
+                _logger.LogInformation("Claim mission request: MissionId={MissionId}, MissionType={MissionType}", 
+                    request.MissionId, request.MissionType);
+
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
+                    _logger.LogWarning("User not authenticated for mission claim");
                     return Unauthorized("User not authenticated");
                 }
 
                 var user = await _context.Users.FindAsync(int.Parse(userId));
                 if (user == null)
                 {
+                    _logger.LogWarning("User not found for mission claim: UserId={UserId}", userId);
                     return NotFound("User not found");
                 }
 
@@ -141,6 +155,8 @@ namespace backend.Controllers
                 var missionData = await GetMissionById(request.MissionId, request.MissionType);
                 if (missionData == null)
                 {
+                    _logger.LogWarning("Mission not found: MissionId={MissionId}, MissionType={MissionType}", 
+                        request.MissionId, request.MissionType);
                     return BadRequest("Mission not found");
                 }
 
@@ -153,13 +169,23 @@ namespace backend.Controllers
                 
                 if (claimedMissions.ContainsKey(claimKey))
                 {
+                    _logger.LogWarning("Mission already claimed: MissionId={MissionId}, ClaimKey={ClaimKey}", 
+                        request.MissionId, claimKey);
                     return BadRequest("Mission already claimed");
                 }
 
                 // Check if mission is completed
                 var missionProgress = GetMissionProgress(rewardType == "character" ? (object?)character ?? user : user, rewardType);
+                var currentProgress = missionProgress.GetValueOrDefault(request.MissionId, 0);
+                var requiredProgress = await GetRequiredProgress(request.MissionId, request.MissionType);
+                
+                _logger.LogInformation("Mission progress check: MissionId={MissionId}, Current={Current}, Required={Required}", 
+                    request.MissionId, currentProgress, requiredProgress);
+                
                 if (!await IsMissionCompleted(request.MissionId, request.MissionType, missionProgress))
                 {
+                    _logger.LogWarning("Mission not completed: MissionId={MissionId}, Current={Current}, Required={Required}", 
+                        request.MissionId, currentProgress, requiredProgress);
                     return BadRequest("Mission not completed yet");
                 }
 
@@ -175,7 +201,7 @@ namespace backend.Controllers
                         {
                             character.ExperiencePoints -= character.MaxExperiencePoints;
                             character.Level += 1;
-                            character.UnspentStatPoints += 2; // 2 stat points per level
+                            character.UnspentStatPoints += 5; // 5 stat points per level (same as BattleController)
                             character.MaxExperiencePoints = (int)(character.MaxExperiencePoints * 1.1); // 10% increase per level
                             character.CurrentHealth = character.MaxHealth; // Full heal on level up
                         }
@@ -199,14 +225,61 @@ namespace backend.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return Ok(new MissionClaimResponse
+                // Prepare response with character data if it's a character reward
+                var response = new MissionClaimResponse
                 {
                     Success = true,
                     Message = "Mission claimed successfully!",
                     RewardAmount = rewardAmount,
                     RewardType = rewardType,
                     RewardItem = rewardItem
-                });
+                };
+
+                // Include character data if it's a character reward
+                if (rewardType == "character" && character != null)
+                {
+                    response.Character = new
+                    {
+                        id = character.Id,
+                        name = character.Name,
+                        level = character.Level,
+                        experiencePoints = character.ExperiencePoints,
+                        maxExperiencePoints = character.MaxExperiencePoints,
+                        currentHealth = character.CurrentHealth,
+                        maxHealth = character.MaxHealth,
+                        currentEnergy = character.CurrentEnergy,
+                        maxEnergy = character.MaxEnergy,
+                        attack = character.Attack,
+                        defense = character.Defense,
+                        agility = character.Agility,
+                        magic = character.Magic,
+                        speed = character.Speed,
+                        criticalChance = character.CriticalChance,
+                        credits = character.Credits,
+                        unspentStatPoints = character.UnspentStatPoints,
+                        canAllocateStats = character.UnspentStatPoints >= 5,
+                        characterClass = character.Class,
+                        profileIconUrl = character.ProfileIconUrl,
+                        createdAt = character.CreatedAt
+                    };
+                }
+                
+                // Include user data if it's a user reward
+                if (rewardType == "user")
+                {
+                    response.User = new
+                    {
+                        id = user.Id,
+                        username = user.Username,
+                        level = user.Level,
+                        experiencePoints = user.ExperiencePoints,
+                        maxExperiencePoints = user.MaxExperiencePoints,
+                        credits = user.Credits,
+                        createdAt = user.CreatedAt
+                    };
+                }
+
+                return Ok(response);
             }
             catch (Exception ex)
             {

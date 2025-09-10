@@ -118,5 +118,45 @@
     "rewardType": "character",
     "rewardAmount": 55,
     "rewardItem": "xp"
+  },
+  {
+    "id": "daily_16",
+    "title": "Agility Master",
+    "description": "Use 4 agility attacks in battles",
+    "rewardType": "character",
+    "rewardAmount": 60,
+    "rewardItem": "xp"
+  },
+  {
+    "id": "daily_17",
+    "title": "Poison Expert",
+    "description": "Use 3 poison attacks in battles",
+    "rewardType": "character",
+    "rewardAmount": 50,
+    "rewardItem": "xp"
+  },
+  {
+    "id": "daily_18",
+    "title": "Attack Specialist",
+    "description": "Use 5 attack-based abilities in battles",
+    "rewardType": "character",
+    "rewardAmount": 65,
+    "rewardItem": "xp"
+  },
+  {
+    "id": "daily_19",
+    "title": "Magic Specialist",
+    "description": "Use 4 magic-based abilities in battles",
+    "rewardType": "character",
+    "rewardAmount": 60,
+    "rewardItem": "xp"
+  },
+  {
+    "id": "daily_20",
+    "title": "Defense Specialist",
+    "description": "Use 3 defense-based abilities in battles",
+    "rewardType": "character",
+    "rewardAmount": 45,
+    "rewardItem": "xp"
   }
 ]

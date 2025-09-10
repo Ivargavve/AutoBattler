@@ -145,6 +145,30 @@ export class AuthService {
     );
   }
 
+  updateMissionRewardData(characterData?: any, userData?: any): void {
+    // Update character data if provided
+    if (characterData) {
+      const normalizedCharacter = this.normalizeCharacterIcon(characterData);
+      this.characterSubject.next(normalizedCharacter as any);
+      
+      // Also update the user's character data
+      const currentUser = this.user;
+      if (currentUser) {
+        const updatedUser = { ...currentUser, character: normalizedCharacter };
+        this.setUser(updatedUser);
+      }
+    }
+    
+    // Update user data if provided (for user rewards like credits)
+    if (userData) {
+      const currentUser = this.user;
+      if (currentUser) {
+        const updatedUser = { ...currentUser, ...userData };
+        this.setUser(updatedUser);
+      }
+    }
+  }
+
   equipItem(slot: string, itemId: number) {
     return this.http.post<{ id: number; equipmentJson: string }>(
       `${environment.apiUrl}/characters/equipment/equip`,

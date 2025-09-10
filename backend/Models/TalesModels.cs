@@ -83,6 +83,10 @@ namespace backend.Models
         public int RewardAmount { get; set; }
         public string RewardType { get; set; } = string.Empty;
         public string RewardItem { get; set; } = string.Empty;
+        [JsonPropertyName("character")]
+        public object? Character { get; set; } // Include character data when rewardType is "character"
+        [JsonPropertyName("user")]
+        public object? User { get; set; } // Include user data when rewardType is "user"
     }
 
     public class MissionProgressUpdateRequest

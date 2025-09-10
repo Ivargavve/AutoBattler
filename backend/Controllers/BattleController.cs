@@ -119,17 +119,14 @@ namespace backend.Controllers
                 isPlayerBlocking = result.BlockNextAttack;
                 isPlayerEvading = result.EvadeNextAttack;
 
+                // Update attack type mission progress for every attack
+                await UpdateAttackTypeMissionProgress(player, attack);
+
                 // apply new poison if attack set it
                 if (result.ApplyPoison && result.PoisonDamagePerTurn > 0 && result.PoisonTurns > 0)
                 {
                     inEnemyPoisonDmg = result.PoisonDamagePerTurn;
                     inEnemyPoisonTurns = result.PoisonTurns;
-                    
-                    // Update poison application mission progress
-                    await UpdatePoisonApplicationMissionProgress(player);
-
-                    // Update attack type mission progress
-                    await UpdateAttackTypeMissionProgress(player, attack);
                 }
 
                 // if this attack grants crit buff (e.g., Camouflage, Battle Shout), it starts next turn
@@ -227,9 +224,6 @@ namespace backend.Controllers
 
                     // Update credit mission progress
                     await UpdateCreditMissionProgress(player, gainedCredits);
-
-                    // Update poison mission progress
-                    await UpdatePoisonMissionProgress(player);
 
                     // Update enemy type defeat mission progress
                     await UpdateEnemyTypeDefeatMissionProgress(player, selectedEnemy.Type ?? "normal");
@@ -347,9 +341,6 @@ namespace backend.Controllers
 
                         // Update credit mission progress
                         await UpdateCreditMissionProgress(player, gainedCredits);
-
-                        // Update poison mission progress
-                        await UpdatePoisonMissionProgress(player);
 
                         // Update enemy type defeat mission progress
                         await UpdateEnemyTypeDefeatMissionProgress(player, selectedEnemy.Type ?? "normal");
@@ -628,103 +619,6 @@ namespace backend.Controllers
             return Ok(EnemyTemplates.All);
         }
 
-        private async Task UpdatePoisonApplicationMissionProgress(Character player)
-        {
-            try
-            {
-                if (player.User == null) return;
-
-                // Get current mission progress
-                var userProgress = GetMissionProgress(player.User, "user");
-                var characterProgress = GetMissionProgress(player, "character");
-
-                // Get mission data to check for poison application missions
-                var dailyMissions = await GetDailyMissions();
-                var weeklyLore = await GetCurrentWeeklyLore();
-                var weeklyMissions = weeklyLore.WeeklyMissions;
-
-                // Check daily missions for poison application missions
-                foreach (var mission in dailyMissions)
-                {
-                    if (IsPoisonApplicationMission(mission.Description))
-                    {
-                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
-                    }
-                }
-
-                // Check weekly missions for poison application missions
-                foreach (var mission in weeklyMissions)
-                {
-                    if (IsPoisonApplicationMission(mission.Description))
-                    {
-                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
-                    }
-                }
-
-                // Save updated progress
-                player.User.MissionProgressJson = JsonSerializer.Serialize(userProgress);
-                player.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error updating poison application mission progress: {ex.Message}");
-            }
-        }
-
-        private async Task UpdatePoisonMissionProgress(Character player)
-        {
-            try
-            {
-                if (player.User == null) return;
-
-                // Get current mission progress
-                var userProgress = GetMissionProgress(player.User, "user");
-                var characterProgress = GetMissionProgress(player, "character");
-
-                // Get mission data to check for poison missions
-                var dailyMissions = await GetDailyMissions();
-                var weeklyLore = await GetCurrentWeeklyLore();
-                var weeklyMissions = weeklyLore.WeeklyMissions;
-
-                // Check daily missions for poison missions
-                foreach (var mission in dailyMissions)
-                {
-                    if (IsPoisonMission(mission.Description))
-                    {
-                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
-                    }
-                }
-
-                // Check weekly missions for poison missions
-                foreach (var mission in weeklyMissions)
-                {
-                    if (IsPoisonMission(mission.Description))
-                    {
-                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
-                    }
-                }
-
-                // Save updated progress
-                player.User.MissionProgressJson = JsonSerializer.Serialize(userProgress);
-                player.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error updating poison mission progress: {ex.Message}");
-            }
-        }
 
         private async Task UpdateEnemyTypeDefeatMissionProgress(Character player, string enemyType)
         {
@@ -775,25 +669,6 @@ namespace backend.Controllers
             }
         }
 
-        private bool IsPoisonApplicationMission(string description)
-        {
-            if (string.IsNullOrEmpty(description)) return false;
-            
-            // Check for patterns like "Apply poison X times"
-            return System.Text.RegularExpressions.Regex.IsMatch(description, 
-                @"apply\s+poison\s+\d+\s+times?", 
-                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-        }
-
-        private bool IsPoisonMission(string description)
-        {
-            if (string.IsNullOrEmpty(description)) return false;
-            
-            // Check for patterns like "Apply poison X times" or "Use poison X times"
-            return System.Text.RegularExpressions.Regex.IsMatch(description, 
-                @"(apply|use)\s+poison\s+\d+\s+times?", 
-                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-        }
 
         private bool IsEnemyTypeDefeatMission(string description, string enemyType)
         {
@@ -1074,97 +949,167 @@ namespace backend.Controllers
                 var weeklyLore = await GetCurrentWeeklyLore();
                 var weeklyMissions = weeklyLore.WeeklyMissions;
 
+                // Helper method to update progress
+                void UpdateProgress(Dictionary<string, int> progressDict, string missionId, int maxRequired)
+                {
+                    var currentProgress = progressDict.GetValueOrDefault(missionId, 0);
+                    var newProgress = currentProgress + 1;
+                    progressDict[missionId] = CapProgressAtMaximum(newProgress, maxRequired);
+                }
+
                 // Check daily missions for attack type missions
                 foreach (var mission in dailyMissions)
                 {
+                    var maxRequired = ExtractNumberFromDescription(mission.Description);
+                    
                     if (IsPhysicalAttackMission(mission.Description) && IsPhysicalAttack(attack))
                     {
-                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
                     }
                     else if (IsMagicAttackMission(mission.Description) && IsMagicAttack(attack))
                     {
-                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
                     }
                     else if (IsHolyAttackMission(mission.Description) && IsHolyAttack(attack))
                     {
-                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
                     }
                     else if (IsRogueAbilityMission(mission.Description) && IsRogueAbility(attack))
                     {
-                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
                     }
                     else if (IsElementalAttackMission(mission.Description) && IsElementalAttack(attack))
                     {
-                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
                     }
                     else if (IsDefensiveAbilityMission(mission.Description) && IsDefensiveAbility(attack))
                     {
-                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
+                    }
+                    // New stat-based mission checks
+                    else if (IsAgilityBasedAttackMission(mission.Description) && IsAgilityBasedAttack(attack))
+                    {
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
+                    }
+                    else if (IsAttackBasedAttackMission(mission.Description) && IsAttackBasedAttack(attack))
+                    {
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
+                    }
+                    else if (IsMagicBasedAttackMission(mission.Description) && IsMagicBasedAttack(attack))
+                    {
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
+                    }
+                    else if (IsDefenseBasedAttackMission(mission.Description) && IsDefenseBasedAttack(attack))
+                    {
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
                     }
                 }
 
                 // Check weekly missions for attack type missions
                 foreach (var mission in weeklyMissions)
                 {
+                    var maxRequired = ExtractNumberFromDescription(mission.Description);
+                    
                     if (IsPhysicalAttackMission(mission.Description) && IsPhysicalAttack(attack))
                     {
-                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
                     }
                     else if (IsMagicAttackMission(mission.Description) && IsMagicAttack(attack))
                     {
-                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
                     }
                     else if (IsHolyAttackMission(mission.Description) && IsHolyAttack(attack))
                     {
-                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
                     }
                     else if (IsRogueAbilityMission(mission.Description) && IsRogueAbility(attack))
                     {
-                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
                     }
                     else if (IsElementalAttackMission(mission.Description) && IsElementalAttack(attack))
                     {
-                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
                     }
                     else if (IsDefensiveAbilityMission(mission.Description) && IsDefensiveAbility(attack))
                     {
-                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
-                        var newProgress = currentProgress + 1;
-                        var maxRequired = ExtractNumberFromDescription(mission.Description);
-                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
+                    }
+                    // New stat-based mission checks for weekly missions
+                    else if (IsAgilityBasedAttackMission(mission.Description) && IsAgilityBasedAttack(attack))
+                    {
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
+                    }
+                    else if (IsAttackBasedAttackMission(mission.Description) && IsAttackBasedAttack(attack))
+                    {
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
+                    }
+                    else if (IsMagicBasedAttackMission(mission.Description) && IsMagicBasedAttack(attack))
+                    {
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
+                    }
+                    else if (IsDefenseBasedAttackMission(mission.Description) && IsDefenseBasedAttack(attack))
+                    {
+                        if (mission.RewardType == "character")
+                            UpdateProgress(characterProgress, mission.Id, maxRequired);
+                        else
+                            UpdateProgress(userProgress, mission.Id, maxRequired);
                     }
                 }
 
@@ -1222,7 +1167,7 @@ namespace backend.Controllers
         {
             if (string.IsNullOrEmpty(description)) return false;
             return System.Text.RegularExpressions.Regex.IsMatch(description, 
-                @"use\s+\d+\s+rogue\s+abilities?", 
+                @"use\s+\d+\s+(rogue\s+abilities?|poison\s+attacks?)", 
                 System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         }
 
@@ -1242,13 +1187,48 @@ namespace backend.Controllers
                 System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         }
 
+        // New stat-based mission detection methods
+        private bool IsAgilityBasedAttackMission(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return false;
+            return System.Text.RegularExpressions.Regex.IsMatch(description, 
+                @"use\s+\d+\s+(agility[-\s]?based\s+(attacks?|abilities?)|agility\s+(attacks?|abilities?)|poison\s+attacks?)", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        private bool IsAttackBasedAttackMission(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return false;
+            return System.Text.RegularExpressions.Regex.IsMatch(description, 
+                @"use\s+\d+\s+(attack[-\s]?based\s+(attacks?|abilities?)|attack\s+(attacks?|abilities?))", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        private bool IsMagicBasedAttackMission(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return false;
+            return System.Text.RegularExpressions.Regex.IsMatch(description, 
+                @"use\s+\d+\s+(magic[-\s]?based\s+(attacks?|abilities?)|magic\s+(attacks?|abilities?))", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        private bool IsDefenseBasedAttackMission(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return false;
+            return System.Text.RegularExpressions.Regex.IsMatch(description, 
+                @"use\s+\d+\s+(defense[-\s]?based\s+(attacks?|abilities?)|defense\s+(attacks?|abilities?))", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
         // Attack Type Detection Methods
         private bool IsPhysicalAttack(PlayerAttack attack)
         {
             if (attack == null || string.IsNullOrEmpty(attack.Name)) return false;
             var name = attack.Name.ToLower();
             return name.Contains("slash") || name.Contains("strike") || name.Contains("punch") || 
-                   name.Contains("kick") || name.Contains("bash") || name.Contains("smash");
+                   name.Contains("kick") || name.Contains("bash") || name.Contains("smash") ||
+                   name.Contains("cleave") || name.Contains("smite") || name.Contains("quick") ||
+                   name.Contains("shot") || name.Contains("backstab");
         }
 
         private bool IsMagicAttack(PlayerAttack attack)
@@ -1256,7 +1236,9 @@ namespace backend.Controllers
             if (attack == null || string.IsNullOrEmpty(attack.Name)) return false;
             var name = attack.Name.ToLower();
             return name.Contains("magic") || name.Contains("spell") || name.Contains("arcane") ||
-                   name.Contains("mystic") || name.Contains("enchant");
+                   name.Contains("mystic") || name.Contains("enchant") || name.Contains("fireball") ||
+                   name.Contains("ice") || name.Contains("frost") || name.Contains("blizzard") ||
+                   name.Contains("flame") || name.Contains("bolt") || name.Contains("blast");
         }
 
         private bool IsHolyAttack(PlayerAttack attack)
@@ -1264,7 +1246,8 @@ namespace backend.Controllers
             if (attack == null || string.IsNullOrEmpty(attack.Name)) return false;
             var name = attack.Name.ToLower();
             return name.Contains("holy") || name.Contains("divine") || name.Contains("blessed") ||
-                   name.Contains("sacred") || name.Contains("light");
+                   name.Contains("sacred") || name.Contains("light") || name.Contains("smite") ||
+                   name.Contains("judgement") || name.Contains("holy light");
         }
 
         private bool IsRogueAbility(PlayerAttack attack)
@@ -1272,7 +1255,9 @@ namespace backend.Controllers
             if (attack == null || string.IsNullOrEmpty(attack.Name)) return false;
             var name = attack.Name.ToLower();
             return name.Contains("stealth") || name.Contains("sneak") || name.Contains("backstab") ||
-                   name.Contains("shadow") || name.Contains("dagger") || name.Contains("trick");
+                   name.Contains("shadow") || name.Contains("dagger") || name.Contains("trick") ||
+                   name.Contains("shadowstep") || name.Contains("poison") || name.Contains("quick") ||
+                   name.Contains("shot") || name.Contains("camouflage") || name.Contains("nature's grasp");
         }
 
         private bool IsElementalAttack(PlayerAttack attack)
@@ -1280,12 +1265,83 @@ namespace backend.Controllers
             if (attack == null || string.IsNullOrEmpty(attack.Name)) return false;
             var name = attack.Name.ToLower();
             return name.Contains("fire") || name.Contains("ice") || name.Contains("frost") ||
-                   name.Contains("arcane") || name.Contains("flame") || name.Contains("blizzard");
+                   name.Contains("arcane") || name.Contains("flame") || name.Contains("blizzard") ||
+                   name.Contains("fireball") || name.Contains("bolt") || name.Contains("blast");
         }
 
         private bool IsDefensiveAbility(PlayerAttack attack)
         {
             if (attack == null || string.IsNullOrEmpty(attack.Name)) return false;
+            var name = attack.Name.ToLower();
+            return name.Contains("block") || name.Contains("shield") || name.Contains("defend") ||
+                   name.Contains("guard") || name.Contains("protect") || name.Contains("barrier") ||
+                   name.Contains("sacred shield") || name.Contains("mana shield");
+        }
+
+        // New stat-based attack detection methods
+        private bool IsAgilityBasedAttack(PlayerAttack attack)
+        {
+            if (attack == null) return false;
+            
+            // Check if attack requires agility
+            if (attack.RequiredStats != null && attack.RequiredStats.ContainsKey("agility"))
+            {
+                return true;
+            }
+            
+            // Also check by name for agility-based attacks
+            var name = attack.Name.ToLower();
+            return name.Contains("quick") || name.Contains("shadow") || name.Contains("poison") ||
+                   name.Contains("shot") || name.Contains("step") || name.Contains("sneak") ||
+                   name.Contains("backstab") || name.Contains("camouflage") || name.Contains("nature's grasp");
+        }
+
+        private bool IsAttackBasedAttack(PlayerAttack attack)
+        {
+            if (attack == null) return false;
+            
+            // Check if attack requires attack stat
+            if (attack.RequiredStats != null && attack.RequiredStats.ContainsKey("attack"))
+            {
+                return true;
+            }
+            
+            // Also check by name for attack-based attacks
+            var name = attack.Name.ToLower();
+            return name.Contains("slash") || name.Contains("strike") || name.Contains("punch") ||
+                   name.Contains("kick") || name.Contains("bash") || name.Contains("smash") ||
+                   name.Contains("cleave") || name.Contains("battle shout");
+        }
+
+        private bool IsMagicBasedAttack(PlayerAttack attack)
+        {
+            if (attack == null) return false;
+            
+            // Check if attack requires magic stat
+            if (attack.RequiredStats != null && attack.RequiredStats.ContainsKey("magic"))
+            {
+                return true;
+            }
+            
+            // Also check by name for magic-based attacks
+            var name = attack.Name.ToLower();
+            return name.Contains("magic") || name.Contains("spell") || name.Contains("arcane") ||
+                   name.Contains("mystic") || name.Contains("enchant") || name.Contains("fireball") ||
+                   name.Contains("ice") || name.Contains("frost") || name.Contains("holy") ||
+                   name.Contains("divine") || name.Contains("blessed") || name.Contains("sacred");
+        }
+
+        private bool IsDefenseBasedAttack(PlayerAttack attack)
+        {
+            if (attack == null) return false;
+            
+            // Check if attack requires defense stat
+            if (attack.RequiredStats != null && attack.RequiredStats.ContainsKey("defense"))
+            {
+                return true;
+            }
+            
+            // Also check by name for defense-based attacks
             var name = attack.Name.ToLower();
             return name.Contains("block") || name.Contains("shield") || name.Contains("defend") ||
                    name.Contains("guard") || name.Contains("protect") || name.Contains("barrier");
