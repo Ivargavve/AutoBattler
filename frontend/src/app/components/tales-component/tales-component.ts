@@ -137,7 +137,6 @@ export class TalesComponent implements OnInit, OnDestroy {
     }
 
     if (!this.authService.isLoggedIn) {
-      alert('Please log in to claim missions.');
       return;
     }
 
@@ -148,21 +147,15 @@ export class TalesComponent implements OnInit, OnDestroy {
       next: (response) => {
         if (response.success) {
           this.claimedMissions.add(missionId);
-          // Show success message (you could implement a toast service here)
-          alert(`${response.message} You received ${response.rewardAmount} ${response.rewardItem}!`);
-          // Reload data to get updated state
-          this.loadTalesData();
-        } else {
-          alert(response.message);
+          // Update user information immediately after claiming
+          this.authService.loadUserWithCharacter().then(() => {
+            // Reload data to get updated state
+            this.loadTalesData();
+          });
         }
       },
       error: (error) => {
         console.error('Error claiming mission:', error);
-        if (error.status === 401) {
-          alert('Please log in to claim missions.');
-        } else {
-          alert('Failed to claim mission. Please try again.');
-        }
       }
     });
   }

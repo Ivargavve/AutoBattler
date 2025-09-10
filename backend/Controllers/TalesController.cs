@@ -169,13 +169,15 @@ namespace backend.Controllers
                     if (rewardItem == "xp")
                     {
                         character.ExperiencePoints += rewardAmount;
-                        // Check for level up
-                        var newLevel = CalculateLevel(character.ExperiencePoints);
-                        if (newLevel > character.Level)
+                        
+                        // Check for level up using the same logic as BattleController
+                        while (character.ExperiencePoints >= character.MaxExperiencePoints)
                         {
-                            var oldLevel = character.Level;
-                            character.Level = newLevel;
-                            character.UnspentStatPoints += (newLevel - oldLevel) * 2; // 2 stat points per level
+                            character.ExperiencePoints -= character.MaxExperiencePoints;
+                            character.Level += 1;
+                            character.UnspentStatPoints += 2; // 2 stat points per level
+                            character.MaxExperiencePoints = (int)(character.MaxExperiencePoints * 1.1); // 10% increase per level
+                            character.CurrentHealth = character.MaxHealth; // Full heal on level up
                         }
                     }
 
@@ -348,11 +350,6 @@ namespace backend.Controllers
             }
         }
 
-        private int CalculateLevel(int xp)
-        {
-            // Simple level calculation: 100 XP per level
-            return (xp / 100) + 1;
-        }
 
         private Dictionary<string, int> GetMissionProgress(object entity, string type)
         {

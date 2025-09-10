@@ -648,10 +648,6 @@ namespace backend.Controllers
                 {
                     if (IsPoisonApplicationMission(mission.Description))
                     {
-                        // Skip if mission is already completed
-                        if (await IsMissionAlreadyCompleted(mission.Id, userProgress))
-                            continue;
-
                         var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
                         var newProgress = currentProgress + 1;
                         var maxRequired = ExtractNumberFromDescription(mission.Description);
@@ -664,10 +660,6 @@ namespace backend.Controllers
                 {
                     if (IsPoisonApplicationMission(mission.Description))
                     {
-                        // Skip if mission is already completed
-                        if (await IsMissionAlreadyCompleted(mission.Id, characterProgress))
-                            continue;
-
                         var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
                         var newProgress = currentProgress + 1;
                         var maxRequired = ExtractNumberFromDescription(mission.Description);
@@ -705,10 +697,6 @@ namespace backend.Controllers
                 {
                     if (IsPoisonMission(mission.Description))
                     {
-                        // Skip if mission is already completed
-                        if (await IsMissionAlreadyCompleted(mission.Id, userProgress))
-                            continue;
-
                         var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
                         var newProgress = currentProgress + 1;
                         var maxRequired = ExtractNumberFromDescription(mission.Description);
@@ -721,10 +709,6 @@ namespace backend.Controllers
                 {
                     if (IsPoisonMission(mission.Description))
                     {
-                        // Skip if mission is already completed
-                        if (await IsMissionAlreadyCompleted(mission.Id, characterProgress))
-                            continue;
-
                         var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
                         var newProgress = currentProgress + 1;
                         var maxRequired = ExtractNumberFromDescription(mission.Description);
@@ -762,10 +746,6 @@ namespace backend.Controllers
                 {
                     if (IsEnemyTypeDefeatMission(mission.Description, enemyType))
                     {
-                        // Skip if mission is already completed
-                        if (await IsMissionAlreadyCompleted(mission.Id, userProgress))
-                            continue;
-
                         var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
                         var newProgress = currentProgress + 1;
                         var maxRequired = ExtractNumberFromDescription(mission.Description);
@@ -778,10 +758,6 @@ namespace backend.Controllers
                 {
                     if (IsEnemyTypeDefeatMission(mission.Description, enemyType))
                     {
-                        // Skip if mission is already completed
-                        if (await IsMissionAlreadyCompleted(mission.Id, characterProgress))
-                            continue;
-
                         var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
                         var newProgress = currentProgress + 1;
                         var maxRequired = ExtractNumberFromDescription(mission.Description);
@@ -891,10 +867,6 @@ namespace backend.Controllers
             {
                 if (IsCreditMission(mission.Description))
                 {
-                    // Skip if mission is already completed
-                    if (await IsMissionAlreadyCompleted(mission.Id, userProgress))
-                        continue;
-
                     var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
                     var newProgress = currentProgress + gainedCredits;
                     var maxRequired = ExtractNumberFromDescription(mission.Description);
@@ -907,10 +879,6 @@ namespace backend.Controllers
             {
                 if (IsCreditMission(mission.Description))
                 {
-                    // Skip if mission is already completed
-                    if (await IsMissionAlreadyCompleted(mission.Id, characterProgress))
-                        continue;
-
                     var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
                     var newProgress = currentProgress + gainedCredits;
                     var maxRequired = ExtractNumberFromDescription(mission.Description);
@@ -1017,10 +985,6 @@ namespace backend.Controllers
                 {
                     if (IsBattleCountMission(mission.Description))
                     {
-                        // Skip if mission is already completed
-                        if (await IsMissionAlreadyCompleted(mission.Id, userProgress))
-                            continue;
-
                         var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
                         var newProgress = currentProgress + 1;
                         var maxRequired = ExtractNumberFromDescription(mission.Description);
@@ -1033,10 +997,6 @@ namespace backend.Controllers
                 {
                     if (IsBattleCountMission(mission.Description))
                     {
-                        // Skip if mission is already completed
-                        if (await IsMissionAlreadyCompleted(mission.Id, characterProgress))
-                            continue;
-
                         var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
                         var newProgress = currentProgress + 1;
                         var maxRequired = ExtractNumberFromDescription(mission.Description);
@@ -1072,10 +1032,6 @@ namespace backend.Controllers
                 {
                     if (IsCriticalHitMission(mission.Description))
                     {
-                        // Skip if mission is already completed
-                        if (await IsMissionAlreadyCompleted(mission.Id, userProgress))
-                            continue;
-
                         var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
                         var newProgress = currentProgress + 1;
                         var maxRequired = ExtractNumberFromDescription(mission.Description);
@@ -1088,10 +1044,6 @@ namespace backend.Controllers
                 {
                     if (IsCriticalHitMission(mission.Description))
                     {
-                        // Skip if mission is already completed
-                        if (await IsMissionAlreadyCompleted(mission.Id, characterProgress))
-                            continue;
-
                         var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
                         var newProgress = currentProgress + 1;
                         var maxRequired = ExtractNumberFromDescription(mission.Description);
@@ -1125,10 +1077,6 @@ namespace backend.Controllers
                 // Check daily missions for attack type missions
                 foreach (var mission in dailyMissions)
                 {
-                    // Skip if mission is already completed
-                    if (await IsMissionAlreadyCompleted(mission.Id, userProgress))
-                        continue;
-
                     if (IsPhysicalAttackMission(mission.Description) && IsPhysicalAttack(attack))
                     {
                         var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
@@ -1176,10 +1124,6 @@ namespace backend.Controllers
                 // Check weekly missions for attack type missions
                 foreach (var mission in weeklyMissions)
                 {
-                    // Skip if mission is already completed
-                    if (await IsMissionAlreadyCompleted(mission.Id, characterProgress))
-                        continue;
-
                     if (IsPhysicalAttackMission(mission.Description) && IsPhysicalAttack(attack))
                     {
                         var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
@@ -1347,24 +1291,6 @@ namespace backend.Controllers
                    name.Contains("guard") || name.Contains("protect") || name.Contains("barrier");
         }
 
-        // Helper method to check if mission is already completed
-        private async Task<bool> IsMissionAlreadyCompleted(string missionId, Dictionary<string, int> progress)
-        {
-            try
-            {
-                var dailyMissions = await GetDailyMissions();
-                var mission = dailyMissions.FirstOrDefault(m => m.Id == missionId);
-                if (mission == null) return false;
-
-                var requiredProgress = ExtractNumberFromDescription(mission.Description);
-                var currentProgress = progress.GetValueOrDefault(missionId, 0);
-                return currentProgress >= requiredProgress;
-            }
-            catch
-            {
-                return false;
-            }
-        }
 
         // Helper method to extract number from mission description
         private int ExtractNumberFromDescription(string description)
