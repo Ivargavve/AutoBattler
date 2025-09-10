@@ -158,7 +158,7 @@ namespace backend.Controllers
 
                 // Check if mission is completed
                 var missionProgress = GetMissionProgress(rewardType == "character" ? (object?)character ?? user : user, rewardType);
-                if (!IsMissionCompleted(request.MissionId, request.MissionType, missionProgress))
+                if (!await IsMissionCompleted(request.MissionId, request.MissionType, missionProgress))
                 {
                     return BadRequest("Mission not completed yet");
                 }
@@ -392,7 +392,7 @@ namespace backend.Controllers
             }
         }
 
-        private bool IsMissionCompleted(string missionId, string missionType, Dictionary<string, int> progress)
+        private async Task<bool> IsMissionCompleted(string missionId, string missionType, Dictionary<string, int> progress)
         {
             if (!progress.ContainsKey(missionId))
                 return false;
@@ -400,15 +400,54 @@ namespace backend.Controllers
             var currentProgress = progress[missionId];
             
             // Define completion thresholds based on mission type and ID
-            var requiredProgress = GetRequiredProgress(missionId, missionType);
+            var requiredProgress = await GetRequiredProgress(missionId, missionType);
             return currentProgress >= requiredProgress;
         }
 
-        private int GetRequiredProgress(string missionId, string missionType)
+        private async Task<int> GetRequiredProgress(string missionId, string missionType)
         {
-            // Basic thresholds: daily missions require 10, weekly missions require 20
-            // (Future enhancement: derive per-mission requirements from data files)
+            try
+            {
+                if (missionType == "daily")
+                {
+                    var dailyMissions = await GetDailyMissions();
+                    var mission = dailyMissions.FirstOrDefault(m => m.Id == missionId);
+                    if (mission != null)
+                    {
+                        return ExtractNumberFromDescription(mission.Description);
+                    }
+                }
+                else if (missionType == "weekly")
+                {
+                    var weeklyLore = await GetCurrentWeeklyLore();
+                    var mission = weeklyLore.WeeklyMissions.FirstOrDefault(m => m.Id == missionId);
+                    if (mission != null)
+                    {
+                        return ExtractNumberFromDescription(mission.Description);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting required progress for mission {MissionId}", missionId);
+            }
+            
+            // Fallback to basic thresholds if extraction fails
             return missionType == "daily" ? 10 : 20;
+        }
+
+        private int ExtractNumberFromDescription(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return 10;
+            
+            // Extract number from patterns like "Earn 100 credits", "Play 5 battles", etc.
+            var match = System.Text.RegularExpressions.Regex.Match(description, @"(\d+)");
+            if (match.Success && int.TryParse(match.Groups[1].Value, out int number))
+            {
+                return number;
+            }
+            
+            return 10; // Default fallback
         }
 
         private string GetClaimKey(string missionId, string missionType, DateTime now)

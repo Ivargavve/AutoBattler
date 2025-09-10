@@ -23,11 +23,11 @@
       },
       {
         "id": "cheese_3",
-        "title": "Cheese Market Crash",
-        "description": "Spend 1000 credits in the bazaar",
-        "rewardType": "user",
-        "rewardAmount": 500,
-        "rewardItem": "credits"
+        "title": "Poison Master Supreme",
+        "description": "Apply poison 10 times in battles",
+        "rewardType": "character",
+        "rewardAmount": 400,
+        "rewardItem": "xp"
       }
     ]
   },
@@ -55,11 +55,11 @@
       },
       {
         "id": "duck_3",
-        "title": "Duck Resistance Leader",
-        "description": "Play 20 battles this week",
-        "rewardType": "user",
-        "rewardAmount": 750,
-        "rewardItem": "credits"
+        "title": "Beast Slayer Supreme",
+        "description": "Defeat 15 beast-type enemies",
+        "rewardType": "character",
+        "rewardAmount": 300,
+        "rewardItem": "xp"
       }
     ]
   },
@@ -87,11 +87,11 @@
       },
       {
         "id": "afk_3",
-        "title": "Idle Crown Seeker",
-        "description": "Reach level 10 with any character",
-        "rewardType": "user",
-        "rewardAmount": 1000,
-        "rewardItem": "credits"
+        "title": "Dragon Slayer",
+        "description": "Defeat 8 dragon-type enemies",
+        "rewardType": "character",
+        "rewardAmount": 500,
+        "rewardItem": "xp"
       }
     ]
   },
@@ -119,11 +119,11 @@
       },
       {
         "id": "greg_3",
-        "title": "Mystery Shopper",
-        "description": "Spend 2000 credits on mysterious items",
-        "rewardType": "user",
-        "rewardAmount": 800,
-        "rewardItem": "credits"
+        "title": "Elemental Destroyer",
+        "description": "Defeat 12 elemental-type enemies",
+        "rewardType": "character",
+        "rewardAmount": 400,
+        "rewardItem": "xp"
       }
     ]
   },
@@ -151,11 +151,11 @@
       },
       {
         "id": "patch_3",
-        "title": "Grandma's Laptop Hero",
-        "description": "Use 25 basic attacks in battles",
-        "rewardType": "user",
-        "rewardAmount": 600,
-        "rewardItem": "credits"
+        "title": "Undead Destroyer",
+        "description": "Defeat 10 undead-type enemies",
+        "rewardType": "character",
+        "rewardAmount": 350,
+        "rewardItem": "xp"
       }
     ]
   }

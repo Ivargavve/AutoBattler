@@ -17,14 +17,6 @@
   },
   {
     "id": "daily_3",
-    "title": "Equipment Enthusiast",
-    "description": "Purchase 1 item from the bazaar",
-    "rewardType": "character",
-    "rewardAmount": 30,
-    "rewardItem": "xp"
-  },
-  {
-    "id": "daily_4",
     "title": "Physical Fighter",
     "description": "Use 5 physical attacks in battles",
     "rewardType": "character",
@@ -32,15 +24,7 @@
     "rewardItem": "xp"
   },
   {
-    "id": "daily_5",
-    "title": "Social Butterfly",
-    "description": "Visit the Hall of Legends",
-    "rewardType": "user",
-    "rewardAmount": 50,
-    "rewardItem": "credits"
-  },
-  {
-    "id": "daily_6",
+    "id": "daily_4",
     "title": "Lucky Streak",
     "description": "Get 2 critical hits in one battle",
     "rewardType": "character",
@@ -48,23 +32,7 @@
     "rewardItem": "xp"
   },
   {
-    "id": "daily_7",
-    "title": "Explorer",
-    "description": "Visit 3 different areas of the game",
-    "rewardType": "character",
-    "rewardAmount": 60,
-    "rewardItem": "xp"
-  },
-  {
-    "id": "daily_8",
-    "title": "Power Player",
-    "description": "Level up any character",
-    "rewardType": "user",
-    "rewardAmount": 100,
-    "rewardItem": "credits"
-  },
-  {
-    "id": "daily_9",
+    "id": "daily_5",
     "title": "Magic User",
     "description": "Use 3 magic attacks in battles",
     "rewardType": "character",
@@ -72,15 +40,7 @@
     "rewardItem": "xp"
   },
   {
-    "id": "daily_10",
-    "title": "Dedication",
-    "description": "Spend 30 minutes in the game",
-    "rewardType": "user",
-    "rewardAmount": 75,
-    "rewardItem": "credits"
-  },
-  {
-    "id": "daily_11",
+    "id": "daily_6",
     "title": "Monster Slayer",
     "description": "Defeat 5 different enemy types",
     "rewardType": "character",
@@ -88,15 +48,7 @@
     "rewardItem": "xp"
   },
   {
-    "id": "daily_12",
-    "title": "Shopaholic",
-    "description": "Spend 500 credits in total",
-    "rewardType": "user",
-    "rewardAmount": 125,
-    "rewardItem": "credits"
-  },
-  {
-    "id": "daily_13",
+    "id": "daily_7",
     "title": "Defensive Master",
     "description": "Use 3 defensive abilities in battles",
     "rewardType": "character",
@@ -104,23 +56,7 @@
     "rewardItem": "xp"
   },
   {
-    "id": "daily_14",
-    "title": "Collector",
-    "description": "Obtain 3 new items",
-    "rewardType": "character",
-    "rewardAmount": 45,
-    "rewardItem": "xp"
-  },
-  {
-    "id": "daily_15",
-    "title": "Speed Demon",
-    "description": "Complete a battle in under 30 seconds",
-    "rewardType": "character",
-    "rewardAmount": 65,
-    "rewardItem": "xp"
-  },
-  {
-    "id": "daily_16",
+    "id": "daily_8",
     "title": "Poison Master",
     "description": "Apply poison 3 times in battles",
     "rewardType": "character",
@@ -128,7 +64,7 @@
     "rewardItem": "xp"
   },
   {
-    "id": "daily_17",
+    "id": "daily_9",
     "title": "Holy Warrior",
     "description": "Use 2 holy attacks in battles",
     "rewardType": "character",
@@ -136,7 +72,7 @@
     "rewardItem": "xp"
   },
   {
-    "id": "daily_18",
+    "id": "daily_10",
     "title": "Rogue Tactics",
     "description": "Use 3 rogue abilities in battles",
     "rewardType": "character",
@@ -144,7 +80,7 @@
     "rewardItem": "xp"
   },
   {
-    "id": "daily_19",
+    "id": "daily_11",
     "title": "Elemental Master",
     "description": "Use fire, ice, or arcane attacks 4 times",
     "rewardType": "character",
@@ -152,11 +88,35 @@
     "rewardItem": "xp"
   },
   {
-    "id": "daily_20",
+    "id": "daily_12",
     "title": "Undead Hunter",
     "description": "Defeat 3 undead enemies",
     "rewardType": "character",
     "rewardAmount": 45,
+    "rewardItem": "xp"
+  },
+  {
+    "id": "daily_13",
+    "title": "Beast Slayer",
+    "description": "Defeat 4 beast-type enemies",
+    "rewardType": "character",
+    "rewardAmount": 60,
+    "rewardItem": "xp"
+  },
+  {
+    "id": "daily_14",
+    "title": "Dragon Hunter",
+    "description": "Defeat 2 dragon-type enemies",
+    "rewardType": "character",
+    "rewardAmount": 70,
+    "rewardItem": "xp"
+  },
+  {
+    "id": "daily_15",
+    "title": "Elemental Slayer",
+    "description": "Defeat 3 elemental-type enemies",
+    "rewardType": "character",
+    "rewardAmount": 55,
     "rewardItem": "xp"
   }
 ]

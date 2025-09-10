@@ -5,6 +5,7 @@ using backend.Logic;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using backend.Utils;
+using backend.Models;
 using System.Text.Json;
 using System.Linq; // FirstOrDefault
 using System;
@@ -15,7 +16,7 @@ namespace backend.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class BattleController : ControllerBase
+    public partial class BattleController : ControllerBase
     {
         private readonly AppDbContext _db;
 
@@ -123,6 +124,12 @@ namespace backend.Controllers
                 {
                     inEnemyPoisonDmg = result.PoisonDamagePerTurn;
                     inEnemyPoisonTurns = result.PoisonTurns;
+                    
+                    // Update poison application mission progress
+                    await UpdatePoisonApplicationMissionProgress(player);
+
+                    // Update attack type mission progress
+                    await UpdateAttackTypeMissionProgress(player, attack);
                 }
 
                 // if this attack grants crit buff (e.g., Camouflage, Battle Shout), it starts next turn
@@ -145,6 +152,9 @@ namespace backend.Controllers
                 if (isCrit)
                 {
                     damage = (int)Math.Round(damage * 2.0);
+                    
+                    // Update critical hit mission progress
+                    await UpdateCriticalHitMissionProgress(player);
 
                     // ability line first
                     log.Add(new BattleLogEntry
@@ -214,6 +224,18 @@ namespace backend.Controllers
                     int gainedCredits = rand.Next(selectedEnemy.CreditsMin, selectedEnemy.CreditsMax + 1);
                     player.Credits += gainedCredits;
                     log.Add(new BattleLogEntry { Message = $"💰 {enemy.Name} drops {gainedCredits} credits!", Type = "loot" });
+
+                    // Update credit mission progress
+                    await UpdateCreditMissionProgress(player, gainedCredits);
+
+                    // Update poison mission progress
+                    await UpdatePoisonMissionProgress(player);
+
+                    // Update enemy type defeat mission progress
+                    await UpdateEnemyTypeDefeatMissionProgress(player, selectedEnemy.Type ?? "normal");
+
+                    // Update battle count mission progress
+                    await UpdateBattleCountMissionProgress(player);
 
                     int gainedXp = enemy.xp;
                     player.ExperiencePoints += gainedXp;
@@ -322,6 +344,18 @@ namespace backend.Controllers
                         int gainedCredits = rand.Next(selectedEnemy.CreditsMin, selectedEnemy.CreditsMax + 1);
                         player.Credits += gainedCredits;
                         log.Add(new BattleLogEntry { Message = $"💰 {enemy.Name} drops {gainedCredits} credits!", Type = "loot" });
+
+                        // Update credit mission progress
+                        await UpdateCreditMissionProgress(player, gainedCredits);
+
+                        // Update poison mission progress
+                        await UpdatePoisonMissionProgress(player);
+
+                        // Update enemy type defeat mission progress
+                        await UpdateEnemyTypeDefeatMissionProgress(player, selectedEnemy.Type ?? "normal");
+
+                        // Update battle count mission progress
+                        await UpdateBattleCountMissionProgress(player);
 
                         int gainedXp = enemy.xp;
                         player.ExperiencePoints += gainedXp;
@@ -593,6 +627,210 @@ namespace backend.Controllers
         {
             return Ok(EnemyTemplates.All);
         }
+
+        private async Task UpdatePoisonApplicationMissionProgress(Character player)
+        {
+            try
+            {
+                if (player.User == null) return;
+
+                // Get current mission progress
+                var userProgress = GetMissionProgress(player.User, "user");
+                var characterProgress = GetMissionProgress(player, "character");
+
+                // Get mission data to check for poison application missions
+                var dailyMissions = await GetDailyMissions();
+                var weeklyLore = await GetCurrentWeeklyLore();
+                var weeklyMissions = weeklyLore.WeeklyMissions;
+
+                // Check daily missions for poison application missions
+                foreach (var mission in dailyMissions)
+                {
+                    if (IsPoisonApplicationMission(mission.Description))
+                    {
+                        // Skip if mission is already completed
+                        if (await IsMissionAlreadyCompleted(mission.Id, userProgress))
+                            continue;
+
+                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                }
+
+                // Check weekly missions for poison application missions
+                foreach (var mission in weeklyMissions)
+                {
+                    if (IsPoisonApplicationMission(mission.Description))
+                    {
+                        // Skip if mission is already completed
+                        if (await IsMissionAlreadyCompleted(mission.Id, characterProgress))
+                            continue;
+
+                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                }
+
+                // Save updated progress
+                player.User.MissionProgressJson = JsonSerializer.Serialize(userProgress);
+                player.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating poison application mission progress: {ex.Message}");
+            }
+        }
+
+        private async Task UpdatePoisonMissionProgress(Character player)
+        {
+            try
+            {
+                if (player.User == null) return;
+
+                // Get current mission progress
+                var userProgress = GetMissionProgress(player.User, "user");
+                var characterProgress = GetMissionProgress(player, "character");
+
+                // Get mission data to check for poison missions
+                var dailyMissions = await GetDailyMissions();
+                var weeklyLore = await GetCurrentWeeklyLore();
+                var weeklyMissions = weeklyLore.WeeklyMissions;
+
+                // Check daily missions for poison missions
+                foreach (var mission in dailyMissions)
+                {
+                    if (IsPoisonMission(mission.Description))
+                    {
+                        // Skip if mission is already completed
+                        if (await IsMissionAlreadyCompleted(mission.Id, userProgress))
+                            continue;
+
+                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                }
+
+                // Check weekly missions for poison missions
+                foreach (var mission in weeklyMissions)
+                {
+                    if (IsPoisonMission(mission.Description))
+                    {
+                        // Skip if mission is already completed
+                        if (await IsMissionAlreadyCompleted(mission.Id, characterProgress))
+                            continue;
+
+                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                }
+
+                // Save updated progress
+                player.User.MissionProgressJson = JsonSerializer.Serialize(userProgress);
+                player.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating poison mission progress: {ex.Message}");
+            }
+        }
+
+        private async Task UpdateEnemyTypeDefeatMissionProgress(Character player, string enemyType)
+        {
+            try
+            {
+                if (player.User == null) return;
+
+                // Get current mission progress
+                var userProgress = GetMissionProgress(player.User, "user");
+                var characterProgress = GetMissionProgress(player, "character");
+
+                // Get mission data to check for enemy type defeat missions
+                var dailyMissions = await GetDailyMissions();
+                var weeklyLore = await GetCurrentWeeklyLore();
+                var weeklyMissions = weeklyLore.WeeklyMissions;
+
+                // Check daily missions for enemy type defeat missions
+                foreach (var mission in dailyMissions)
+                {
+                    if (IsEnemyTypeDefeatMission(mission.Description, enemyType))
+                    {
+                        // Skip if mission is already completed
+                        if (await IsMissionAlreadyCompleted(mission.Id, userProgress))
+                            continue;
+
+                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                }
+
+                // Check weekly missions for enemy type defeat missions
+                foreach (var mission in weeklyMissions)
+                {
+                    if (IsEnemyTypeDefeatMission(mission.Description, enemyType))
+                    {
+                        // Skip if mission is already completed
+                        if (await IsMissionAlreadyCompleted(mission.Id, characterProgress))
+                            continue;
+
+                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                }
+
+                // Save updated progress
+                player.User.MissionProgressJson = JsonSerializer.Serialize(userProgress);
+                player.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating enemy type defeat mission progress: {ex.Message}");
+            }
+        }
+
+        private bool IsPoisonApplicationMission(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return false;
+            
+            // Check for patterns like "Apply poison X times"
+            return System.Text.RegularExpressions.Regex.IsMatch(description, 
+                @"apply\s+poison\s+\d+\s+times?", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        private bool IsPoisonMission(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return false;
+            
+            // Check for patterns like "Apply poison X times" or "Use poison X times"
+            return System.Text.RegularExpressions.Regex.IsMatch(description, 
+                @"(apply|use)\s+poison\s+\d+\s+times?", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        private bool IsEnemyTypeDefeatMission(string description, string enemyType)
+        {
+            if (string.IsNullOrEmpty(description)) return false;
+            
+            // Check for patterns like "Defeat X beast-type enemies", "Defeat X undead enemies", etc.
+            var typePattern = enemyType.ToLower();
+            var pattern = $@"defeat\s+\d+\s+{typePattern}(-type)?\s+enemies?";
+            
+            return System.Text.RegularExpressions.Regex.IsMatch(description, 
+                pattern, 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
     }
 
     public class BattleLogEntry
@@ -626,5 +864,526 @@ namespace backend.Controllers
         public int? PlayerCritBonusTurns { get; set; }
         public int? EnemyPoisonDamagePerTurn { get; set; }
         public int? EnemyPoisonTurnsLeft { get; set; }
+    }
+}
+
+namespace backend.Controllers
+{
+    public partial class BattleController
+    {
+        private async Task UpdateCreditMissionProgress(Character player, int gainedCredits)
+    {
+        try
+        {
+            if (player.User == null) return;
+
+            // Get current mission progress
+            var userProgress = GetMissionProgress(player.User, "user");
+            var characterProgress = GetMissionProgress(player, "character");
+
+            // Get mission data to check for credit missions
+            var dailyMissions = await GetDailyMissions();
+            var weeklyLore = await GetCurrentWeeklyLore();
+            var weeklyMissions = weeklyLore.WeeklyMissions;
+
+            // Check daily missions for credit-related missions
+            foreach (var mission in dailyMissions)
+            {
+                if (IsCreditMission(mission.Description))
+                {
+                    // Skip if mission is already completed
+                    if (await IsMissionAlreadyCompleted(mission.Id, userProgress))
+                        continue;
+
+                    var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
+                    var newProgress = currentProgress + gainedCredits;
+                    var maxRequired = ExtractNumberFromDescription(mission.Description);
+                    userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                }
+            }
+
+            // Check weekly missions for credit-related missions
+            foreach (var mission in weeklyMissions)
+            {
+                if (IsCreditMission(mission.Description))
+                {
+                    // Skip if mission is already completed
+                    if (await IsMissionAlreadyCompleted(mission.Id, characterProgress))
+                        continue;
+
+                    var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
+                    var newProgress = currentProgress + gainedCredits;
+                    var maxRequired = ExtractNumberFromDescription(mission.Description);
+                    characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                }
+            }
+
+            // Save updated progress
+            player.User.MissionProgressJson = JsonSerializer.Serialize(userProgress);
+            player.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't fail the battle
+            Console.WriteLine($"Error updating credit mission progress: {ex.Message}");
+        }
+    }
+
+    private bool IsCreditMission(string description)
+    {
+        if (string.IsNullOrEmpty(description)) return false;
+        
+        // Check for patterns like "earn X credits", "gain X credits", "collect X credits"
+        return System.Text.RegularExpressions.Regex.IsMatch(description, 
+            @"(earn|gain|collect|get)\s+\d+\s+credits?", 
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+    }
+
+    private Dictionary<string, int> GetMissionProgress(object entity, string type)
+    {
+        try
+        {
+            string json = type == "character" 
+                ? ((Character)entity).MissionProgressJson 
+                : ((User)entity).MissionProgressJson;
+            
+            if (string.IsNullOrEmpty(json) || json == "{}")
+                return new Dictionary<string, int>();
+            
+            return JsonSerializer.Deserialize<Dictionary<string, int>>(json) ?? new Dictionary<string, int>();
+        }
+        catch
+        {
+            return new Dictionary<string, int>();
+        }
+    }
+
+    private async Task<List<DailyMission>> GetDailyMissions()
+    {
+        try
+        {
+            var dailyMissionsPath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "DailyMissions.json");
+            var jsonContent = await System.IO.File.ReadAllTextAsync(dailyMissionsPath);
+            var dailyMissions = JsonSerializer.Deserialize<List<DailyMission>>(jsonContent);
+            return dailyMissions ?? new List<DailyMission>();
+        }
+        catch
+        {
+            return new List<DailyMission>();
+        }
+    }
+
+    private async Task<WeeklyLore> GetCurrentWeeklyLore()
+    {
+        try
+        {
+            var weeklyLorePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "WeeklyLore.json");
+            var jsonContent = await System.IO.File.ReadAllTextAsync(weeklyLorePath);
+            var weeklyLoreList = JsonSerializer.Deserialize<List<WeeklyLore>>(jsonContent);
+            
+            if (weeklyLoreList == null || !weeklyLoreList.Any())
+                return new WeeklyLore();
+
+            // Get current week's lore using ISO week number for consistency
+            var now = DateTime.UtcNow;
+            var calendar = System.Globalization.CultureInfo.CurrentCulture.Calendar;
+            var weekNumber = calendar.GetWeekOfYear(now, System.Globalization.CalendarWeekRule.FirstDay, DayOfWeek.Monday);
+            var loreIndex = (weekNumber - 1) % weeklyLoreList.Count;
+            
+            return weeklyLoreList[loreIndex];
+        }
+        catch
+        {
+            return new WeeklyLore();
+        }
+    }
+
+        // Battle Count Mission Progress
+        private async Task UpdateBattleCountMissionProgress(Character player)
+        {
+            try
+            {
+                if (player.User == null) return;
+
+                var userProgress = GetMissionProgress(player.User, "user");
+                var characterProgress = GetMissionProgress(player, "character");
+
+                var dailyMissions = await GetDailyMissions();
+                var weeklyLore = await GetCurrentWeeklyLore();
+                var weeklyMissions = weeklyLore.WeeklyMissions;
+
+                // Check daily missions for battle count missions
+                foreach (var mission in dailyMissions)
+                {
+                    if (IsBattleCountMission(mission.Description))
+                    {
+                        // Skip if mission is already completed
+                        if (await IsMissionAlreadyCompleted(mission.Id, userProgress))
+                            continue;
+
+                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                }
+
+                // Check weekly missions for battle count missions
+                foreach (var mission in weeklyMissions)
+                {
+                    if (IsBattleCountMission(mission.Description))
+                    {
+                        // Skip if mission is already completed
+                        if (await IsMissionAlreadyCompleted(mission.Id, characterProgress))
+                            continue;
+
+                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                }
+
+                player.User.MissionProgressJson = JsonSerializer.Serialize(userProgress);
+                player.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating battle count mission progress: {ex.Message}");
+            }
+        }
+
+        // Critical Hit Mission Progress
+        private async Task UpdateCriticalHitMissionProgress(Character player)
+        {
+            try
+            {
+                if (player.User == null) return;
+
+                var userProgress = GetMissionProgress(player.User, "user");
+                var characterProgress = GetMissionProgress(player, "character");
+
+                var dailyMissions = await GetDailyMissions();
+                var weeklyLore = await GetCurrentWeeklyLore();
+                var weeklyMissions = weeklyLore.WeeklyMissions;
+
+                // Check daily missions for critical hit missions
+                foreach (var mission in dailyMissions)
+                {
+                    if (IsCriticalHitMission(mission.Description))
+                    {
+                        // Skip if mission is already completed
+                        if (await IsMissionAlreadyCompleted(mission.Id, userProgress))
+                            continue;
+
+                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                }
+
+                // Check weekly missions for critical hit missions
+                foreach (var mission in weeklyMissions)
+                {
+                    if (IsCriticalHitMission(mission.Description))
+                    {
+                        // Skip if mission is already completed
+                        if (await IsMissionAlreadyCompleted(mission.Id, characterProgress))
+                            continue;
+
+                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                }
+
+                player.User.MissionProgressJson = JsonSerializer.Serialize(userProgress);
+                player.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating critical hit mission progress: {ex.Message}");
+            }
+        }
+
+        // Attack Type Mission Progress
+        private async Task UpdateAttackTypeMissionProgress(Character player, PlayerAttack attack)
+        {
+            try
+            {
+                if (player.User == null) return;
+
+                var userProgress = GetMissionProgress(player.User, "user");
+                var characterProgress = GetMissionProgress(player, "character");
+
+                var dailyMissions = await GetDailyMissions();
+                var weeklyLore = await GetCurrentWeeklyLore();
+                var weeklyMissions = weeklyLore.WeeklyMissions;
+
+                // Check daily missions for attack type missions
+                foreach (var mission in dailyMissions)
+                {
+                    // Skip if mission is already completed
+                    if (await IsMissionAlreadyCompleted(mission.Id, userProgress))
+                        continue;
+
+                    if (IsPhysicalAttackMission(mission.Description) && IsPhysicalAttack(attack))
+                    {
+                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                    else if (IsMagicAttackMission(mission.Description) && IsMagicAttack(attack))
+                    {
+                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                    else if (IsHolyAttackMission(mission.Description) && IsHolyAttack(attack))
+                    {
+                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                    else if (IsRogueAbilityMission(mission.Description) && IsRogueAbility(attack))
+                    {
+                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                    else if (IsElementalAttackMission(mission.Description) && IsElementalAttack(attack))
+                    {
+                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                    else if (IsDefensiveAbilityMission(mission.Description) && IsDefensiveAbility(attack))
+                    {
+                        var currentProgress = userProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        userProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                }
+
+                // Check weekly missions for attack type missions
+                foreach (var mission in weeklyMissions)
+                {
+                    // Skip if mission is already completed
+                    if (await IsMissionAlreadyCompleted(mission.Id, characterProgress))
+                        continue;
+
+                    if (IsPhysicalAttackMission(mission.Description) && IsPhysicalAttack(attack))
+                    {
+                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                    else if (IsMagicAttackMission(mission.Description) && IsMagicAttack(attack))
+                    {
+                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                    else if (IsHolyAttackMission(mission.Description) && IsHolyAttack(attack))
+                    {
+                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                    else if (IsRogueAbilityMission(mission.Description) && IsRogueAbility(attack))
+                    {
+                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                    else if (IsElementalAttackMission(mission.Description) && IsElementalAttack(attack))
+                    {
+                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                    else if (IsDefensiveAbilityMission(mission.Description) && IsDefensiveAbility(attack))
+                    {
+                        var currentProgress = characterProgress.GetValueOrDefault(mission.Id, 0);
+                        var newProgress = currentProgress + 1;
+                        var maxRequired = ExtractNumberFromDescription(mission.Description);
+                        characterProgress[mission.Id] = CapProgressAtMaximum(newProgress, maxRequired);
+                    }
+                }
+
+                player.User.MissionProgressJson = JsonSerializer.Serialize(userProgress);
+                player.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating attack type mission progress: {ex.Message}");
+            }
+        }
+
+        // Mission Type Detection Methods
+        private bool IsBattleCountMission(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return false;
+            return System.Text.RegularExpressions.Regex.IsMatch(description, 
+                @"play\s+\d+\s+battles?", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        private bool IsCriticalHitMission(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return false;
+            return System.Text.RegularExpressions.Regex.IsMatch(description, 
+                @"(get|score|hit)\s+\d+\s+critical\s+hits?", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        private bool IsPhysicalAttackMission(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return false;
+            return System.Text.RegularExpressions.Regex.IsMatch(description, 
+                @"use\s+\d+\s+physical\s+attacks?", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        private bool IsMagicAttackMission(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return false;
+            return System.Text.RegularExpressions.Regex.IsMatch(description, 
+                @"use\s+\d+\s+magic\s+attacks?", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        private bool IsHolyAttackMission(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return false;
+            return System.Text.RegularExpressions.Regex.IsMatch(description, 
+                @"use\s+\d+\s+holy\s+attacks?", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        private bool IsRogueAbilityMission(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return false;
+            return System.Text.RegularExpressions.Regex.IsMatch(description, 
+                @"use\s+\d+\s+rogue\s+abilities?", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        private bool IsElementalAttackMission(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return false;
+            return System.Text.RegularExpressions.Regex.IsMatch(description, 
+                @"use\s+(fire|ice|arcane)\s+attacks?\s+\d+\s+times?", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        private bool IsDefensiveAbilityMission(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return false;
+            return System.Text.RegularExpressions.Regex.IsMatch(description, 
+                @"use\s+\d+\s+defensive\s+abilities?", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        // Attack Type Detection Methods
+        private bool IsPhysicalAttack(PlayerAttack attack)
+        {
+            if (attack == null || string.IsNullOrEmpty(attack.Name)) return false;
+            var name = attack.Name.ToLower();
+            return name.Contains("slash") || name.Contains("strike") || name.Contains("punch") || 
+                   name.Contains("kick") || name.Contains("bash") || name.Contains("smash");
+        }
+
+        private bool IsMagicAttack(PlayerAttack attack)
+        {
+            if (attack == null || string.IsNullOrEmpty(attack.Name)) return false;
+            var name = attack.Name.ToLower();
+            return name.Contains("magic") || name.Contains("spell") || name.Contains("arcane") ||
+                   name.Contains("mystic") || name.Contains("enchant");
+        }
+
+        private bool IsHolyAttack(PlayerAttack attack)
+        {
+            if (attack == null || string.IsNullOrEmpty(attack.Name)) return false;
+            var name = attack.Name.ToLower();
+            return name.Contains("holy") || name.Contains("divine") || name.Contains("blessed") ||
+                   name.Contains("sacred") || name.Contains("light");
+        }
+
+        private bool IsRogueAbility(PlayerAttack attack)
+        {
+            if (attack == null || string.IsNullOrEmpty(attack.Name)) return false;
+            var name = attack.Name.ToLower();
+            return name.Contains("stealth") || name.Contains("sneak") || name.Contains("backstab") ||
+                   name.Contains("shadow") || name.Contains("dagger") || name.Contains("trick");
+        }
+
+        private bool IsElementalAttack(PlayerAttack attack)
+        {
+            if (attack == null || string.IsNullOrEmpty(attack.Name)) return false;
+            var name = attack.Name.ToLower();
+            return name.Contains("fire") || name.Contains("ice") || name.Contains("frost") ||
+                   name.Contains("arcane") || name.Contains("flame") || name.Contains("blizzard");
+        }
+
+        private bool IsDefensiveAbility(PlayerAttack attack)
+        {
+            if (attack == null || string.IsNullOrEmpty(attack.Name)) return false;
+            var name = attack.Name.ToLower();
+            return name.Contains("block") || name.Contains("shield") || name.Contains("defend") ||
+                   name.Contains("guard") || name.Contains("protect") || name.Contains("barrier");
+        }
+
+        // Helper method to check if mission is already completed
+        private async Task<bool> IsMissionAlreadyCompleted(string missionId, Dictionary<string, int> progress)
+        {
+            try
+            {
+                var dailyMissions = await GetDailyMissions();
+                var mission = dailyMissions.FirstOrDefault(m => m.Id == missionId);
+                if (mission == null) return false;
+
+                var requiredProgress = ExtractNumberFromDescription(mission.Description);
+                var currentProgress = progress.GetValueOrDefault(missionId, 0);
+                return currentProgress >= requiredProgress;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // Helper method to extract number from mission description
+        private int ExtractNumberFromDescription(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return 10;
+            
+            var match = System.Text.RegularExpressions.Regex.Match(description, @"(\d+)");
+            if (match.Success && int.TryParse(match.Groups[1].Value, out int number))
+            {
+                return number;
+            }
+            
+            return 10; // Default fallback
+        }
+
+        // Helper method to cap progress at maximum required
+        private int CapProgressAtMaximum(int currentProgress, int maxRequired)
+        {
+            return Math.Min(currentProgress, maxRequired);
+        }
     }
 }

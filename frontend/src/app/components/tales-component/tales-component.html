@@ -74,9 +74,9 @@
 
             <div class="mission-progress">
               <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="(getMissionProgress(mission.id) / 10) * 100"></div>
+                <div class="progress-fill" [style.width.%]="(getMissionProgress(mission.id) / getMissionRequirement(mission.id, 'daily')) * 100"></div>
               </div>
-              <span class="progress-text">{{ getMissionProgress(mission.id) }}/10</span>
+              <span class="progress-text">{{ getMissionProgress(mission.id) }}/{{ getMissionRequirement(mission.id, 'daily') }}</span>
             </div>
 
             <div class="mission-footer">
@@ -124,9 +124,9 @@
 
             <div class="mission-progress">
               <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="(getMissionProgress(mission.id) / 20) * 100"></div>
+                <div class="progress-fill" [style.width.%]="(getMissionProgress(mission.id) / getMissionRequirement(mission.id, 'weekly')) * 100"></div>
               </div>
-              <span class="progress-text">{{ getMissionProgress(mission.id) }}/20</span>
+              <span class="progress-text">{{ getMissionProgress(mission.id) }}/{{ getMissionRequirement(mission.id, 'weekly') }}</span>
             </div>
 
             <div class="mission-footer">

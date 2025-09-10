@@ -275,9 +275,28 @@ export class TalesComponent implements OnInit, OnDestroy {
     return this.missionProgress.get(missionId) || 0;
   }
 
+  getMissionRequirement(missionId: string, missionType: 'daily' | 'weekly'): number {
+    const missions = missionType === 'daily' ? this.talesData?.dailyMissions : this.talesData?.weeklyMissions;
+    const mission = missions?.find(m => m.id === missionId);
+    
+    if (!mission?.description) {
+      return missionType === 'daily' ? 10 : 20; // Fallback
+    }
+    
+    // Extract number from description like "Earn 100 credits", "Play 5 battles"
+    const match = mission.description.match(/(\d+)/);
+    if (match) {
+      return parseInt(match[1], 10);
+    }
+    
+    return missionType === 'daily' ? 10 : 20; // Fallback
+  }
+
   isMissionCompleted(missionId: string): boolean {
-    // Legacy helper: default to daily threshold
-    return this.getMissionProgress(missionId) >= 10;
+    // Check if it's a daily or weekly mission and use appropriate requirement
+    const isDaily = this.talesData?.dailyMissions?.some(m => m.id === missionId);
+    const requirement = isDaily ? this.getMissionRequirement(missionId, 'daily') : this.getMissionRequirement(missionId, 'weekly');
+    return this.getMissionProgress(missionId) >= requirement;
   }
 
   isMissionClaimed(missionId: string): boolean {
@@ -292,11 +311,13 @@ export class TalesComponent implements OnInit, OnDestroy {
 
   // New helpers: split completion and claimed logic by mission type
   isDailyMissionCompleted(missionId: string): boolean {
-    return this.getMissionProgress(missionId) >= 10;
+    const requirement = this.getMissionRequirement(missionId, 'daily');
+    return this.getMissionProgress(missionId) >= requirement;
   }
 
   isWeeklyMissionCompleted(missionId: string): boolean {
-    return this.getMissionProgress(missionId) >= 20;
+    const requirement = this.getMissionRequirement(missionId, 'weekly');
+    return this.getMissionProgress(missionId) >= requirement;
   }
 
   isDailyMissionClaimed(missionId: string): boolean {
