@@ -17,6 +17,7 @@ namespace backend.Controllers
         private readonly ILogger<TalesController> _logger;
         private readonly string _weeklyLorePath;
         private readonly string _dailyMissionsPath;
+        private readonly MissionsController _missionsController;
 
         public TalesController(AppDbContext context, ILogger<TalesController> logger, IWebHostEnvironment env)
         {
@@ -24,6 +25,7 @@ namespace backend.Controllers
             _logger = logger;
             _weeklyLorePath = Path.Combine(env.ContentRootPath, "Data", "WeeklyLore.json");
             _dailyMissionsPath = Path.Combine(env.ContentRootPath, "Data", "DailyMissions.json");
+            _missionsController = new MissionsController(context);
         }
 
         [HttpGet]
@@ -78,6 +80,9 @@ namespace backend.Controllers
 
                 var character = await _context.Characters
                     .FirstOrDefaultAsync(c => c.UserId == int.Parse(userId));
+
+                // Note: Mission progress reset is now handled automatically when missions change
+                // No need to reset here as it would clear progress every time user checks missions
 
                 // Get global weekly lore and daily missions (same for all users)
                 var weeklyLore = await GetCurrentWeeklyLore();
