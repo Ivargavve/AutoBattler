@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { Character } from '../../services/character';
+import { StatsService, EnhancedStats } from '../../services/stats.service';
 import { Observable } from 'rxjs';
 import { tap, take } from 'rxjs/operators';
 
@@ -51,7 +52,8 @@ export class HeroComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private statsService: StatsService
   ) {
     this.character$ = this.authService.character$;
   }
@@ -187,6 +189,35 @@ export class HeroComponent implements OnInit {
       'speed': '🏃'
     };
     return icons[stat] || '📊';
+  }
+
+  // Enhanced stats methods using the stats service
+  getEnhancedStats(character: Character): EnhancedStats {
+    return this.statsService.calculateTotalStats(character);
+  }
+
+  getStatWithBonus(character: Character, statName: keyof EnhancedStats): number {
+    return this.statsService.getStatWithBonus(character, statName);
+  }
+
+  getEquipmentBonus(character: Character, statName: string): number {
+    return this.statsService.getEquipmentBonus(character, statName);
+  }
+
+  formatStatDisplay(character: Character, statName: keyof EnhancedStats): {
+    base: number;
+    bonus: number;
+    total: number;
+  } {
+    return this.statsService.formatStatDisplay(character, statName);
+  }
+
+  formatStatDisplayForUI(character: Character, statName: keyof EnhancedStats): {
+    total: number;
+    bonus: number;
+    hasBonus: boolean;
+  } {
+    return this.statsService.formatStatDisplayForUI(character, statName);
   }
 
   onImageError(event: any) {

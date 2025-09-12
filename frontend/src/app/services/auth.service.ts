@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, lastValueFrom, firstValueFrom } from 'rxjs';
-import { tap, map } from 'rxjs/operators';
+import { tap, map, take } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { User } from '../services/user';
 import { Character } from '../services/character';
@@ -201,6 +201,12 @@ export class AuthService {
         this.loadUserWithCharacter();
       })
     );
+  }
+
+  getCurrentCharacter(): Character | null {
+    let currentCharacter: Character | null = null;
+    this.character$.pipe(take(1)).subscribe(char => currentCharacter = char);
+    return currentCharacter;
   }
 
 }

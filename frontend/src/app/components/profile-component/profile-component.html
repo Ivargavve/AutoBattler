@@ -111,27 +111,62 @@
                   <div class="stat-item">
                     <span class="stat-icon">⚔️</span>
                     <span class="stat-label">Attack</span>
-                    <span class="stat-value">{{ character.attack }}</span>
+                    <span class="stat-value">
+                      <ng-container *ngIf="formatStatDisplayForUI(character, 'attack').hasBonus; else simpleAttack">
+                        {{ formatStatDisplayForUI(character, 'attack').total }} <span class="stat-bonus">| {{ formatStatDisplayForUI(character, 'attack').bonus }}</span>
+                      </ng-container>
+                      <ng-template #simpleAttack>
+                        {{ formatStatDisplayForUI(character, 'attack').total }}
+                      </ng-template>
+                    </span>
                   </div>
                   <div class="stat-item">
                     <span class="stat-icon">🛡️</span>
                     <span class="stat-label">Defense</span>
-                    <span class="stat-value">{{ character.defense }}</span>
+                    <span class="stat-value">
+                      <ng-container *ngIf="formatStatDisplayForUI(character, 'defense').hasBonus; else simpleDefense">
+                        {{ formatStatDisplayForUI(character, 'defense').total }} <span class="stat-bonus">| {{ formatStatDisplayForUI(character, 'defense').bonus }}</span>
+                      </ng-container>
+                      <ng-template #simpleDefense>
+                        {{ formatStatDisplayForUI(character, 'defense').total }}
+                      </ng-template>
+                    </span>
                   </div>
                   <div class="stat-item">
                     <span class="stat-icon">💨</span>
                     <span class="stat-label">Agility</span>
-                    <span class="stat-value">{{ character.agility }}</span>
+                    <span class="stat-value">
+                      <ng-container *ngIf="formatStatDisplayForUI(character, 'agility').hasBonus; else simpleAgility">
+                        {{ formatStatDisplayForUI(character, 'agility').total }} <span class="stat-bonus">| {{ formatStatDisplayForUI(character, 'agility').bonus }}</span>
+                      </ng-container>
+                      <ng-template #simpleAgility>
+                        {{ formatStatDisplayForUI(character, 'agility').total }}
+                      </ng-template>
+                    </span>
                   </div>
                   <div class="stat-item">
                     <span class="stat-icon">🔮</span>
                     <span class="stat-label">Magic</span>
-                    <span class="stat-value">{{ character.magic }}</span>
+                    <span class="stat-value">
+                      <ng-container *ngIf="formatStatDisplayForUI(character, 'magic').hasBonus; else simpleMagic">
+                        {{ formatStatDisplayForUI(character, 'magic').total }} <span class="stat-bonus">| {{ formatStatDisplayForUI(character, 'magic').bonus }}</span>
+                      </ng-container>
+                      <ng-template #simpleMagic>
+                        {{ formatStatDisplayForUI(character, 'magic').total }}
+                      </ng-template>
+                    </span>
                   </div>
                   <div class="stat-item">
                     <span class="stat-icon">🏃</span>
                     <span class="stat-label">Speed</span>
-                    <span class="stat-value">{{ character.speed }}</span>
+                    <span class="stat-value">
+                      <ng-container *ngIf="formatStatDisplayForUI(character, 'speed').hasBonus; else simpleSpeed">
+                        {{ formatStatDisplayForUI(character, 'speed').total }} <span class="stat-bonus">| {{ formatStatDisplayForUI(character, 'speed').bonus }}</span>
+                      </ng-container>
+                      <ng-template #simpleSpeed>
+                        {{ formatStatDisplayForUI(character, 'speed').total }}
+                      </ng-template>
+                    </span>
                   </div>
                   <div class="stat-item">
                     <span class="stat-icon">💥</span>

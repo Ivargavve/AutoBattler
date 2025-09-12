@@ -190,6 +190,11 @@
   font-weight: bold;
 }
 
+.stat-bonus {
+  color: #4ade80; /* Green color for bonus */
+  font-weight: bold;
+}
+
 // User Meta
 .user-meta {
   display: flex;
@@ -314,6 +319,11 @@
 .combat-stats .stat-value {
   font-size: 1.3rem;
   color: var(--accent, #86f7b3);
+}
+
+.combat-stats .stat-bonus {
+  color: #4ade80; /* Green color for bonus */
+  font-weight: bold;
 }
 
 // Character Meta

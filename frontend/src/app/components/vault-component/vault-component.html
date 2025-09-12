@@ -7,9 +7,12 @@
         <div class="stat-row" *ngFor="let s of ['attack','defense','agility','magic','speed','maxHealth']">
           <span class="stat-name">{{ s | titlecase }}</span>
           <span class="stat-values">
-            <span class="base">{{ getBaseStat(s) }}</span>
-            <span class="bonus" *ngIf="getBonusStat(s) as b" [hidden]="!b">+{{ b }}</span>
-            <span class="total" *ngIf="getBonusStat(s)">= {{ getTotalStat(s) }}</span>
+            <ng-container *ngIf="formatStatDisplayForUI(s).hasBonus; else simpleStat">
+              {{ formatStatDisplayForUI(s).total }} <span class="stat-bonus">| {{ formatStatDisplayForUI(s).bonus }}</span>
+            </ng-container>
+            <ng-template #simpleStat>
+              {{ formatStatDisplayForUI(s).total }}
+            </ng-template>
           </span>
         </div>
       </section>
@@ -169,9 +172,9 @@
 
       <section class="section-box inventory-section">
         <h2 class="section-title">Inventory</h2>
-        <div *ngIf="inventory.length === 0" class="inventory-empty">No items in your inventory.</div>
-        <ul class="inventory-list" *ngIf="inventory.length > 0">
-          <li class="inventory-item" *ngFor="let item of inventory">
+        <div *ngIf="unequippedInventory.length === 0" class="inventory-empty">No unequipped items in your inventory.</div>
+        <ul class="inventory-list" *ngIf="unequippedInventory.length > 0">
+          <li class="inventory-item" *ngFor="let item of unequippedInventory">
             <img [src]="item.ImageUrl || item.imageUrl" class="inv-icon" alt="{{ item.Name || item.name }}" />
             <div class="inv-details">
               <div class="inv-name">{{ item.Name || item.name }}</div>

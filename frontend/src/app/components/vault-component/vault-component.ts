@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { Character } from '../../services/character';
 import { PlayerAttack } from '../../services/battle-interfaces';
+import { StatsService } from '../../services/stats.service';
 import { Observable, Subscription, of } from 'rxjs';
 import { TitleService } from '../../services/title.service';
 
@@ -28,6 +29,7 @@ export class VaultComponent implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
+    private statsService: StatsService,
     private titleService: TitleService
   ) {}
 
@@ -123,59 +125,44 @@ export class VaultComponent implements OnInit, OnDestroy {
     event.target.src = 'assets/characters/char1.jpeg';
   }
 
-  // Compute equipment bonus totals by stat
-  get equipmentBonuses(): Record<string, number> {
-    const bonuses: Record<string, number> = {};
-    const equippedItems = this.equippedSlots
-      .map(es => this.inventory.find(i => i.id === es.itemId))
-      .filter(Boolean);
-    for (const item of equippedItems) {
-      const stats = (item as any).statBonuses || {};
-      for (const key of Object.keys(stats)) {
-        bonuses[key] = (bonuses[key] || 0) + (stats[key] || 0);
-      }
-    }
-    return bonuses;
-  }
-
-  get baseStats() {
-    const c = this.character as any;
-    return {
-      attack: c?.attack ?? 0,
-      defense: c?.defense ?? 0,
-      agility: c?.agility ?? 0,
-      magic: c?.magic ?? 0,
-      speed: c?.speed ?? 0,
-      maxHealth: c?.maxHealth ?? 0
-    };
-  }
-
-  get totalWithBonuses() {
-    const base = this.baseStats;
-    const bonus = this.equipmentBonuses;
-    return {
-      attack: base.attack + (bonus['attack'] || 0),
-      defense: base.defense + (bonus['defense'] || 0),
-      agility: base.agility + (bonus['agility'] || 0),
-      magic: base.magic + (bonus['magic'] || 0),
-      speed: base.speed + (bonus['speed'] || 0),
-      maxHealth: base.maxHealth + (bonus['health'] || 0)
-    };
-  }
-
+  // Use the centralized stats service methods
   getBaseStat(stat: string): number {
-    const b = this.baseStats as any;
-    return Number(b?.[stat] || 0);
+    if (!this.character) return 0;
+    return this.statsService.getBaseStats(this.character)[stat as keyof import('../../services/stats.service').EnhancedStats] || 0;
   }
 
   getBonusStat(stat: string): number {
-    if (stat === 'maxHealth') return Number(this.equipmentBonuses['health'] || 0);
-    return Number((this.equipmentBonuses as any)[stat] || 0);
+    if (!this.character) return 0;
+    return this.statsService.getEquipmentBonus(this.character, stat);
   }
 
   getTotalStat(stat: string): number {
-    if (stat === 'maxHealth') return this.getBaseStat(stat) + this.getBonusStat(stat);
-    return this.getBaseStat(stat) + this.getBonusStat(stat);
+    if (!this.character) return 0;
+    const baseStats = this.statsService.getBaseStats(this.character);
+    const bonus = this.getBonusStat(stat);
+    const statKey = stat === 'maxHealth' ? 'maxHealth' : stat;
+    return baseStats[statKey as keyof import('../../services/stats.service').EnhancedStats] + bonus;
+  }
+
+  formatStatDisplayForUI(stat: string): {
+    total: number;
+    bonus: number;
+    hasBonus: boolean;
+  } {
+    if (!this.character) return { total: 0, bonus: 0, hasBonus: false };
+    const statKey = stat === 'maxHealth' ? 'maxHealth' : stat;
+    return this.statsService.formatStatDisplayForUI(this.character, statKey as keyof import('../../services/stats.service').EnhancedStats);
+  }
+
+  // Get inventory items that are NOT equipped
+  get unequippedInventory() {
+    const equippedItemIds = this.equippedSlots
+      .filter(slot => slot.itemId)
+      .map(slot => slot.itemId);
+    
+    return this.inventory.filter(item => 
+      !equippedItemIds.includes(item.id)
+    );
   }
 
   getSlotLabel(slot: string) {

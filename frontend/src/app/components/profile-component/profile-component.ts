@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../services/user';
 import { Character } from '../../services/character';
+import { StatsService, EnhancedStats } from '../../services/stats.service';
 import { Observable, of, map, switchMap } from 'rxjs';
 import { LoadingSpinnerComponent } from '../loading-component/loading-component';
 
@@ -22,7 +23,8 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private statsService: StatsService
   ) {}
 
   ngOnInit() {
@@ -72,6 +74,35 @@ export class ProfileComponent implements OnInit {
         }
       })
     );
+  }
+
+  // Enhanced stats methods using the stats service
+  getEnhancedStats(character: Character): EnhancedStats {
+    return this.statsService.calculateTotalStats(character);
+  }
+
+  getStatWithBonus(character: Character, statName: keyof EnhancedStats): number {
+    return this.statsService.getStatWithBonus(character, statName);
+  }
+
+  getEquipmentBonus(character: Character, statName: string): number {
+    return this.statsService.getEquipmentBonus(character, statName);
+  }
+
+  formatStatDisplay(character: Character, statName: keyof EnhancedStats): {
+    base: number;
+    bonus: number;
+    total: number;
+  } {
+    return this.statsService.formatStatDisplay(character, statName);
+  }
+
+  formatStatDisplayForUI(character: Character, statName: keyof EnhancedStats): {
+    total: number;
+    bonus: number;
+    hasBonus: boolean;
+  } {
+    return this.statsService.formatStatDisplayForUI(character, statName);
   }
 
   onImageError(event: any) {

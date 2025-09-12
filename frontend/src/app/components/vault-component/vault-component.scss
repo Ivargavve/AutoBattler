@@ -354,6 +354,7 @@
 .stats-section .stat-row { display: flex; justify-content: space-between; margin: 0.35rem 0; }
 .stats-section .base { color: #cfcfcf; }
 .stats-section .bonus { color: #79ff97; }
+.stats-section .stat-bonus { color: #4ade80; font-weight: bold; }
 
 /* Mannequin & slots simplified: stack slots instead of absolute positioning */
 .mannequin-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; padding: 0.5rem; }

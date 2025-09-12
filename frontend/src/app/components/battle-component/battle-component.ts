@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Fighter, BattleLogEntry, PlayerAttack } from '../../services/battle-interfaces';
 import { AuthService } from '../../services/auth.service';
+import { StatsService } from '../../services/stats.service';
 import { environment } from '../../../environments/environment';
 import { Subscription, firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
@@ -66,6 +67,7 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private authService: AuthService,
+    private statsService: StatsService,
     private router: Router,
     private battleService: BattleService,
     private route: ActivatedRoute
@@ -226,12 +228,31 @@ export class BattleComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.isLoading = true;
 
+    // Get enhanced stats from current character
+    const character = this.authService.getCurrentCharacter();
+    let enhancedStats = {};
+    
+    if (character) {
+      const totalStats = this.statsService.calculateTotalStats(character);
+      enhancedStats = {
+        enhancedAttack: totalStats.attack,
+        enhancedDefense: totalStats.defense,
+        enhancedAgility: totalStats.agility,
+        enhancedMagic: totalStats.magic,
+        enhancedSpeed: totalStats.speed,
+        enhancedMaxHealth: totalStats.maxHealth
+      };
+    }
+
     const req = {
       playerId: this.player.id,
       enemyHp: this.enemy.hp,
       enemyName: this.enemy.name,
       action: 'attack',
       attackId: attack.id,
+
+      // Enhanced stats with equipment bonuses
+      ...enhancedStats,
 
       // crit buff state
       playerCritBonus: this.playerCritBonus,

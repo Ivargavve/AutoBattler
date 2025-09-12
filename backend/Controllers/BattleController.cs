@@ -110,7 +110,9 @@ namespace backend.Controllers
                 if (attackTemplate == null)
                     return BadRequest("Attack template not found.");
 
-                var result = AttackLogic.ApplyAttack(attackTemplate, player, enemy);
+                // Create enhanced player object if enhanced stats are provided
+                var playerForBattle = CreateEnhancedPlayer(player, req);
+                var result = AttackLogic.ApplyAttack(attackTemplate, playerForBattle, enemy);
 
                 int damage = result.DamageToEnemy;
                 int heal = result.HealToPlayer;
@@ -555,6 +557,29 @@ namespace backend.Controllers
             return Ok(EnemyTemplates.All);
         }
 
+        /// <summary>
+        /// Creates an enhanced player object using equipment bonuses when available
+        /// </summary>
+        private object CreateEnhancedPlayer(Character player, BattleRequest req)
+        {
+            // If enhanced stats are provided, use them; otherwise use base stats
+            return new
+            {
+                Id = player.Id,
+                Name = player.Name,
+                Attack = req.EnhancedAttack ?? player.Attack,
+                Defense = req.EnhancedDefense ?? player.Defense,
+                Agility = req.EnhancedAgility ?? player.Agility,
+                Magic = req.EnhancedMagic ?? player.Magic,
+                Speed = req.EnhancedSpeed ?? player.Speed,
+                MaxHealth = req.EnhancedMaxHealth ?? player.MaxHealth,
+                CurrentHealth = player.CurrentHealth,
+                CriticalChance = player.CriticalChance,
+                HealAmount = player.HealAmount,
+                PoisonedTurns = player.PoisonedTurns,
+                IsBlocking = player.IsBlocking
+            };
+        }
     }
 
     public class BattleLogEntry
@@ -566,10 +591,20 @@ namespace backend.Controllers
 
     public class BattleRequest
     {
-        public string? Action { get; set; }
-        public int? AttackId { get; set; }
-        public int? EnemyHp { get; set; }
+        public int PlayerId { get; set; }
+        public int? AttackId { get; set; } 
+        public int? EnemyHp { get; set; } 
         public string? EnemyName { get; set; }
+        public string Action { get; set; } = string.Empty;
+        
+        // Enhanced stats from equipment (optional for backward compatibility)
+        public int? EnhancedAttack { get; set; }
+        public int? EnhancedDefense { get; set; }
+        public int? EnhancedAgility { get; set; }
+        public int? EnhancedMagic { get; set; }
+        public int? EnhancedSpeed { get; set; }
+        public int? EnhancedMaxHealth { get; set; }
+        
         public int? PlayerCritBonus { get; set; }
         public int? PlayerCritBonusTurns { get; set; }
         public int? EnemyPoisonDamagePerTurn { get; set; }
