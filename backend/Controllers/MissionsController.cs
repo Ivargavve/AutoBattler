@@ -422,6 +422,21 @@ namespace backend.Controllers
             }
         }
 
+        private async Task<List<DailyMission>> GetAllDailyMissions()
+        {
+            try
+            {
+                var dailyMissionsPath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "DailyMissions.json");
+                var jsonContent = await System.IO.File.ReadAllTextAsync(dailyMissionsPath);
+                var allDailyMissions = JsonSerializer.Deserialize<List<DailyMission>>(jsonContent);
+                return allDailyMissions ?? new List<DailyMission>();
+            }
+            catch
+            {
+                return new List<DailyMission>();
+            }
+        }
+
         private async Task<WeeklyLore> GetCurrentWeeklyLore()
         {
             try
@@ -443,6 +458,32 @@ namespace backend.Controllers
             catch
             {
                 return new WeeklyLore();
+            }
+        }
+
+        private async Task<List<WeeklyMission>> GetAllWeeklyMissions()
+        {
+            try
+            {
+                var weeklyLorePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "WeeklyLore.json");
+                var jsonContent = await System.IO.File.ReadAllTextAsync(weeklyLorePath);
+                var weeklyLoreList = JsonSerializer.Deserialize<List<WeeklyLore>>(jsonContent);
+                
+                if (weeklyLoreList == null || !weeklyLoreList.Any())
+                    return new List<WeeklyMission>();
+
+                // Return all weekly missions from all lore entries
+                var allMissions = new List<WeeklyMission>();
+                foreach (var lore in weeklyLoreList)
+                {
+                    allMissions.AddRange(lore.WeeklyMissions);
+                }
+                
+                return allMissions;
+            }
+            catch
+            {
+                return new List<WeeklyMission>();
             }
         }
 
@@ -697,26 +738,31 @@ namespace backend.Controllers
 
         private async Task ResetDailyMissionProgress(Character character)
         {
-           
             var currentDailyMissions = await GetDailyMissions();
             var characterProgress = GetMissionProgress(character, "character");
             var userProgress = GetMissionProgress(character.User!, "user");
             
+            // Get all possible daily mission IDs from the full list, not just current 3
+            var allDailyMissions = await GetAllDailyMissions();
+            var allDailyMissionIds = allDailyMissions.Select(m => m.Id).ToHashSet();
+            
             bool shouldResetCharacter = false;
             bool shouldResetUser = false;
             
-            foreach (var mission in currentDailyMissions)
+            // Check if we need to reset character progress
+            foreach (var missionId in allDailyMissionIds)
             {
-                if (!characterProgress.ContainsKey(mission.Id))
+                if (characterProgress.ContainsKey(missionId))
                 {
                     shouldResetCharacter = true;
                     break;
                 }
             }
             
-            foreach (var mission in currentDailyMissions)
+            // Check if we need to reset user progress
+            foreach (var missionId in allDailyMissionIds)
             {
-                if (!userProgress.ContainsKey(mission.Id))
+                if (userProgress.ContainsKey(missionId))
                 {
                     shouldResetUser = true;
                     break;
@@ -725,24 +771,22 @@ namespace backend.Controllers
 
             if (shouldResetCharacter)
             {
-                foreach (var mission in currentDailyMissions)
+                // Remove all daily mission progress from character
+                var keysToRemove = characterProgress.Keys.Where(key => allDailyMissionIds.Contains(key)).ToList();
+                foreach (var key in keysToRemove)
                 {
-                    if (characterProgress.ContainsKey(mission.Id))
-                    {
-                        characterProgress.Remove(mission.Id);
-                    }
+                    characterProgress.Remove(key);
                 }
                 character.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
             }
 
             if (shouldResetUser)
             {
-                foreach (var mission in currentDailyMissions)
+                // Remove all daily mission progress from user
+                var keysToRemove = userProgress.Keys.Where(key => allDailyMissionIds.Contains(key)).ToList();
+                foreach (var key in keysToRemove)
                 {
-                    if (userProgress.ContainsKey(mission.Id))
-                    {
-                        userProgress.Remove(mission.Id);
-                    }
+                    userProgress.Remove(key);
                 }
                 character.User!.MissionProgressJson = JsonSerializer.Serialize(userProgress);
             }
@@ -754,21 +798,27 @@ namespace backend.Controllers
             var characterProgress = GetMissionProgress(character, "character");
             var userProgress = GetMissionProgress(character.User!, "user");
             
+            // Get all possible weekly mission IDs from all weekly lore entries
+            var allWeeklyMissions = await GetAllWeeklyMissions();
+            var allWeeklyMissionIds = allWeeklyMissions.Select(m => m.Id).ToHashSet();
+            
             bool shouldResetCharacter = false;
             bool shouldResetUser = false;
             
-            foreach (var mission in currentWeeklyLore.WeeklyMissions)
+            // Check if we need to reset character progress
+            foreach (var missionId in allWeeklyMissionIds)
             {
-                if (!characterProgress.ContainsKey(mission.Id))
+                if (characterProgress.ContainsKey(missionId))
                 {
                     shouldResetCharacter = true;
                     break;
                 }
             }
             
-            foreach (var mission in currentWeeklyLore.WeeklyMissions)
+            // Check if we need to reset user progress
+            foreach (var missionId in allWeeklyMissionIds)
             {
-                if (!userProgress.ContainsKey(mission.Id))
+                if (userProgress.ContainsKey(missionId))
                 {
                     shouldResetUser = true;
                     break;
@@ -777,24 +827,22 @@ namespace backend.Controllers
 
             if (shouldResetCharacter)
             {
-                foreach (var mission in currentWeeklyLore.WeeklyMissions)
+                // Remove all weekly mission progress from character
+                var keysToRemove = characterProgress.Keys.Where(key => allWeeklyMissionIds.Contains(key)).ToList();
+                foreach (var key in keysToRemove)
                 {
-                    if (characterProgress.ContainsKey(mission.Id))
-                    {
-                        characterProgress.Remove(mission.Id);
-                    }
+                    characterProgress.Remove(key);
                 }
                 character.MissionProgressJson = JsonSerializer.Serialize(characterProgress);
             }
 
             if (shouldResetUser)
             {
-                foreach (var mission in currentWeeklyLore.WeeklyMissions)
+                // Remove all weekly mission progress from user
+                var keysToRemove = userProgress.Keys.Where(key => allWeeklyMissionIds.Contains(key)).ToList();
+                foreach (var key in keysToRemove)
                 {
-                    if (userProgress.ContainsKey(mission.Id))
-                    {
-                        userProgress.Remove(mission.Id);
-                    }
+                    userProgress.Remove(key);
                 }
                 character.User!.MissionProgressJson = JsonSerializer.Serialize(userProgress);
             }

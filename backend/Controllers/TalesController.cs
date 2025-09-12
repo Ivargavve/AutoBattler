@@ -81,9 +81,6 @@ namespace backend.Controllers
                 var character = await _context.Characters
                     .FirstOrDefaultAsync(c => c.UserId == int.Parse(userId));
 
-                // Note: Mission progress reset is now handled automatically when missions change
-                // No need to reset here as it would clear progress every time user checks missions
-
                 // Get global weekly lore and daily missions (same for all users)
                 var weeklyLore = await GetCurrentWeeklyLore();
                 var dailyMissions = await GetDailyMissions();
@@ -569,6 +566,152 @@ namespace backend.Controllers
                 daysUntilMonday = 7; // If it's exactly Monday midnight, next reset is next Monday
             }
             return now.Date.AddDays(daysUntilMonday);
+        }
+
+
+        private DateTime GetLastResetDate(Character character)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(character.LastDailyResetJson))
+                    return DateTime.MinValue;
+                
+                var lastReset = JsonSerializer.Deserialize<DateTime>(character.LastDailyResetJson);
+                return lastReset;
+            }
+            catch
+            {
+                return DateTime.MinValue;
+            }
+        }
+
+        private void SetLastResetDate(Character character, DateTime date, string resetType)
+        {
+            try
+            {
+                if (resetType == "daily")
+                {
+                    character.LastDailyResetJson = JsonSerializer.Serialize(date);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error setting last reset date for character {CharacterId}", character.Id);
+            }
+        }
+
+        private int GetLastWeeklyResetWeek(Character character)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(character.LastWeeklyResetJson))
+                    return 0;
+                
+                var lastResetWeek = JsonSerializer.Deserialize<int>(character.LastWeeklyResetJson);
+                return lastResetWeek;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        private void SetLastWeeklyResetWeek(Character character, int weekNumber)
+        {
+            try
+            {
+                character.LastWeeklyResetJson = JsonSerializer.Serialize(weekNumber);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error setting last weekly reset week for character {CharacterId}", character.Id);
+            }
+        }
+
+        [HttpPost("reset-daily-missions")]
+        [Authorize]
+        public async Task<ActionResult> ResetDailyMissions()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("User not authenticated");
+                }
+
+                var character = await _context.Characters
+                    .FirstOrDefaultAsync(c => c.UserId == int.Parse(userId));
+
+                if (character == null)
+                {
+                    return NotFound("Character not found");
+                }
+
+                // Check if we need to reset daily missions
+                var now = DateTime.UtcNow;
+                var lastResetDate = GetLastResetDate(character);
+                var today = now.Date;
+                
+                if (lastResetDate.Date < today)
+                {
+                    await _missionsController.ResetMissionProgress(character, "daily");
+                    SetLastResetDate(character, today, "daily");
+                    await _context.SaveChangesAsync();
+                    
+                    return Ok(new { message = "Daily missions reset successfully" });
+                }
+                
+                return Ok(new { message = "Daily missions already reset for today" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error resetting daily missions");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPost("reset-weekly-missions")]
+        [Authorize]
+        public async Task<ActionResult> ResetWeeklyMissions()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("User not authenticated");
+                }
+
+                var character = await _context.Characters
+                    .FirstOrDefaultAsync(c => c.UserId == int.Parse(userId));
+
+                if (character == null)
+                {
+                    return NotFound("Character not found");
+                }
+
+                // Check if we need to reset weekly missions
+                var now = DateTime.UtcNow;
+                var currentWeekNumber = GetWeekNumber(now);
+                var lastWeeklyResetWeek = GetLastWeeklyResetWeek(character);
+                
+                if (lastWeeklyResetWeek < currentWeekNumber)
+                {
+                    await _missionsController.ResetMissionProgress(character, "weekly");
+                    SetLastWeeklyResetWeek(character, currentWeekNumber);
+                    await _context.SaveChangesAsync();
+                    
+                    return Ok(new { message = "Weekly missions reset successfully" });
+                }
+                
+                return Ok(new { message = "Weekly missions already reset for this week" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error resetting weekly missions");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
     }

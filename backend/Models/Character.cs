@@ -44,5 +44,7 @@ namespace backend.Models
         // Mission progression tracking
         public string MissionProgressJson { get; set; } = "{}";
         public string ClaimedMissionsJson { get; set; } = "{}";
+        public string LastDailyResetJson { get; set; } = "";
+        public string LastWeeklyResetJson { get; set; } = "";
     }
 }

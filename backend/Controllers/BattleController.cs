@@ -555,7 +555,6 @@ namespace backend.Controllers
             return Ok(EnemyTemplates.All);
         }
 
-
     }
 
     public class BattleLogEntry
